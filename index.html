@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>TODOリスト</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    li.completed { text-decoration: line-through; color: gray; }
+    button { margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h1>TODOリスト</h1>
+  <input id="new-task" placeholder="タスクを入力" />
+  <button onclick="addTask()">追加</button>
+  <ul id="task-list"></ul>
+
+  <script src="todo.js"></script>
+</body>
+</html>
