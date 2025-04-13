@@ -1,0 +1,54 @@
+body {
+  font-family: sans-serif;
+  margin: 20px;
+  background: #f5f5f5;
+}
+
+h1, h2 {
+  color: #333;
+}
+
+input, select, textarea, button {
+  display: block;
+  margin: 8px 0;
+  padding: 8px;
+  width: 100%;
+  max-width: 400px;
+}
+
+textarea {
+  height: 60px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.task-section {
+  margin-top: 30px;
+}
+
+.form-section {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#login-screen {
+  text-align: center;
+  margin-top: 100px;
+}
