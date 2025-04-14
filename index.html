@@ -1,61 +1,42 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>タスク管理</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>タスク管理 | つみきとぬみき</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 </head>
 <body>
-  <div id="login-screen">
+  <div id="login-screen" class="login-screen">
     <h2>パスワードを入力してください</h2>
-    <input type="password" id="password" placeholder="パスワード">
+    <input type="password" id="password" placeholder="パスワード" />
     <button onclick="checkPassword()">ログイン</button>
     <p id="login-error"></p>
   </div>
 
   <div id="main-app" style="display: none;">
-    <h1>タスク管理</h1>
+    <header>
+      <img src="https://illust8.com/wp-content/uploads/2020/03/usagi_02.png" alt="うさぎ" class="icon" />
+      <h1>つみきとぬみきのタスク帳</h1>
+    </header>
 
-    <section class="form-section">
-      <h2>タスクを追加</h2>
-      <input type="text" id="task-name" placeholder="タスク名">
-      <select id="task-status">
-        <option>未対応</option>
-        <option>対応中</option>
-        <option>完了</option>
-      </select>
-      <input type="datetime-local" id="task-deadline">
-      <select id="task-repeat">
-        <option>都度</option>
-        <option>毎日</option>
-        <option>毎週</option>
-        <option>毎月</option>
-      </select>
-      <select id="task-assignee">
-        <option value="">-- 担当者選択 --</option>
-        <option>つみき</option>
-        <option>ぬみき</option>
-      </select>
-      <textarea id="task-note" placeholder="メモ"></textarea>
-      <button onclick="addTask()">タスク追加</button>
-    </section>
-
-    <section class="task-section">
-      <h2>担当者別タスク</h2>
-      <div id="tasks-by-user"></div>
-      <h2>未割り振りタスク</h2>
-      <ul id="tasks-unassigned"></ul>
-    </section>
-
-    <section class="calendar-section">
-      <h2>カレンダー</h2>
-      <div id="calendar"></div>
-    </section>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
-
+    <div class="container">
+      <div class="left">
+        <section class="task-form">
+          <h2>📝 タスクを追加</h2>
+          <input type="text" id="task-name" placeholder="タスク名" />
+          <select id="task-status">
+            <option>未対応</option>
+            <option>対応中</option>
+            <option>完了</option>
+          </select>
+          <input type="time" id="task-deadline" />
+          <select id="task-repeat">
+            <option>都度</option>
+            <option>毎日</option>
+            <option>毎週</option>
+            <option>毎月</option>
+          </select>
+          <select id="task-assignee">
+            <option value="">-- 担当者選択 --</option>
+            <option>つみ
