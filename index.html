@@ -2,28 +2,30 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>タスク管理 | つみきとぬみき</title>
+  <title>タスク管理</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 </head>
 <body>
+  <!-- ログイン画面 -->
   <div id="login-screen" class="login-screen">
     <h2>パスワードを入力してください</h2>
     <input type="password" id="password" placeholder="パスワード" />
     <button onclick="checkPassword()">ログイン</button>
-    <p id="login-error"></p>
+    <div id="login-error"></div>
   </div>
 
+  <!-- メインアプリ画面 -->
   <div id="main-app" style="display: none;">
     <header>
-      <img src="https://illust8.com/wp-content/uploads/2020/03/usagi_02.png" alt="うさぎ" class="icon" />
-      <h1>つみきとぬみきのタスク帳</h1>
+      <img src="https://cdn.pixabay.com/photo/2013/07/13/11/44/star-158766_1280.png" class="icon" />
+      <h1>タスク管理</h1>
     </header>
 
     <div class="container">
       <div class="left">
-        <section class="task-form">
-          <h2>📝 タスクを追加</h2>
+        <section>
+          <h2>📋 タスク追加</h2>
           <input type="text" id="task-name" placeholder="タスク名" />
           <select id="task-status">
             <option>未対応</option>
@@ -38,42 +40,46 @@
             <option>毎月</option>
           </select>
           <select id="task-assignee">
-            <option value="">-- 担当者選択 --</option>
+            <option value="">未割り当て</option>
             <option>つみき</option>
             <option>ぬみき</option>
           </select>
           <textarea id="task-note" placeholder="メモ"></textarea>
-          <button onclick="addTask()">＋ タスク追加</button>
-          <input type="file" id="csv-upload" accept=".csv" onchange="loadCSV(this.files[0])" />
+          <button onclick="addTask()">追加</button>
         </section>
 
         <section>
-          <h2>📆 カレンダー</h2>
-          <div id="calendar"></div>
+          <h2>📤 定期タスクCSV読込</h2>
+          <input type="file" accept=".csv" onchange="loadCSV(this.files[0])" />
         </section>
       </div>
 
       <div class="right">
         <section>
-          <h2>📋 選択日のタスク</h2>
+          <h2>📅 カレンダー</h2>
+          <div id="calendar"></div>
+        </section>
+
+        <section>
+          <h2>🗓 選択日のタスク</h2>
           <ul id="selected-tasks"></ul>
         </section>
 
         <section>
-          <h2>👤 担当者別タスク</h2>
+          <h2>👥 担当者別タスク</h2>
           <div id="tasks-by-user"></div>
         </section>
 
         <section>
-          <h2>📌 残っているタスク</h2>
+          <h2>🌀 残っているタスク（未割り当て）</h2>
           <ul id="tasks-unassigned"></ul>
         </section>
       </div>
     </div>
   </div>
 
+  <!-- FullCalendarとアプリJS -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
-
