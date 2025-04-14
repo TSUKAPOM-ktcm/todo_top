@@ -39,4 +39,41 @@
           </select>
           <select id="task-assignee">
             <option value="">-- 担当者選択 --</option>
-            <option>つみ
+            <option>つみき</option>
+            <option>ぬみき</option>
+          </select>
+          <textarea id="task-note" placeholder="メモ"></textarea>
+          <button onclick="addTask()">＋ タスク追加</button>
+          <input type="file" id="csv-upload" accept=".csv" onchange="loadCSV(this.files[0])" />
+        </section>
+
+        <section>
+          <h2>📆 カレンダー</h2>
+          <div id="calendar"></div>
+        </section>
+      </div>
+
+      <div class="right">
+        <section>
+          <h2>📋 選択日のタスク</h2>
+          <ul id="selected-tasks"></ul>
+        </section>
+
+        <section>
+          <h2>👤 担当者別タスク</h2>
+          <div id="tasks-by-user"></div>
+        </section>
+
+        <section>
+          <h2>📌 残っているタスク</h2>
+          <ul id="tasks-unassigned"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
