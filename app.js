@@ -24,8 +24,15 @@ function addTask() {
     repeat: document.getElementById("task-repeat").value,
     assignee: document.getElementById("task-assignee").value,
     note: document.getElementById("task-note").value,
-    date: calendar.getDate().toISOString().split("T")[0]
+    date: calendar.getDate().toISOString().split("T")[0],
+    completedAt: null // 完了時間を記録するためのフィールド
   };
+
+  // ステータスが「完了」の場合は完了時刻を打刻
+  if (task.status === "完了") {
+    task.completedAt = new Date().toLocaleString(); // 現在時刻を取得して保存
+  }
+
   taskList.push(task);
   saveTasks();
   renderTasks();
@@ -61,7 +68,8 @@ function initCalendar() {
     selectable: true,
     dateClick: function(info) {
       renderSelectedDateTasks(info.dateStr);
-    }
+    },
+    initialDate: new Date() // 初期表示を今日に設定
   });
   calendar.render();
 }
@@ -73,12 +81,12 @@ function renderSelectedDateTasks(dateStr) {
   const tasks = taskList.filter(t => t.date === dateStr);
   tasks.forEach(t => {
     const li = document.createElement("li");
-    li.textContent = `${t.time} - ${t.name}（${t.status} / ${t.assignee || "未割り当て"}）`;
+    li.textContent = `${t.time} - ${t.name}（${t.status} / ${t.assignee || "未割り当て"}${t.completedAt ? " / 完了時刻: " + t.completedAt : ""}）`;
     container.appendChild(li);
   });
 }
 
-// ✅ 担当者別 & 未割り当て表示
+// ✅ 担当者別 & 今日の残っているタスク表示
 function renderTasks() {
   const byUser = document.getElementById("tasks-by-user");
   const unassigned = document.getElementById("tasks-unassigned");
@@ -111,28 +119,18 @@ function renderTasks() {
     section.appendChild(ul);
     byUser.appendChild(section);
   }
+
+  // 今日の残っているタスク
+  const today = new Date().toISOString().split("T")[0]; // 今日の日付
+  const todayTasks = taskList.filter(t => t.date === today && !t.assignee);
+  todayTasks.forEach(t => {
+    const li = document.createElement("li");
+    li.textContent = `${t.time} - ${t.name}（${t.status}）`;
+    unassigned.appendChild(li);
+  });
 }
 
-// ✅ CSV読み込み（定期タスク）
+// ✅ CSV読み込みの非表示（機能を削除）
 function loadCSV(file) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const lines = e.target.result.split("\n");
-    for (let line of lines) {
-      const [name, status, time, repeat, assignee, note] = line.split(",");
-      if (!name || name.trim() === "タスク名") continue;
-      taskList.push({
-        name: name.trim(),
-        status: status.trim(),
-        time: time.trim(),
-        repeat: repeat.trim(),
-        assignee: assignee.trim(),
-        note: note.trim(),
-        date: new Date().toISOString().split("T")[0]
-      });
-    }
-    saveTasks();
-    renderTasks();
-  };
-  reader.readAsText(file);
+  // ここは削除したので、実装しない
 }
