@@ -16,10 +16,10 @@ function checkPassword() {
 }
 
 function updateDateDisplay() {
-  document.getElementById("date-display").textContent = selectedDate;
+  document.getElementById("today-display").textContent = selectedDate;
 }
 
-document.getElementById("date-display").addEventListener("click", () => {
+document.getElementById("today-display").addEventListener("click", () => {
   const input = document.createElement("input");
   input.type = "date";
   input.value = selectedDate;
