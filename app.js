@@ -13,14 +13,17 @@ function showModal(type) {
   const modal = document.getElementById("modal");
   const modalText = document.getElementById("modalText");
   const taskForm = document.getElementById("taskForm");
+  const confirmButtons = document.getElementById("confirmButtons");
 
   if (type === "task") {
     taskForm.classList.remove("hidden");
     modalText.style.display = "none";
+    confirmButtons.style.display = "none";
   } else {
     taskForm.classList.add("hidden");
     modalText.textContent = "伝言メモを追加しますか？";
     modalText.style.display = "block";
+    confirmButtons.style.display = "flex";
   }
 
   modal.style.display = "flex";
@@ -31,8 +34,11 @@ function showModal(type) {
 function hideModal() {
   const modal = document.getElementById("modal");
   const taskForm = document.getElementById("taskForm");
+  const confirmButtons = document.getElementById("confirmButtons");
+
   taskForm.reset();
   taskForm.classList.add("hidden");
+  confirmButtons.style.display = "none";
   modal.classList.add("hidden");
   modal.style.display = "none";
 }
