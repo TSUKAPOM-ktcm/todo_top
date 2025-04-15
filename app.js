@@ -31,12 +31,12 @@ document.getElementById("today-display").addEventListener("click", () => {
   input.click();
 });
 
-document.getElementById("open-task-form").addEventListener("click", () => {
-  document.getElementById("task-form-modal").classList.remove("hidden");
+document.getElementById("save-task-btn").addEventListener("click", () => {
+  document.getElementById("task-modal").classList.remove("hidden");
 });
 
 document.getElementById("close-task-form").addEventListener("click", () => {
-  document.getElementById("task-form-modal").classList.add("hidden");
+  document.getElementById("task-modal").classList.add("hidden");
 });
 
 document.getElementById("save-task").addEventListener("click", () => {
