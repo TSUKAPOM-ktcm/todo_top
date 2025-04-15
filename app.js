@@ -8,7 +8,7 @@ function checkPassword() {
     document.getElementById("login-screen").classList.add("hidden");
     document.getElementById("main-app").classList.remove("hidden");
     updateDateDisplay();
-    renderTasks();
+    setTimeout(renderTasks, 100); // 画面が描画されるのを待つ
   } else {
     alert("パスワードが違います");
   }
@@ -81,6 +81,10 @@ document.getElementById("save-memo-btn").addEventListener("click", () => {
 
 function renderTasks() {
   const container = document.getElementById("task-list-container");
+  if (!container) {
+    console.error('task-list-container not found');
+    return;
+  }
   container.innerHTML = "";
   const grouped = {};
 
@@ -139,4 +143,5 @@ document.getElementById("close-task-modal").addEventListener("click", () => {
 document.getElementById("close-memo-modal").addEventListener("click", () => {
   document.getElementById("memo-modal").classList.add("hidden");
 });
+
 
