@@ -12,7 +12,6 @@
   <!-- ログイン画面 -->
   <div id="login-screen" class="centered">
     <h1>こたちゃんすくすく計画 ✨</h1>
-    <!-- フォームで囲み、submitイベントを処理 -->
     <form id="login-form" onsubmit="event.preventDefault(); checkPassword();">
       <input type="password" id="password" placeholder="パスワードを入力">
       <button type="submit" id="login-btn">ログイン</button>
@@ -30,7 +29,6 @@
 
     <div class="buttons">
       <button id="add-task-btn">＋ タスク追加</button>
-      <button id="memo-btn">📝 伝言メモ</button>
     </div>
 
     <div class="task-list" id="task-list-container">
@@ -88,4 +86,5 @@
   </div>
 </body>
 </html>
+
 
