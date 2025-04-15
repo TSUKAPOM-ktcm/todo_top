@@ -92,6 +92,17 @@
         </div>
       </form>
 
+      <form id="memoForm" class="hidden task-form">
+        <h3>伝言メモを追加</h3>
+        <label>メモ<span class="required">*</span>
+          <textarea id="memoText" rows="4" required></textarea>
+        </label>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
+
       <p id="modalText">完了にしますか？</p>
       <div class="modal-buttons" id="confirmButtons">
         <button onclick="hideModal()">キャンセル</button>
@@ -103,3 +114,4 @@
   <script src="app.js"></script>
 </body>
 </html>
+
