@@ -18,7 +18,7 @@
   </div>
 
   <!-- メインアプリ -->
-  <div id="main-app" style="display:none;">
+  <div id="main-app" class="hidden">
     <header>
       <img src="handdrawn-assets/icon.png" alt="アイコン" class="icon">
       <h1>こたちゃんすくすく計画</h1>
@@ -30,8 +30,22 @@
       <button id="memo-btn">📝 伝言メモ</button>
     </div>
 
-    <div class="task-list" id="task-list">
-      <!-- 担当者別タスクがここに表示される -->
+    <div class="task-list" id="task-list-container">
+      <div id="tasks-by-user">
+        <!-- 担当者別タスクがここに表示される -->
+      </div>
+    </div>
+
+    <!-- 伝言メモモーダル -->
+    <div id="memo-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>伝言メモ</h2>
+        <textarea id="memo-content" rows="6"></textarea>
+        <div class="modal-buttons">
+          <button id="save-memo-btn">保存</button>
+          <button id="close-memo-modal">閉じる</button>
+        </div>
+      </div>
     </div>
 
     <!-- タスク追加モーダル -->
@@ -46,8 +60,7 @@
             <option value="完了">完了</option>
           </select>
         </label>
-        <label>頻度（必須）
-          <select id="task-frequency">
+        <label>頻度（必須）<select id="task-repeat">
             <option value="毎日">毎日</option>
             <option value="毎週">毎週</option>
             <option value="隔週">隔週</option>
@@ -65,23 +78,12 @@
         <label>完了予定日<input type="date" id="task-deadline"></label>
         <label>メモ<textarea id="task-note"></textarea></label>
         <div class="modal-buttons">
-          <button id="save-task">保存</button>
-          <button id="close-task-form">キャンセル</button>
+          <button id="save-task-btn">保存</button>
+          <button id="close-task-modal">キャンセル</button>
         </div>
       </div>
     </div>
 
-    <!-- 伝言メモモーダル -->
-    <div id="memo-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>伝言メモ</h2>
-        <textarea id="memo-content" rows="6"></textarea>
-        <div class="modal-buttons">
-          <button id="save-memo-btn">保存</button>
-          <button id="close-memo-modal">閉じる</button>
-        </div>
-      </div>
-    </div>
   </div>
 </body>
 </html>
