@@ -1,19 +1,18 @@
-// app.js
 let taskList = JSON.parse(localStorage.getItem("tasks") || "[]");
 let selectedDate = new Date().toISOString().split("T")[0];
 
-// ログインチェック
-function checkPassword() {
+// ログイン処理
+document.getElementById("login-btn").addEventListener("click", () => {
   const input = document.getElementById("password").value;
   if (input === "kotachan") {
-    document.getElementById("login-screen").classList.add("hidden");
-    document.getElementById("main-app").classList.remove("hidden");
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("main-app").style.display = "block";
     updateDateDisplay();
     renderTasks();
   } else {
-    alert("パスワードが違います");
+    document.getElementById("login-error").textContent = "パスワードが違います";
   }
-}
+});
 
 function updateDateDisplay() {
   document.getElementById("today-display").textContent = selectedDate;
@@ -31,7 +30,7 @@ document.getElementById("today-display").addEventListener("click", () => {
   input.click();
 });
 
-document.getElementById("save-task-btn").addEventListener("click", () => {
+document.getElementById("add-task-btn").addEventListener("click", () => {
   document.getElementById("task-modal").classList.remove("hidden");
 });
 
@@ -61,49 +60,66 @@ document.getElementById("save-task").addEventListener("click", () => {
     deadline,
     note,
     created: selectedDate,
-    completedAt: null
+    completedAt: status === "完了" ? new Date().toISOString() : null
   };
   taskList.push(task);
   localStorage.setItem("tasks", JSON.stringify(taskList));
-  document.getElementById("task-form-modal").classList.add("hidden");
+  document.getElementById("task-modal").classList.add("hidden");
   renderTasks();
 });
 
-document.getElementById("open-memo").addEventListener("click", () => {
-  const text = prompt("伝言メモを入力してください");
-  if (text) alert("メモを保存しました: " + text);
+document.getElementById("memo-btn").addEventListener("click", () => {
+  document.getElementById("memo-modal").classList.remove("hidden");
+});
+
+document.getElementById("close-memo-modal").addEventListener("click", () => {
+  document.getElementById("memo-modal").classList.add("hidden");
+});
+
+document.getElementById("save-memo-btn").addEventListener("click", () => {
+  const text = document.getElementById("memo-content").value;
+  localStorage.setItem("memo", text);
+  alert("メモを保存しました");
+  document.getElementById("memo-modal").classList.add("hidden");
 });
 
 function renderTasks() {
   const container = document.getElementById("task-list");
   container.innerHTML = "";
   const grouped = {};
+
   taskList.forEach(task => {
     if (task.status !== "完了") {
-      if (!grouped[task.assignee]) grouped[task.assignee] = [];
-      grouped[task.assignee].push(task);
+      const key = task.assignee || "未担当";
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(task);
     }
   });
+
   for (const name in grouped) {
     const section = document.createElement("section");
     const title = document.createElement("h3");
-    title.textContent = name === "" ? "未担当" : name;
+    title.textContent = name === "" ? "今日の残っているタスク" : name;
     const ul = document.createElement("ul");
+
     grouped[name].forEach(task => {
       const li = document.createElement("li");
       li.textContent = `${task.name}（${task.status}）`;
       li.style.cursor = "pointer";
       li.onclick = () => {
         const newStatus = prompt("ステータスを変更（未対応・対応中・完了）:", task.status);
-        if (newStatus === "完了") {
-          task.completedAt = new Date().toISOString();
+        if (newStatus) {
+          task.status = newStatus;
+          if (newStatus === "完了") {
+            task.completedAt = new Date().toISOString();
+          }
+          localStorage.setItem("tasks", JSON.stringify(taskList));
+          renderTasks();
         }
-        task.status = newStatus;
-        localStorage.setItem("tasks", JSON.stringify(taskList));
-        renderTasks();
       };
       ul.appendChild(li);
     });
+
     section.appendChild(title);
     section.appendChild(ul);
     container.appendChild(section);
