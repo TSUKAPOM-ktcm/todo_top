@@ -1,83 +1,89 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>こたちゃんすくすく計画</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
+  <script defer src="app.js"></script>
 </head>
 <body>
   <!-- ログイン画面 -->
-  <div id="login-screen" class="login-screen">
-    <h2>パスワードを入力してください</h2>
-    <input type="password" id="password" placeholder="パスワード" />
-    <button onclick="checkPassword()">ログイン</button>
-    <div id="login-error"></div>
+  <div id="login-screen" class="centered">
+    <h1>こたちゃんすくすく計画 ✨</h1>
+    <input type="password" id="password" placeholder="パスワードを入力">
+    <button id="login-btn">ログイン</button>
+    <p id="login-error"></p>
   </div>
 
-  <!-- メインアプリ画面 -->
-  <div id="main-app" style="display: none;">
+  <!-- メインアプリ -->
+  <div id="main-app" style="display:none;">
     <header>
-      <img src="https://cdn.pixabay.com/photo/2016/04/01/11/56/bear-1300167_1280.png" class="icon" alt="くまのアイコン" />
+      <img src="handdrawn-assets/icon.png" alt="アイコン" class="icon">
       <h1>こたちゃんすくすく計画</h1>
+      <div class="date-display" id="today-display"></div>
     </header>
 
-    <div class="container">
-      <div class="left">
-        <section style="padding: 1rem; box-sizing: border-box;">
-          <h2>📋 タスク追加</h2>
-          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <input type="text" id="task-name" placeholder="タスク名" />
-            <select id="task-status">
-              <option>未対応</option>
-              <option>対応中</option>
-              <option>完了</option>
-            </select>
-            <input type="time" id="task-deadline" />
-            <select id="task-repeat">
-              <option>都度</option>
-              <option>毎日</option>
-              <option>毎週</option>
-              <option>毎月</option>
-            </select>
-            <select id="task-assignee">
-              <option value="">未割り当て</option>
-              <option>つみき</option>
-              <option>ぬみき</option>
-            </select>
-            <textarea id="task-note" placeholder="メモ"></textarea>
-            <button onclick="addTask()">追加</button>
-          </div>
-        </section>
+    <div class="buttons">
+      <button id="add-task-btn">＋ タスク追加</button>
+      <button id="memo-btn">📝 伝言メモ</button>
+    </div>
+
+    <div class="task-list" id="task-list-container">
+      <!-- 担当者別タスクがここに表示される -->
+    </div>
+
+    <!-- タスク追加モーダル -->
+    <div id="task-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>タスクを追加</h2>
+        <label>タスク名（必須）<input id="task-name" required></label>
+        <label>ステータス
+          <select id="task-status">
+            <option value="未対応" selected>未対応</option>
+            <option value="対応中">対応中</option>
+            <option value="完了">完了</option>
+          </select>
+        </label>
+        <label>頻度（必須）
+          <select id="task-repeat">
+            <option value="毎日">毎日</option>
+            <option value="毎週">毎週</option>
+            <option value="隔週">隔週</option>
+            <option value="毎月">毎月</option>
+            <option value="都度" selected>都度</option>
+          </select>
+        </label>
+        <label>担当者
+          <select id="task-assignee">
+            <option value="">なし</option>
+            <option value="つみき">つみき</option>
+            <option value="ぬみき">ぬみき</option>
+          </select>
+        </label>
+        <label>完了予定日<input type="date" id="task-deadline"></label>
+        <label>メモ<textarea id="task-note"></textarea></label>
+        <div class="modal-buttons">
+          <button id="save-task-btn">保存</button>
+          <button id="close-task-modal">キャンセル</button>
+        </div>
       </div>
+    </div>
 
-      <div class="right">
-        <section>
-          <h2>📅 カレンダー</h2>
-          <div id="calendar" style="max-width: 300px;"></div>
-        </section>
-
-        <section>
-          <h2>🗓 選択日のタスク</h2>
-          <ul id="selected-tasks"></ul>
-        </section>
-
-        <section>
-          <h2>👥 担当者別タスク</h2>
-          <div id="tasks-by-user"></div>
-        </section>
-
-        <section>
-          <h2>🌀 今日の残っているタスク</h2>
-          <ul id="tasks-unassigned"></ul>
-        </section>
+    <!-- 伝言メモモーダル -->
+    <div id="memo-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>伝言メモ</h2>
+        <textarea id="memo-content" rows="6"></textarea>
+        <div class="modal-buttons">
+          <button id="save-memo-btn">保存</button>
+          <button id="close-memo-modal">閉じる</button>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- FullCalendarとアプリJS -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script src="app.js"></script>
 </body>
 </html>
+
 
