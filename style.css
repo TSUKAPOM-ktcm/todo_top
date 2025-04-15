@@ -92,11 +92,12 @@ header {
   min-height: 100px;
 }
 
+/* ✅ 修正ポイント：モーダルを最初は非表示に */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.3);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: 999;
@@ -125,3 +126,4 @@ header {
     font-size: 1rem;
   }
 }
+
