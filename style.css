@@ -1,3 +1,5 @@
+/* style.css */
+
 @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
 
 body {
@@ -182,6 +184,8 @@ header h2 {
 
 .modal-buttons button {
   width: 100px;
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem;
 }
 
 @media (max-width: 768px) {
@@ -203,4 +207,3 @@ header h2 {
     margin-left: 0;
   }
 }
-
