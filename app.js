@@ -1,136 +1,111 @@
-let taskList = [];
-let calendar;
+// app.js
+let taskList = JSON.parse(localStorage.getItem("tasks") || "[]");
+let selectedDate = new Date().toISOString().split("T")[0];
 
-// ✅ パスワードチェック
+// ログインチェック
 function checkPassword() {
   const input = document.getElementById("password").value;
   if (input === "kotachan") {
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("main-app").style.display = "block";
-    loadTasks();
-    initCalendar();
+    document.getElementById("login-screen").classList.add("hidden");
+    document.getElementById("main-app").classList.remove("hidden");
+    updateDateDisplay();
     renderTasks();
   } else {
-    document.getElementById("login-error").textContent = "パスワードが違います";
+    alert("パスワードが違います");
   }
 }
 
-// ✅ タスク追加
-function addTask() {
-  const task = {
-    name: document.getElementById("task-name").value,
-    status: document.getElementById("task-status").value,
-    time: document.getElementById("task-deadline").value,
-    repeat: document.getElementById("task-repeat").value,
-    assignee: document.getElementById("task-assignee").value,
-    note: document.getElementById("task-note").value,
-    date: calendar.getDate().toISOString().split("T")[0],
-    completedAt: null // 完了時間を記録するためのフィールド
+function updateDateDisplay() {
+  document.getElementById("date-display").textContent = selectedDate;
+}
+
+document.getElementById("date-display").addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "date";
+  input.value = selectedDate;
+  input.onchange = () => {
+    selectedDate = input.value;
+    updateDateDisplay();
+    renderTasks();
   };
+  input.click();
+});
 
-  // ステータスが「完了」の場合は完了時刻を打刻
-  if (task.status === "完了") {
-    task.completedAt = new Date().toLocaleString(); // 現在時刻を取得して保存
+document.getElementById("open-task-form").addEventListener("click", () => {
+  document.getElementById("task-form-modal").classList.remove("hidden");
+});
+
+document.getElementById("close-task-form").addEventListener("click", () => {
+  document.getElementById("task-form-modal").classList.add("hidden");
+});
+
+document.getElementById("save-task").addEventListener("click", () => {
+  const name = document.getElementById("task-name").value;
+  const status = document.getElementById("task-status").value;
+  const frequency = document.getElementById("task-frequency").value;
+  const assignee = document.getElementById("task-assignee").value;
+  const deadline = document.getElementById("task-deadline").value;
+  const note = document.getElementById("task-note").value;
+
+  if (!name || !frequency) {
+    alert("タスク名と頻度は必須です");
+    return;
   }
 
+  const task = {
+    id: Date.now(),
+    name,
+    status,
+    frequency,
+    assignee,
+    deadline,
+    note,
+    created: selectedDate,
+    completedAt: null
+  };
   taskList.push(task);
-  saveTasks();
-  renderTasks();
-  clearForm();
-}
-
-function clearForm() {
-  document.getElementById("task-name").value = "";
-  document.getElementById("task-status").value = "未対応";
-  document.getElementById("task-deadline").value = "";
-  document.getElementById("task-repeat").value = "都度";
-  document.getElementById("task-assignee").value = "";
-  document.getElementById("task-note").value = "";
-}
-
-// ✅ 保存・読み込み
-function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(taskList));
-}
+  document.getElementById("task-form-modal").classList.add("hidden");
+  renderTasks();
+});
 
-function loadTasks() {
-  const data = localStorage.getItem("tasks");
-  if (data) {
-    taskList = JSON.parse(data);
-  }
-}
+document.getElementById("open-memo").addEventListener("click", () => {
+  const text = prompt("伝言メモを入力してください");
+  if (text) alert("メモを保存しました: " + text);
+});
 
-// ✅ カレンダー初期化
-function initCalendar() {
-  calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
-    initialView: "dayGridMonth",
-    locale: "ja",
-    selectable: true,
-    dateClick: function(info) {
-      renderSelectedDateTasks(info.dateStr);
-    },
-    initialDate: new Date() // 初期表示を今日に設定
-  });
-  calendar.render();
-}
-
-// ✅ 選択日のタスク表示
-function renderSelectedDateTasks(dateStr) {
-  const container = document.getElementById("selected-tasks");
-  container.innerHTML = "";
-  const tasks = taskList.filter(t => t.date === dateStr);
-  tasks.forEach(t => {
-    const li = document.createElement("li");
-    li.textContent = `${t.time} - ${t.name}（${t.status} / ${t.assignee || "未割り当て"}${t.completedAt ? " / 完了時刻: " + t.completedAt : ""}）`;
-    container.appendChild(li);
-  });
-}
-
-// ✅ 担当者別 & 今日の残っているタスク表示
 function renderTasks() {
-  const byUser = document.getElementById("tasks-by-user");
-  const unassigned = document.getElementById("tasks-unassigned");
-  byUser.innerHTML = "";
-  unassigned.innerHTML = "";
-
+  const container = document.getElementById("task-list");
+  container.innerHTML = "";
   const grouped = {};
-  taskList.forEach(t => {
-    if (t.assignee) {
-      if (!grouped[t.assignee]) grouped[t.assignee] = [];
-      grouped[t.assignee].push(t);
-    } else {
-      const li = document.createElement("li");
-      li.textContent = `${t.date} ${t.time} - ${t.name}（${t.status}）`;
-      unassigned.appendChild(li);
+  taskList.forEach(task => {
+    if (task.status !== "完了") {
+      if (!grouped[task.assignee]) grouped[task.assignee] = [];
+      grouped[task.assignee].push(task);
     }
   });
-
-  for (const person in grouped) {
+  for (const name in grouped) {
     const section = document.createElement("section");
     const title = document.createElement("h3");
-    title.textContent = `👤 ${person}`;
+    title.textContent = name === "" ? "未担当" : name;
     const ul = document.createElement("ul");
-    grouped[person].forEach(t => {
+    grouped[name].forEach(task => {
       const li = document.createElement("li");
-      li.textContent = `${t.date} ${t.time} - ${t.name}（${t.status}）`;
+      li.textContent = `${task.name}（${task.status}）`;
+      li.style.cursor = "pointer";
+      li.onclick = () => {
+        const newStatus = prompt("ステータスを変更（未対応・対応中・完了）:", task.status);
+        if (newStatus === "完了") {
+          task.completedAt = new Date().toISOString();
+        }
+        task.status = newStatus;
+        localStorage.setItem("tasks", JSON.stringify(taskList));
+        renderTasks();
+      };
       ul.appendChild(li);
     });
     section.appendChild(title);
     section.appendChild(ul);
-    byUser.appendChild(section);
+    container.appendChild(section);
   }
-
-  // 今日の残っているタスク
-  const today = new Date().toISOString().split("T")[0]; // 今日の日付
-  const todayTasks = taskList.filter(t => t.date === today && !t.assignee);
-  todayTasks.forEach(t => {
-    const li = document.createElement("li");
-    li.textContent = `${t.time} - ${t.name}（${t.status}）`;
-    unassigned.appendChild(li);
-  });
-}
-
-// ✅ CSV読み込みの非表示（機能を削除）
-function loadCSV(file) {
-  // ここは削除したので、実装しない
 }
