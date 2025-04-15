@@ -1,9 +1,8 @@
-/* style.css - 最新版 */
 @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
 
 body {
   margin: 0;
-  font-family: 'Kosugi Maru', 'Hiragino Maru Gothic Pro', 'Yu Gothic UI', sans-serif;
+  font-family: 'Kosugi Maru', sans-serif;
   background: #fffaf3;
   color: #5b4338;
   overflow-x: hidden;
@@ -28,11 +27,6 @@ body {
 
 .big-title {
   font-size: 3.2rem;
-}
-
-.bear-icon {
-  width: 120px;
-  margin: 1rem auto;
 }
 
 .bear-icon.large {
@@ -117,14 +111,46 @@ header h2 {
   margin-top: 0;
 }
 
-#tasks, #memos, #calendar {
-  margin-top: 0.5rem;
+.tasks-column h4 {
+  font-size: 1.1rem;
+  margin: 0.7rem 0 0.3rem;
+  color: #555;
+}
+
+#tasks, #memos, #calendar,
+#tasks-none-未対応, #tasks-つみき-未対応, #tasks-つみき-対応中,
+#tasks-ぬみき-未対応, #tasks-ぬみき-対応中 {
   background: #fff;
   padding: 1rem;
   border-radius: 1rem;
-  min-height: 100px;
+  margin-bottom: 1rem;
+  min-height: 60px;
 }
 
+.task-item {
+  background: #fff0f7;
+  border-radius: 1rem;
+  padding: 0.6rem 1rem;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.task-item:hover {
+  background: #ffe9f3;
+}
+
+.memo-item {
+  background: #fefefe;
+  border-radius: 1rem;
+  padding: 0.6rem 1rem;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+/* モーダル全体 */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -145,6 +171,7 @@ header h2 {
   max-width: 500px;
 }
 
+/* 入力フォーム全体 */
 .task-form label {
   display: block;
   margin: 1rem 0 0.4rem;
@@ -157,6 +184,7 @@ header h2 {
 .task-form textarea {
   width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
   padding: 0.6rem;
   font-size: 1rem;
   border: 2px solid #ffd6e0;
@@ -165,7 +193,6 @@ header h2 {
   font-family: 'Kosugi Maru', sans-serif;
   box-shadow: 0 2px 4px rgba(255,192,203,0.3) inset;
   transition: 0.2s ease;
-  box-sizing: border-box;
 }
 
 .task-form input:focus,
