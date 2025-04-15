@@ -102,25 +102,30 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note) {
 }
 
 function openEditModal(taskDiv) {
-  const editForm = document.getElementById("editForm");
-  document.getElementById("editTaskId").value = taskDiv.dataset.taskId;
-  document.getElementById("editStatus").value = taskDiv.dataset.status;
-  document.getElementById("editAssignee").value = taskDiv.dataset.assignee;
-  showModal("edit");
+  // 編集フォームを再生成
+  const oldForm = document.getElementById("editForm");
+  const newForm = oldForm.cloneNode(true);
+  oldForm.parentNode.replaceChild(newForm, oldForm);
 
-  // 編集フォームの再バインド（多重イベント防止）
-  const newForm = editForm.cloneNode(true);
-  editForm.parentNode.replaceChild(newForm, editForm);
+  // 再取得して中身を反映
+  const id = taskDiv.dataset.taskId;
+  const status = taskDiv.dataset.status;
+  const assignee = taskDiv.dataset.assignee;
+
+  newForm.querySelector("#editTaskId").value = id;
+  newForm.querySelector("#editStatus").value = status;
+  newForm.querySelector("#editAssignee").value = assignee;
+
+  showModal("edit");
 
   newForm.addEventListener("submit", function (e) {
     e.preventDefault();
-    const newStatus = document.getElementById("editStatus").value;
-    const newAssignee = document.getElementById("editAssignee").value;
+    const newStatus = newForm.querySelector("#editStatus").value;
+    const newAssignee = newForm.querySelector("#editAssignee").value;
 
     taskDiv.dataset.status = newStatus;
     taskDiv.dataset.assignee = newAssignee;
 
-    // 完了になったら削除
     if (newStatus === "完了") {
       taskDiv.remove();
     } else {
