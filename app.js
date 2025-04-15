@@ -1,5 +1,3 @@
-// app.js - 担当者別未完了タスクフィールド仕分け対応済み
-
 function login() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
@@ -11,32 +9,26 @@ function login() {
   }
 }
 
-function showModal(type, taskElement = null) {
+function showModal(type) {
   const modal = document.getElementById("modal");
   const taskForm = document.getElementById("taskForm");
   const memoForm = document.getElementById("memoForm");
+  const editForm = document.getElementById("editForm");
   const modalText = document.getElementById("modalText");
   const confirmButtons = document.getElementById("confirmButtons");
 
   taskForm.classList.add("hidden");
   memoForm.classList.add("hidden");
+  editForm.classList.add("hidden");
   modalText.style.display = "none";
   confirmButtons.style.display = "none";
 
   if (type === "task") {
     taskForm.classList.remove("hidden");
-    taskForm.dataset.mode = "new";
-    taskForm.dataset.taskId = "";
   } else if (type === "memo") {
     memoForm.classList.remove("hidden");
   } else if (type === "edit") {
-    const name = taskElement.dataset.name;
-    const status = taskElement.dataset.status;
-    const assignee = taskElement.dataset.assignee;
-    document.getElementById("editStatus").value = status;
-    document.getElementById("editAssignee").value = assignee;
-    document.getElementById("editTaskId").value = taskElement.id;
-    document.getElementById("editForm").classList.remove("hidden");
+    editForm.classList.remove("hidden");
   } else {
     modalText.style.display = "block";
     confirmButtons.style.display = "flex";
@@ -49,20 +41,12 @@ function showModal(type, taskElement = null) {
 
 function hideModal() {
   const modal = document.getElementById("modal");
-  const taskForm = document.getElementById("taskForm");
-  const memoForm = document.getElementById("memoForm");
-  const editForm = document.getElementById("editForm");
-  const confirmButtons = document.getElementById("confirmButtons");
-
-  taskForm.reset();
-  memoForm.reset();
-  editForm.reset();
-  taskForm.classList.add("hidden");
-  memoForm.classList.add("hidden");
-  editForm.classList.add("hidden");
   modal.classList.add("hidden");
   modal.style.display = "none";
-  confirmButtons.style.display = "none";
+
+  document.getElementById("taskForm").reset();
+  document.getElementById("memoForm").reset();
+  document.getElementById("editForm").reset();
 }
 
 function confirmModal() {
@@ -73,39 +57,78 @@ function confirmModal() {
   }
 }
 
-function createTaskElement(task) {
-  const taskDiv = document.createElement("div");
-  taskDiv.className = "task-item";
-  taskDiv.id = `task-${Date.now()}`;
-  taskDiv.dataset.name = task.name;
-  taskDiv.dataset.status = task.status;
-  taskDiv.dataset.assignee = task.assignee;
-  taskDiv.innerHTML = `<strong class="task-name clickable">${task.name}</strong><br>
-    頻度: ${task.frequency} ／ 予定日: ${task.dueDate || "（未設定）"}<br>
-    メモ: ${task.note || "なし"}`;
-
-  taskDiv.querySelector(".task-name").onclick = () => showModal("edit", taskDiv);
-  return taskDiv;
-}
-
 function addTaskFromForm(e) {
   e.preventDefault();
-  const task = {
-    name: document.getElementById("taskName").value,
-    status: document.getElementById("status").value,
-    frequency: document.getElementById("frequency").value,
-    assignee: document.getElementById("assignee").value,
-    dueDate: document.getElementById("dueDate").value,
-    note: document.getElementById("note").value,
-  };
-  if (task.status === "完了") return;
-  const fieldId = `tasks-${task.assignee}-${task.status}`;
-  const field = document.getElementById(fieldId);
-  if (field) {
-    const taskElement = createTaskElement(task);
-    field.appendChild(taskElement);
-  }
+  const name = document.getElementById("taskName").value;
+  const status = document.getElementById("status").value;
+  const frequency = document.getElementById("frequency").value;
+  const assignee = document.getElementById("assignee").value;
+  const dueDate = document.getElementById("dueDate").value;
+  const note = document.getElementById("note").value;
+
+  createTaskElement(name, status, frequency, assignee, dueDate, note);
   hideModal();
+}
+
+function createTaskElement(name, status, frequency, assignee, dueDate, note) {
+  if (status === "完了") return;
+
+  const taskDiv = document.createElement("div");
+  taskDiv.className = "task-item";
+  const id = "task-" + Date.now();
+  taskDiv.dataset.taskId = id;
+  taskDiv.dataset.status = status;
+  taskDiv.dataset.assignee = assignee;
+
+  taskDiv.innerHTML = `
+    <strong class="task-title">${name}</strong><br>
+    頻度: ${frequency} ／ 予定日: ${dueDate || "（未設定）"}<br>
+    メモ: ${note || "なし"}
+  `;
+
+  taskDiv.querySelector(".task-title").style.cursor = "pointer";
+  taskDiv.querySelector(".task-title").addEventListener("click", () => {
+    openEditModal(taskDiv);
+  });
+
+  const containerId = `tasks-${assignee}-${status}`;
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.appendChild(taskDiv);
+  }
+}
+
+function openEditModal(taskDiv) {
+  const editForm = document.getElementById("editForm");
+  document.getElementById("editTaskId").value = taskDiv.dataset.taskId;
+  document.getElementById("editStatus").value = taskDiv.dataset.status;
+  document.getElementById("editAssignee").value = taskDiv.dataset.assignee;
+  showModal("edit");
+
+  // 編集モーダルの submit を一度 remove して再登録（多重登録防止）
+  const newForm = editForm.cloneNode(true);
+  editForm.parentNode.replaceChild(newForm, editForm);
+
+  newForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const newStatus = document.getElementById("editStatus").value;
+    const newAssignee = document.getElementById("editAssignee").value;
+    taskDiv.dataset.status = newStatus;
+    taskDiv.dataset.assignee = newAssignee;
+
+    // 完了になったら削除
+    if (newStatus === "完了") {
+      taskDiv.remove();
+    } else {
+      const newContainerId = `tasks-${newAssignee}-${newStatus}`;
+      const container = document.getElementById(newContainerId);
+      if (container) {
+        container.appendChild(taskDiv);
+      }
+    }
+
+    hideModal();
+  });
 }
 
 function addMemoFromForm(e) {
@@ -120,26 +143,6 @@ function addMemoFromForm(e) {
   hideModal();
 }
 
-function updateTaskFromEdit(e) {
-  e.preventDefault();
-  const taskId = document.getElementById("editTaskId").value;
-  const status = document.getElementById("editStatus").value;
-  const assignee = document.getElementById("editAssignee").value;
-  const task = document.getElementById(taskId);
-  if (!task) return;
-  task.dataset.status = status;
-  task.dataset.assignee = assignee;
-
-  const fieldId = `tasks-${assignee}-${status}`;
-  const newField = document.getElementById(fieldId);
-  if (status === "完了") {
-    task.remove();
-  } else if (newField) {
-    newField.appendChild(task);
-  }
-  hideModal();
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("modal");
   modal.classList.add("hidden");
@@ -147,5 +150,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
   document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
-  document.getElementById("editForm").addEventListener("submit", updateTaskFromEdit);
 });
