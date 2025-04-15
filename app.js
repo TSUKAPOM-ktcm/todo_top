@@ -16,11 +16,14 @@ function showModal(type) {
   const modalText = document.getElementById("modalText");
   modalText.textContent = type === "task" ? "新しいタスクを追加しますか？" : "伝言メモを追加しますか？";
   modal.dataset.type = type;
+  modal.style.display = "flex";
   modal.classList.remove("hidden");
 }
 
 function hideModal() {
-  document.getElementById("modal").classList.add("hidden");
+  const modal = document.getElementById("modal");
+  modal.classList.add("hidden");
+  modal.style.display = "none";
 }
 
 function confirmModal() {
@@ -54,10 +57,9 @@ function addMemo() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // モーダルを完全に非表示にする（スタイル以外に表示状態もリセット）
   const modal = document.getElementById("modal");
   if (modal) {
     modal.classList.add("hidden");
-    modal.style.display = "none"; // これを追加
+    modal.style.display = "none";
   }
 });
