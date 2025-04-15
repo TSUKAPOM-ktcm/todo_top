@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <div class="modal hidden" id="modal">
+  <div class="modal hidden" id="modal" style="display: none;">
     <div class="modal-content">
       <p id="modalText">完了にしますか？</p>
       <div class="modal-buttons">
@@ -49,36 +49,6 @@
     </div>
   </div>
 
-  <script>
-    function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      // 仮のログインチェック（後でFirebaseと連携）
-      if (email === "test@example.com" && password === "password") {
-        document.getElementById("loginScreen").classList.add("hidden");
-        document.getElementById("mainScreen").classList.remove("hidden");
-      } else {
-        alert("IDかパスワードが違います");
-      }
-    }
-
-    function showModal(type) {
-      const modal = document.getElementById("modal");
-      const modalText = document.getElementById("modalText");
-      modalText.textContent = type === "task" ? "新しいタスクを追加しますか？" : "伝言メモを追加しますか？";
-      modal.dataset.type = type;
-      modal.classList.remove("hidden");
-    }
-
-    function hideModal() {
-      document.getElementById("modal").classList.add("hidden");
-    }
-
-    function confirmModal() {
-      const type = document.getElementById("modal").dataset.type;
-      hideModal();
-      alert(type + "の追加処理を行います（ここは後で実装）");
-    }
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
