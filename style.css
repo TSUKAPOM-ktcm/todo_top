@@ -1,86 +1,127 @@
+/* style.css */
 body {
-  font-family: 'Zen Maru Gothic', sans-serif;
   margin: 0;
-  background: #fef9f5;
-  color: #333;
-}
-
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  background: #ffd1dc;
+  font-family: 'Hiragino Maru Gothic Pro', 'Yu Gothic UI', sans-serif;
+  background: #fff8f2;
+  color: #555;
+  overflow-x: hidden;
 }
 
 .hidden {
   display: none;
 }
 
-.buttons {
+.login-screen {
+  text-align: center;
+  padding: 4rem 1rem;
+  background: url('background-stars.png') no-repeat center top / cover;
+}
+
+.app-title {
+  font-size: 2.5rem;
+  color: #ff77aa;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.bear-icon {
+  width: 120px;
+  margin: 1rem 0;
+}
+
+input[type="email"],
+input[type="password"] {
+  display: block;
+  margin: 0.5rem auto;
+  padding: 0.7rem;
+  width: 80%;
+  max-width: 300px;
+  border: 2px solid #ffddee;
+  border-radius: 1rem;
+  background: #fff0f7;
+}
+
+button {
+  padding: 0.7rem 1.5rem;
+  background: #ffb6c1;
+  border: none;
+  border-radius: 1.5rem;
+  color: white;
+  font-size: 1rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.main-screen {
+  padding: 1rem;
+}
+
+header {
+  background: #ffe0ec;
   padding: 1rem;
   text-align: center;
+  font-size: 1.5rem;
+  border-bottom: 2px dashed #ffbad2;
 }
 
-.buttons button {
-  margin: 0 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  background: #fbb;
-  border: none;
-  border-radius: 8px;
-}
-
-.content {
+.container {
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
   padding: 1rem;
 }
 
-.task-list, .memo-display {
-  width: 50%;
+.tasks-column, .right-column {
+  flex: 1 1 300px;
+  background: #fff5fa;
+  border: 2px dashed #ffd2e1;
+  border-radius: 1rem;
   padding: 1rem;
 }
 
-.memo-display {
-  background: #fff3f3;
-  border-left: 2px dashed #f99;
-  min-height: 200px;
+.tasks-column h3, .memo h3, .calendar h3 {
+  color: #ff77aa;
+}
+
+#tasks, #memos, #calendar {
+  margin-top: 0.5rem;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 1rem;
+  min-height: 100px;
 }
 
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 999;
 }
 
 .modal-content {
-  background: white;
-  padding: 1rem;
-  border-radius: 12px;
-  width: 300px;
+  background: #fff0f7;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-.modal-buttons {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 1rem;
+.modal-buttons button {
+  margin: 0 0.5rem;
 }
 
-input, select, textarea {
-  width: 100%;
-  margin: 0.5rem 0;
-  padding: 0.4rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .app-title {
+    font-size: 2rem;
+  }
+  input, button {
+    font-size: 1rem;
+  }
 }
-
