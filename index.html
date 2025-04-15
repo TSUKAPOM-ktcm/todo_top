@@ -1,99 +1,50 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>こたちゃんすくすく計画</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- ログイン画面 -->
-  <div id="login-screen" class="centered">
-    <h1>こたちゃんすくすく計画 ✨</h1>
-    <input type="password" id="password" placeholder="パスワードを入力" />
-    <button id="login-btn">ログイン</button>
-    <p id="login-error"></p>
+  <div class="login-screen" id="loginScreen">
+    <h1 class="app-title">こたちゃん<br>すくすく計画</h1>
+    <img src="bear.png" alt="くま" class="bear-icon">
+    <input type="email" id="email" placeholder="メールアドレス">
+    <input type="password" id="password" placeholder="パスワード">
+    <button onclick="login()">ログイン</button>
   </div>
 
-  <!-- メイン画面 -->
-  <div id="main-app" class="hidden">
+  <div class="main-screen hidden" id="mainScreen">
     <header>
-      <h1>こたちゃんすくすく計画</h1>
-      <div id="today-display" class="date-display"></div>
+      <h2>こたちゃんすくすく計画</h2>
     </header>
-
-    <div class="buttons">
-      <button id="add-task-btn">＋ タスク追加</button>
-      <button id="memo-btn">📝 伝言メモ</button>
-    </div>
-
-    <div class="content">
-      <div id="task-list" class="task-list">
-        <!-- タスクが表示されます -->
+    <div class="container">
+      <div class="tasks-column">
+        <h3>担当者別タスク</h3>
+        <div id="tasks"></div>
+        <button onclick="showModal('task')">タスクを追加</button>
       </div>
-      <div id="memo-display" class="memo-display">
-        <!-- メモが表示されます -->
-      </div>
-    </div>
-
-    <!-- タスクモーダル -->
-    <div id="task-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>タスクを追加</h2>
-        <label>タスク名<input id="task-name"></label>
-        <label>ステータス
-          <select id="task-status">
-            <option>未対応</option>
-            <option>対応中</option>
-            <option>完了</option>
-          </select>
-        </label>
-        <label>頻度
-          <select id="task-repeat">
-            <option>毎日</option>
-            <option>毎週</option>
-            <option>隔週</option>
-            <option>毎月</option>
-            <option selected>都度</option>
-          </select>
-        </label>
-        <label>担当者
-          <select id="task-assignee">
-            <option value="">未担当</option>
-            <option>つみき</option>
-            <option>ぬみき</option>
-          </select>
-        </label>
-        <label>期限<input type="date" id="task-deadline"></label>
-        <label>メモ<textarea id="task-note"></textarea></label>
-        <div class="modal-buttons">
-          <button id="save-task-btn">保存</button>
-          <button id="close-task-modal">キャンセル</button>
+      <div class="right-column">
+        <div class="calendar">
+          <h3>カレンダー</h3>
+          <div id="calendar"></div>
+        </div>
+        <div class="memo">
+          <h3>伝言メモ</h3>
+          <div id="memos"></div>
+          <button onclick="showModal('memo')">伝言メモ追加</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- 伝言メモモーダル -->
-    <div id="memo-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>伝言メモ</h2>
-        <textarea id="memo-content" rows="6"></textarea>
-        <div class="modal-buttons">
-          <button id="save-memo-btn">保存</button>
-          <button id="close-memo-modal">閉じる</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ステータス変更モーダル -->
-    <div id="status-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>このタスクを完了にしますか？</h2>
-        <div class="modal-buttons">
-          <button id="confirm-status-btn">完了にする</button>
-          <button id="cancel-status-btn">キャンセル</button>
-        </div>
+  <div class="modal hidden" id="modal">
+    <div class="modal-content">
+      <p id="modalText">完了にしますか？</p>
+      <div class="modal-buttons">
+        <button onclick="hideModal()">キャンセル</button>
+        <button onclick="confirmModal()">OK</button>
       </div>
     </div>
   </div>
