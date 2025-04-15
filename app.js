@@ -14,6 +14,9 @@ function checkPassword() {
   }
 }
 
+// ログインボタンにイベントリスナーを追加
+document.getElementById("login-btn").addEventListener("click", checkPassword);
+
 function updateDateDisplay() {
   document.getElementById("today-display").textContent = selectedDate;
 }
