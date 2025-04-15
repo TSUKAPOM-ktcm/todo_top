@@ -15,6 +15,9 @@ function checkPassword() {
   }
 }
 
+// ログインボタンのクリックイベントを設定
+document.getElementById("login-btn").addEventListener("click", checkPassword);
+
 function updateDateDisplay() {
   document.getElementById("today-display").textContent = selectedDate;
 }
