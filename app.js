@@ -14,14 +14,27 @@ function login() {
 function showModal(type) {
   const modal = document.getElementById("modal");
   const modalText = document.getElementById("modalText");
-  modalText.textContent = type === "task" ? "新しいタスクを追加しますか？" : "伝言メモを追加しますか？";
-  modal.dataset.type = type;
+  const taskForm = document.getElementById("taskForm");
+
+  if (type === "task") {
+    taskForm.classList.remove("hidden");
+    modalText.style.display = "none";
+  } else {
+    taskForm.classList.add("hidden");
+    modalText.textContent = "伝言メモを追加しますか？";
+    modalText.style.display = "block";
+  }
+
   modal.style.display = "flex";
   modal.classList.remove("hidden");
+  modal.dataset.type = type;
 }
 
 function hideModal() {
   const modal = document.getElementById("modal");
+  const taskForm = document.getElementById("taskForm");
+  taskForm.reset();
+  taskForm.classList.add("hidden");
   modal.classList.add("hidden");
   modal.style.display = "none";
 }
@@ -29,21 +42,32 @@ function hideModal() {
 function confirmModal() {
   const type = document.getElementById("modal").dataset.type;
   hideModal();
-  if (type === "task") {
-    addTask();
-  } else if (type === "memo") {
+  if (type === "memo") {
     addMemo();
   }
 }
 
-function addTask() {
-  const task = prompt("タスク名を入力してください：");
-  if (task) {
-    const taskDiv = document.createElement("div");
-    taskDiv.textContent = task;
-    taskDiv.className = "task-item";
-    document.getElementById("tasks").appendChild(taskDiv);
-  }
+function addTaskFromForm(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("taskName").value;
+  const status = document.getElementById("status").value;
+  const frequency = document.getElementById("frequency").value;
+  const assignee = document.getElementById("assignee").value;
+  const dueDate = document.getElementById("dueDate").value;
+  const note = document.getElementById("note").value;
+
+  const taskDiv = document.createElement("div");
+  taskDiv.className = "task-item";
+  taskDiv.innerHTML = `
+    <strong>${name}</strong><br>
+    ステータス: ${status} ／ 頻度: ${frequency} ／ 担当: ${assignee}<br>
+    予定日: ${dueDate || "（未設定）"}<br>
+    メモ: ${note || "なし"}
+  `;
+
+  document.getElementById("tasks").appendChild(taskDiv);
+  hideModal();
 }
 
 function addMemo() {
@@ -58,8 +82,9 @@ function addMemo() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("modal");
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.style.display = "none";
-  }
+  modal.classList.add("hidden");
+  modal.style.display = "none";
+
+  const taskForm = document.getElementById("taskForm");
+  taskForm.addEventListener("submit", addTaskFromForm);
 });
