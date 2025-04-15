@@ -21,7 +21,7 @@ body {
 .app-title {
   font-size: 2.8rem;
   font-weight: bold;
-  color: #d96f9b;
+  color: #5b4338;
   line-height: 1.4;
   margin-bottom: 0.5rem;
 }
@@ -75,7 +75,6 @@ button:hover {
   background: #ff92a0;
 }
 
-/* ログインデコ */
 .login-header .decorations {
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -106,7 +105,6 @@ button:hover {
   50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
 }
 
-/* メイン画面 */
 .main-screen {
   padding: 1rem;
 }
@@ -125,16 +123,10 @@ header {
 
 header h2 {
   margin: 0;
-  color: #d96f9b;
+  color: #5b4338;
   font-size: 1.6rem;
 }
 
-header button {
-  margin-left: 0.5rem;
-  margin-top: 0.3rem;
-}
-
-/* コンテンツレイアウト */
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -163,13 +155,6 @@ header button {
   min-height: 100px;
 }
 
-.tasks-column button,
-.memo button {
-  display: block;
-  margin: 1rem auto 0;
-}
-
-/* モーダル */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -199,7 +184,6 @@ header button {
   width: 100px;
 }
 
-/* モバイル対応 */
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
@@ -219,3 +203,4 @@ header button {
     margin-left: 0;
   }
 }
+
