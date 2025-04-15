@@ -20,8 +20,50 @@ body {
 .app-title {
   font-size: 2.5rem;
   color: #ff77aa;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   line-height: 1.2;
+}
+
+.login-header .decorations {
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.decorations span {
+  margin: 0 0.3rem;
+  display: inline-block;
+  transform: rotate(-10deg);
+  opacity: 0.8;
+  animation: sparkle 2.5s infinite ease-in-out;
+}
+
+.decorations .star {
+  color: #ffd700;
+  animation-delay: 0s;
+}
+.decorations .heart {
+  color: #ff8fa3;
+  animation-delay: 0.2s;
+}
+.decorations .flower {
+  color: #ffaacc;
+  animation-delay: 0.4s;
+}
+.decorations .sparkle {
+  color: #c0c0ff;
+  animation-delay: 0.6s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
 }
 
 .bear-icon {
@@ -92,7 +134,6 @@ header {
   min-height: 100px;
 }
 
-/* ✅ 修正ポイント：モーダルを最初は非表示に */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -126,50 +167,3 @@ header {
     font-size: 1rem;
   }
 }
-
-.decorations {
-  margin-top: -0.5rem;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  animation: float 3s ease-in-out infinite;
-}
-
-.decorations span {
-  margin: 0 0.3rem;
-  display: inline-block;
-  transform: rotate(-10deg);
-  opacity: 0.8;
-  animation: sparkle 2.5s infinite ease-in-out;
-}
-
-/* ランダムな動きっぽくちょっとずつ遅らせる */
-.decorations .star {
-  color: #ffd700;
-  animation-delay: 0s;
-}
-.decorations .heart {
-  color: #ff8fa3;
-  animation-delay: 0.2s;
-}
-.decorations .flower {
-  color: #ffaacc;
-  animation-delay: 0.4s;
-}
-.decorations .sparkle {
-  color: #c0c0ff;
-  animation-delay: 0.6s;
-}
-
-/* ゆらゆらアニメーション */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-/* きらっと光る感じ */
-@keyframes sparkle {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
-  50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
-}
-
-
