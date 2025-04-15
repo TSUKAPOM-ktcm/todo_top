@@ -54,5 +54,10 @@ function addMemo() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  hideModal();
+  // モーダルを完全に非表示にする（スタイル以外に表示状態もリセット）
+  const modal = document.getElementById("modal");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.style.display = "none"; // これを追加
+  }
 });
