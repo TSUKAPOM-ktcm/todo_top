@@ -1,4 +1,4 @@
-// app.js - 伝言メモモーダル対応済み
+// app.js - 担当者別未完了タスクフィールド仕分け対応済み
 
 function login() {
   const email = document.getElementById('email').value;
@@ -11,7 +11,7 @@ function login() {
   }
 }
 
-function showModal(type) {
+function showModal(type, taskElement = null) {
   const modal = document.getElementById("modal");
   const taskForm = document.getElementById("taskForm");
   const memoForm = document.getElementById("memoForm");
@@ -25,8 +25,18 @@ function showModal(type) {
 
   if (type === "task") {
     taskForm.classList.remove("hidden");
+    taskForm.dataset.mode = "new";
+    taskForm.dataset.taskId = "";
   } else if (type === "memo") {
     memoForm.classList.remove("hidden");
+  } else if (type === "edit") {
+    const name = taskElement.dataset.name;
+    const status = taskElement.dataset.status;
+    const assignee = taskElement.dataset.assignee;
+    document.getElementById("editStatus").value = status;
+    document.getElementById("editAssignee").value = assignee;
+    document.getElementById("editTaskId").value = taskElement.id;
+    document.getElementById("editForm").classList.remove("hidden");
   } else {
     modalText.style.display = "block";
     confirmButtons.style.display = "flex";
@@ -41,10 +51,15 @@ function hideModal() {
   const modal = document.getElementById("modal");
   const taskForm = document.getElementById("taskForm");
   const memoForm = document.getElementById("memoForm");
+  const editForm = document.getElementById("editForm");
   const confirmButtons = document.getElementById("confirmButtons");
 
   taskForm.reset();
   memoForm.reset();
+  editForm.reset();
+  taskForm.classList.add("hidden");
+  memoForm.classList.add("hidden");
+  editForm.classList.add("hidden");
   modal.classList.add("hidden");
   modal.style.display = "none";
   confirmButtons.style.display = "none";
@@ -58,25 +73,38 @@ function confirmModal() {
   }
 }
 
-function addTaskFromForm(e) {
-  e.preventDefault();
-  const name = document.getElementById("taskName").value;
-  const status = document.getElementById("status").value;
-  const frequency = document.getElementById("frequency").value;
-  const assignee = document.getElementById("assignee").value;
-  const dueDate = document.getElementById("dueDate").value;
-  const note = document.getElementById("note").value;
-
+function createTaskElement(task) {
   const taskDiv = document.createElement("div");
   taskDiv.className = "task-item";
-  taskDiv.innerHTML = `
-    <strong>${name}</strong><br>
-    ステータス: ${status} ／ 頻度: ${frequency} ／ 担当: ${assignee}<br>
-    予定日: ${dueDate || "（未設定）"}<br>
-    メモ: ${note || "なし"}
-  `;
+  taskDiv.id = `task-${Date.now()}`;
+  taskDiv.dataset.name = task.name;
+  taskDiv.dataset.status = task.status;
+  taskDiv.dataset.assignee = task.assignee;
+  taskDiv.innerHTML = `<strong class="task-name clickable">${task.name}</strong><br>
+    頻度: ${task.frequency} ／ 予定日: ${task.dueDate || "（未設定）"}<br>
+    メモ: ${task.note || "なし"}`;
 
-  document.getElementById("tasks").appendChild(taskDiv);
+  taskDiv.querySelector(".task-name").onclick = () => showModal("edit", taskDiv);
+  return taskDiv;
+}
+
+function addTaskFromForm(e) {
+  e.preventDefault();
+  const task = {
+    name: document.getElementById("taskName").value,
+    status: document.getElementById("status").value,
+    frequency: document.getElementById("frequency").value,
+    assignee: document.getElementById("assignee").value,
+    dueDate: document.getElementById("dueDate").value,
+    note: document.getElementById("note").value,
+  };
+  if (task.status === "完了") return;
+  const fieldId = `tasks-${task.assignee}-${task.status}`;
+  const field = document.getElementById(fieldId);
+  if (field) {
+    const taskElement = createTaskElement(task);
+    field.appendChild(taskElement);
+  }
   hideModal();
 }
 
@@ -92,6 +120,26 @@ function addMemoFromForm(e) {
   hideModal();
 }
 
+function updateTaskFromEdit(e) {
+  e.preventDefault();
+  const taskId = document.getElementById("editTaskId").value;
+  const status = document.getElementById("editStatus").value;
+  const assignee = document.getElementById("editAssignee").value;
+  const task = document.getElementById(taskId);
+  if (!task) return;
+  task.dataset.status = status;
+  task.dataset.assignee = assignee;
+
+  const fieldId = `tasks-${assignee}-${status}`;
+  const newField = document.getElementById(fieldId);
+  if (status === "完了") {
+    task.remove();
+  } else if (newField) {
+    newField.appendChild(task);
+  }
+  hideModal();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("modal");
   modal.classList.add("hidden");
@@ -99,4 +147,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
   document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
+  document.getElementById("editForm").addEventListener("submit", updateTaskFromEdit);
 });
