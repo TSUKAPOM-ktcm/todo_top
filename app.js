@@ -1,111 +1,113 @@
-let taskList = JSON.parse(localStorage.getItem("tasks") || "[]");
-let selectedDate = new Date().toISOString().split("T")[0];
+const passwordField = document.getElementById("password");
+const loginBtn = document.getElementById("login-btn");
+const loginScreen = document.getElementById("login-screen");
+const mainApp = document.getElementById("main-app");
+const taskListDiv = document.getElementById("task-list");
+const memoDisplay = document.getElementById("memo-display");
+const todayDisplay = document.getElementById("today-display");
 
-// ログインチェック
-function checkPassword() {
-  const input = document.getElementById("password").value;
-  if (input === "kotachan") {
-    document.getElementById("login-screen").classList.add("hidden");
-    document.getElementById("main-app").classList.remove("hidden");
-    updateDateDisplay();
+let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+let memoText = localStorage.getItem("memo") || "";
+let selectedTaskId = null;
+
+loginBtn.addEventListener("click", () => {
+  if (passwordField.value === "kotachan") {
+    loginScreen.classList.add("hidden");
+    mainApp.classList.remove("hidden");
+    updateDate();
     renderTasks();
-  } else {
-    alert("パスワードが違います");
-    document.getElementById("login-error").textContent = "パスワードが違います"; // エラーメッセージを表示
+    memoDisplay.innerText = memoText;
   }
-}
-
-// ログインボタンのクリックイベントを設定
-document.getElementById("login-btn").addEventListener("click", checkPassword);
-
-function updateDateDisplay() {
-  document.getElementById("today-display").textContent = selectedDate;
-}
-
-document.getElementById("today-display").addEventListener("click", () => {
-  const input = document.createElement("input");
-  input.type = "date";
-  input.value = selectedDate;
-  input.onchange = () => {
-    selectedDate = input.value;
-    updateDateDisplay();
-    renderTasks();
-  };
-  input.click();
 });
 
-// タスクの保存
+// 日付表示
+function updateDate() {
+  const today = new Date().toISOString().split("T")[0];
+  todayDisplay.textContent = today;
+}
+
+// タスクモーダル
+document.getElementById("add-task-btn").addEventListener("click", () => {
+  document.getElementById("task-modal").classList.remove("hidden");
+});
+
+document.getElementById("close-task-modal").addEventListener("click", () => {
+  document.getElementById("task-modal").classList.add("hidden");
+});
+
 document.getElementById("save-task-btn").addEventListener("click", () => {
-  const name = document.getElementById("task-name").value;
-  const status = document.getElementById("task-status").value;
-  const frequency = document.getElementById("task-repeat").value;
-  const assignee = document.getElementById("task-assignee").value;
-  const deadline = document.getElementById("task-deadline").value;
-  const note = document.getElementById("task-note").value;
-
-  if (!name || !frequency) {
-    alert("タスク名と頻度は必須です");
-    return;
-  }
-
   const task = {
     id: Date.now(),
-    name,
-    status,
-    frequency,
-    assignee,
-    deadline,
-    note,
-    created: selectedDate,
-    completedAt: null
+    name: document.getElementById("task-name").value,
+    status: document.getElementById("task-status").value,
+    repeat: document.getElementById("task-repeat").value,
+    assignee: document.getElementById("task-assignee").value,
+    deadline: document.getElementById("task-deadline").value,
+    note: document.getElementById("task-note").value
   };
-  taskList.push(task);
-  localStorage.setItem("tasks", JSON.stringify(taskList));
+  tasks.push(task);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
   document.getElementById("task-modal").classList.add("hidden");
   renderTasks();
 });
 
-// タスクのレンダリング
+// メモモーダル
+document.getElementById("memo-btn").addEventListener("click", () => {
+  document.getElementById("memo-content").value = memoText;
+  document.getElementById("memo-modal").classList.remove("hidden");
+});
+
+document.getElementById("close-memo-modal").addEventListener("click", () => {
+  document.getElementById("memo-modal").classList.add("hidden");
+});
+
+document.getElementById("save-memo-btn").addEventListener("click", () => {
+  memoText = document.getElementById("memo-content").value;
+  localStorage.setItem("memo", memoText);
+  memoDisplay.innerText = memoText;
+  document.getElementById("memo-modal").classList.add("hidden");
+});
+
+// ステータス変更モーダル
+document.getElementById("confirm-status-btn").addEventListener("click", () => {
+  const task = tasks.find(t => t.id === selectedTaskId);
+  if (task) {
+    task.status = "完了";
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    renderTasks();
+  }
+  document.getElementById("status-modal").classList.add("hidden");
+});
+
+document.getElementById("cancel-status-btn").addEventListener("click", () => {
+  document.getElementById("status-modal").classList.add("hidden");
+});
+
 function renderTasks() {
-  const container = document.getElementById("task-list-container");
-  container.innerHTML = "";
+  taskListDiv.innerHTML = "";
   const grouped = {};
-  taskList.forEach(task => {
-    if (task.status !== "完了") {
-      if (!grouped[task.assignee]) grouped[task.assignee] = [];
-      grouped[task.assignee].push(task);
-    }
+  tasks.forEach(task => {
+    if (!grouped[task.assignee]) grouped[task.assignee] = [];
+    grouped[task.assignee].push(task);
   });
-  for (const name in grouped) {
+
+  for (const assignee in grouped) {
     const section = document.createElement("section");
-    const title = document.createElement("h3");
-    title.textContent = name === "" ? "未担当" : name;
+    const h3 = document.createElement("h3");
+    h3.textContent = assignee || "未担当";
+    section.appendChild(h3);
     const ul = document.createElement("ul");
-    grouped[name].forEach(task => {
+    grouped[assignee].forEach(task => {
       const li = document.createElement("li");
-      li.textContent = `${task.name}（${task.status}）`;
+      li.textContent = `${task.name} (${task.status})`;
       li.style.cursor = "pointer";
-      li.onclick = () => {
-        const newStatus = prompt("ステータスを変更（未対応・対応中・完了）:", task.status);
-        if (newStatus === "完了") {
-          task.completedAt = new Date().toISOString();
-        }
-        task.status = newStatus;
-        localStorage.setItem("tasks", JSON.stringify(taskList));
-        renderTasks();
-      };
+      li.addEventListener("click", () => {
+        selectedTaskId = task.id;
+        document.getElementById("status-modal").classList.remove("hidden");
+      });
       ul.appendChild(li);
     });
-    section.appendChild(title);
     section.appendChild(ul);
-    container.appendChild(section);
+    taskListDiv.appendChild(section);
   }
 }
-
-// 伝言メモ
-document.getElementById("memo-btn").addEventListener("click", () => {
-  const memoContent = document.getElementById("memo-content").value;
-  if (memoContent) {
-    alert("メモが保存されました: " + memoContent);
-  }
-});
