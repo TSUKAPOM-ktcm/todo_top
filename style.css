@@ -24,7 +24,6 @@ body {
   color: #d96f9b;
   line-height: 1.4;
   margin-bottom: 0.5rem;
-  font-family: 'Kosugi Maru', sans-serif;
 }
 
 .big-title {
@@ -61,27 +60,22 @@ input[type="password"] {
 }
 
 button {
-  font-size: 1.2rem;
-  padding: 0.7rem 2rem;
+  font-size: 1.1rem;
+  padding: 0.6rem 1.5rem;
   background: #ffa8b0;
   color: white;
   border: none;
   border-radius: 2rem;
   cursor: pointer;
-  width: 80%;
-  max-width: 320px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-  margin-top: 1rem;
+  transition: background 0.3s ease;
 }
 
 button:hover {
   background: #ff92a0;
 }
 
-/* デコレーションまわり */
+/* ログインデコ */
 .login-header .decorations {
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -119,12 +113,28 @@ button:hover {
 
 header {
   background: #ffe0ec;
-  padding: 1rem;
-  text-align: center;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
   font-size: 1.5rem;
   border-bottom: 2px dashed #ffbad2;
 }
 
+header h2 {
+  margin: 0;
+  color: #d96f9b;
+  font-size: 1.6rem;
+}
+
+header button {
+  margin-left: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+/* コンテンツレイアウト */
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -142,6 +152,7 @@ header {
 
 .tasks-column h3, .memo h3, .calendar h3 {
   color: #ff77aa;
+  margin-top: 0;
 }
 
 #tasks, #memos, #calendar {
@@ -152,13 +163,10 @@ header {
   min-height: 100px;
 }
 
-/* ボタン位置の微調整 */
 .tasks-column button,
 .memo button {
-  margin-top: 1rem;
-  margin-left: auto;
-  margin-right: auto;
   display: block;
+  margin: 1rem auto 0;
 }
 
 /* モーダル */
@@ -188,19 +196,26 @@ header {
 }
 
 .modal-buttons button {
-  margin: 0;
   width: 100px;
 }
 
-/* スマホ対応 */
+/* モバイル対応 */
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
   }
+
   .app-title {
     font-size: 2.2rem;
   }
-  input, button {
-    font-size: 1rem;
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  header button {
+    width: 100%;
+    margin-left: 0;
   }
 }
