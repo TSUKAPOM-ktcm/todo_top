@@ -62,11 +62,51 @@
 
   <div class="modal hidden" id="modal" style="display: none;">
     <div class="modal-content">
-      <p id="modalText">完了にしますか？</p>
-      <div class="modal-buttons">
-        <button onclick="hideModal()">キャンセル</button>
-        <button onclick="confirmModal()">OK</button>
-      </div>
+  <form id="taskForm" class="hidden">
+    <h3>タスクを追加</h3>
+    <label>タスク名（必須）<br><input type="text" id="taskName" required></label><br><br>
+
+    <label>ステータス（必須）<br>
+      <select id="status" required>
+        <option value="未対応" selected>未対応</option>
+        <option value="対応中">対応中</option>
+        <option value="完了">完了</option>
+      </select>
+    </label><br><br>
+
+    <label>頻度（必須）<br>
+      <select id="frequency" required>
+        <option value="毎日">毎日</option>
+        <option value="毎週">毎週</option>
+        <option value="隔週">隔週</option>
+        <option value="毎月">毎月</option>
+        <option value="都度">都度</option>
+      </select>
+    </label><br><br>
+
+    <label>担当者（必須）<br>
+      <select id="assignee" required>
+        <option value="なし" selected>なし</option>
+        <option value="つみき">つみき</option>
+        <option value="ぬみき">ぬみき</option>
+      </select>
+    </label><br><br>
+
+    <label>完了予定日（任意）<br><input type="date" id="dueDate"></label><br><br>
+
+    <label>メモ（任意）<br><textarea id="note" rows="3"></textarea></label><br><br>
+
+    <div class="modal-buttons">
+      <button type="button" onclick="hideModal()">キャンセル</button>
+      <button type="submit">OK</button>
+    </div>
+  </form>
+
+  <p id="modalText">完了にしますか？</p>
+  <div class="modal-buttons">
+    <button onclick="hideModal()">キャンセル</button>
+    <button onclick="confirmModal()">OK</button>
+  </div>
     </div>
   </div>
 
