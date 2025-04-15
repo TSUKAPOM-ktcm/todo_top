@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
+
 body {
   margin: 0;
-  font-family: 'Hiragino Maru Gothic Pro', 'Yu Gothic UI', sans-serif;
+  font-family: 'Kosugi Maru', 'Hiragino Maru Gothic Pro', 'Yu Gothic UI', sans-serif;
   background: #fffaf3;
   color: #5b4338;
   overflow-x: hidden;
@@ -22,15 +24,21 @@ body {
   color: #d96f9b;
   line-height: 1.4;
   margin-bottom: 0.5rem;
+  font-family: 'Kosugi Maru', sans-serif;
 }
 
 .big-title {
-  font-size: 3rem;
+  font-size: 3.2rem;
 }
 
 .bear-icon {
   width: 120px;
   margin: 1rem auto;
+}
+
+.bear-icon.large {
+  width: 180px;
+  max-width: 60%;
 }
 
 .input-group {
@@ -102,64 +110,6 @@ button:hover {
   animation-delay: 0.6s;
 }
 
-/* タイトルを囲むキラキラ */
-.sparkle-wrap {
-  position: relative;
-  display: inline-block;
-  padding: 1rem;
-}
-
-.sparkle-top,
-.sparkle-bottom {
-  position: absolute;
-  font-size: 1.5rem;
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-.sparkle-top.sparkle1 {
-  top: -10px;
-  left: -20px;
-  color: #ffc0cb;
-  animation: twinkle 3s infinite ease-in-out;
-}
-
-.sparkle-top.sparkle2 {
-  top: -12px;
-  right: -20px;
-  color: #ffd700;
-  animation: twinkle 4s infinite ease-in-out;
-}
-
-.sparkle-top.sparkle5 {
-  top: -20px;
-  left: 45%;
-  color: #c0c0ff;
-  animation: twinkle 5s infinite ease-in-out;
-}
-
-.sparkle-bottom.sparkle3 {
-  bottom: -10px;
-  left: -15px;
-  color: #c0c0ff;
-  animation: twinkle 3.5s infinite ease-in-out;
-}
-
-.sparkle-bottom.sparkle4 {
-  bottom: -10px;
-  right: -15px;
-  color: #ffaacc;
-  animation: twinkle 4.5s infinite ease-in-out;
-}
-
-.sparkle-bottom.sparkle6 {
-  bottom: -20px;
-  left: 48%;
-  color: #ffddee;
-  animation: twinkle 5s infinite ease-in-out;
-}
-
-/* アニメーション定義 */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
@@ -168,11 +118,6 @@ button:hover {
 @keyframes sparkle {
   0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
   50% { transform: scale(1.2) rotate(10deg); opacity: 1; }
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.8; transform: scale(1) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.2) rotate(15deg); }
 }
 
 /* メイン画面共通 */
@@ -248,4 +193,3 @@ header {
     font-size: 1rem;
   }
 }
-
