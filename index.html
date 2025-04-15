@@ -30,7 +30,7 @@
       <button id="memo-btn">📝 伝言メモ</button>
     </div>
 
-    <div class="task-list" id="task-list-container">
+    <div class="task-list" id="task-list">
       <!-- 担当者別タスクがここに表示される -->
     </div>
 
@@ -47,7 +47,7 @@
           </select>
         </label>
         <label>頻度（必須）
-          <select id="task-repeat">
+          <select id="task-frequency">
             <option value="毎日">毎日</option>
             <option value="毎週">毎週</option>
             <option value="隔週">隔週</option>
@@ -65,8 +65,8 @@
         <label>完了予定日<input type="date" id="task-deadline"></label>
         <label>メモ<textarea id="task-note"></textarea></label>
         <div class="modal-buttons">
-          <button id="save-task-btn">保存</button>
-          <button id="close-task-modal">キャンセル</button>
+          <button id="save-task">保存</button>
+          <button id="close-task-form">キャンセル</button>
         </div>
       </div>
     </div>
@@ -85,8 +85,3 @@
   </div>
 </body>
 </html>
-
-
-
-
-
