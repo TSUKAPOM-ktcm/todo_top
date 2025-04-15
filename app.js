@@ -1,3 +1,5 @@
+// app.js - 伝言メモモーダル対応済み
+
 function login() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
@@ -11,17 +13,21 @@ function login() {
 
 function showModal(type) {
   const modal = document.getElementById("modal");
-  const modalText = document.getElementById("modalText");
   const taskForm = document.getElementById("taskForm");
+  const memoForm = document.getElementById("memoForm");
+  const modalText = document.getElementById("modalText");
   const confirmButtons = document.getElementById("confirmButtons");
+
+  taskForm.classList.add("hidden");
+  memoForm.classList.add("hidden");
+  modalText.style.display = "none";
+  confirmButtons.style.display = "none";
 
   if (type === "task") {
     taskForm.classList.remove("hidden");
-    modalText.style.display = "none";
-    confirmButtons.style.display = "none";
+  } else if (type === "memo") {
+    memoForm.classList.remove("hidden");
   } else {
-    taskForm.classList.add("hidden");
-    modalText.textContent = "伝言メモを追加しますか？";
     modalText.style.display = "block";
     confirmButtons.style.display = "flex";
   }
@@ -34,13 +40,14 @@ function showModal(type) {
 function hideModal() {
   const modal = document.getElementById("modal");
   const taskForm = document.getElementById("taskForm");
+  const memoForm = document.getElementById("memoForm");
   const confirmButtons = document.getElementById("confirmButtons");
 
   taskForm.reset();
-  taskForm.classList.add("hidden");
-  confirmButtons.style.display = "none";
+  memoForm.reset();
   modal.classList.add("hidden");
   modal.style.display = "none";
+  confirmButtons.style.display = "none";
 }
 
 function confirmModal() {
@@ -73,14 +80,16 @@ function addTaskFromForm(e) {
   hideModal();
 }
 
-function addMemo() {
-  const memo = prompt("伝言メモを入力してください：");
-  if (memo) {
+function addMemoFromForm(e) {
+  e.preventDefault();
+  const memo = document.getElementById("memoText").value;
+  if (memo.trim()) {
     const memoDiv = document.createElement("div");
     memoDiv.textContent = memo;
     memoDiv.className = "memo-item";
     document.getElementById("memos").appendChild(memoDiv);
   }
+  hideModal();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -88,6 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
   modal.classList.add("hidden");
   modal.style.display = "none";
 
-  const taskForm = document.getElementById("taskForm");
-  taskForm.addEventListener("submit", addTaskFromForm);
+  document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
+  document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
 });
