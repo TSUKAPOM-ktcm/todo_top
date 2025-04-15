@@ -79,6 +79,10 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note) {
   taskDiv.dataset.taskId = id;
   taskDiv.dataset.status = status;
   taskDiv.dataset.assignee = assignee;
+  taskDiv.dataset.name = name;
+  taskDiv.dataset.frequency = frequency;
+  taskDiv.dataset.dueDate = dueDate;
+  taskDiv.dataset.note = note;
 
   taskDiv.innerHTML = `
     <strong class="task-title">${name}</strong><br>
@@ -86,8 +90,7 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note) {
     メモ: ${note || "なし"}
   `;
 
-  taskDiv.querySelector(".task-title").style.cursor = "pointer";
-  taskDiv.querySelector(".task-title").addEventListener("click", () => {
+  taskDiv.addEventListener("click", () => {
     openEditModal(taskDiv);
   });
 
@@ -105,7 +108,7 @@ function openEditModal(taskDiv) {
   document.getElementById("editAssignee").value = taskDiv.dataset.assignee;
   showModal("edit");
 
-  // 編集モーダルの submit を一度 remove して再登録（多重登録防止）
+  // 編集フォームの再バインド（多重イベント防止）
   const newForm = editForm.cloneNode(true);
   editForm.parentNode.replaceChild(newForm, editForm);
 
@@ -113,6 +116,7 @@ function openEditModal(taskDiv) {
     e.preventDefault();
     const newStatus = document.getElementById("editStatus").value;
     const newAssignee = document.getElementById("editAssignee").value;
+
     taskDiv.dataset.status = newStatus;
     taskDiv.dataset.assignee = newAssignee;
 
