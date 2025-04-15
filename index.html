@@ -62,15 +62,15 @@
     <div class="modal-content">
       <form id="taskForm" class="hidden" style="text-align: left;">
         <h3 style="font-size: 1.5rem; text-align: center;">タスクを追加</h3>
-        <label><span style="color: red">＊</span>タスク名<br><input type="text" id="taskName" required></label><br><br>
-        <label><span style="color: red">＊</span>ステータス<br>
+        <label>$1<span style="color: red">＊</span><br><input type="text" id="taskName" required></label><br><br>
+        <label>$1<span style="color: red">＊</span><br>
           <select id="status" required>
             <option value="未対応" selected>未対応</option>
             <option value="対応中">対応中</option>
             <option value="完了">完了</option>
           </select>
         </label><br><br>
-        <label><span style="color: red">＊</span>頻度<br>
+        <label>$1<span style="color: red">＊</span><br>
           <select id="frequency" required>
             <option value="毎日">毎日</option>
             <option value="毎週">毎週</option>
@@ -79,7 +79,7 @@
             <option value="都度">都度</option>
           </select>
         </label><br><br>
-        <label><span style="color: red">＊</span>担当者<br>
+        <label>$1<span style="color: red">＊</span><br>
           <select id="assignee" required>
             <option value="なし" selected>なし</option>
             <option value="つみき">つみき</option>
@@ -94,14 +94,11 @@
         </div>
       </form>
 
-      <p id="modalText">完了にしますか？</p>
-      <div class="modal-buttons">
-        <button onclick="hideModal()">キャンセル</button>
-        <button onclick="confirmModal()">OK</button>
-      </div>
+      
     </div>
   </div>
 
   <script src="app.js"></script>
 </body>
 </html>
+
