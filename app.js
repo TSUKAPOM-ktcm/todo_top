@@ -49,7 +49,6 @@ function confirmModal() {
 
 function addTaskFromForm(e) {
   e.preventDefault();
-
   const name = document.getElementById("taskName").value;
   const status = document.getElementById("status").value;
   const frequency = document.getElementById("frequency").value;
