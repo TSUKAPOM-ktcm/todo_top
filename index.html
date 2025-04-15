@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>こたちゃんすくすく計画</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
-  <script defer src="app.js"></script>
 </head>
 <body>
   <!-- ログイン画面 -->
   <div id="login-screen" class="centered">
     <h1>こたちゃんすくすく計画 ✨</h1>
-    <input type="password" id="password" placeholder="パスワードを入力">
+    <input type="password" id="password" placeholder="パスワードを入力" />
     <button id="login-btn">ログイン</button>
     <p id="login-error"></p>
   </div>
 
-  <!-- メインアプリ -->
+  <!-- メイン画面 -->
   <div id="main-app" class="hidden">
     <header>
-      <img src="handdrawn-assets/icon.png" alt="アイコン" class="icon">
       <h1>こたちゃんすくすく計画</h1>
-      <div class="date-display" id="today-display"></div>
+      <div id="today-display" class="date-display"></div>
     </header>
 
     <div class="buttons">
@@ -30,39 +28,44 @@
       <button id="memo-btn">📝 伝言メモ</button>
     </div>
 
-    <div class="task-list" id="task-list-container">
-      <!-- 担当者別タスクがここに表示される -->
+    <div class="content">
+      <div id="task-list" class="task-list">
+        <!-- タスクが表示されます -->
+      </div>
+      <div id="memo-display" class="memo-display">
+        <!-- メモが表示されます -->
+      </div>
     </div>
 
-    <!-- タスク追加モーダル -->
+    <!-- タスクモーダル -->
     <div id="task-modal" class="modal hidden">
       <div class="modal-content">
         <h2>タスクを追加</h2>
-        <label>タスク名（必須）<input id="task-name" required></label>
+        <label>タスク名<input id="task-name"></label>
         <label>ステータス
           <select id="task-status">
-            <option value="未対応" selected>未対応</option>
-            <option value="対応中">対応中</option>
-            <option value="完了">完了</option>
+            <option>未対応</option>
+            <option>対応中</option>
+            <option>完了</option>
           </select>
         </label>
-        <label>頻度（必須）
+        <label>頻度
           <select id="task-repeat">
-            <option value="毎日">毎日</option>
-            <option value="毎週">毎週</option>
-            <option value="隔週">隔週</option>
-            <option value="毎月">毎月</option>
-            <option value="都度" selected>都度</option>
+            <option>毎日</option>
+            <option>毎週</option>
+            <option>隔週</option>
+            <option>毎月</option>
+            <option selected>都度</option>
           </select>
         </label>
         <label>担当者
           <select id="task-assignee">
-            <option value="">なし</option>
-            <option value="つみき">つみき</option>
-            <option value="ぬみき">ぬみき</option>
+            <option value="">未担当</option>
+            <option>つみき</option>
+            <option>ぬみき</option>
           </select>
         </label>
-        <label>完了予定日<input type="date" id="task-deadline"></label>
+        <label>期限<input type="date" id="task-deadline"></label>
         <label>メモ<textarea id="task-note"></textarea></label>
         <div class="modal-buttons">
           <button id="save-task-btn">保存</button>
@@ -82,7 +85,19 @@
         </div>
       </div>
     </div>
+
+    <!-- ステータス変更モーダル -->
+    <div id="status-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>このタスクを完了にしますか？</h2>
+        <div class="modal-buttons">
+          <button id="confirm-status-btn">完了にする</button>
+          <button id="cancel-status-btn">キャンセル</button>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
-
