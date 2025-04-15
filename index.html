@@ -12,13 +12,16 @@
   <!-- ログイン画面 -->
   <div id="login-screen" class="centered">
     <h1>こたちゃんすくすく計画 ✨</h1>
-    <input type="password" id="password" placeholder="パスワードを入力">
-    <button id="login-btn">ログイン</button>
+    <!-- フォームで囲み、submitイベントを処理 -->
+    <form id="login-form" onsubmit="event.preventDefault(); checkPassword();">
+      <input type="password" id="password" placeholder="パスワードを入力">
+      <button type="submit" id="login-btn">ログイン</button>
+    </form>
     <p id="login-error"></p>
   </div>
 
   <!-- メインアプリ -->
-  <div id="main-app" class="hidden">
+  <div id="main-app" style="display:none;">
     <header>
       <img src="handdrawn-assets/icon.png" alt="アイコン" class="icon">
       <h1>こたちゃんすくすく計画</h1>
@@ -31,21 +34,7 @@
     </div>
 
     <div class="task-list" id="task-list-container">
-      <div id="tasks-by-user">
-        <!-- 担当者別タスクがここに表示される -->
-      </div>
-    </div>
-
-    <!-- 伝言メモモーダル -->
-    <div id="memo-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>伝言メモ</h2>
-        <textarea id="memo-content" rows="6"></textarea>
-        <div class="modal-buttons">
-          <button id="save-memo-btn">保存</button>
-          <button id="close-memo-modal">閉じる</button>
-        </div>
-      </div>
+      <!-- 担当者別タスクがここに表示される -->
     </div>
 
     <!-- タスク追加モーダル -->
@@ -60,7 +49,8 @@
             <option value="完了">完了</option>
           </select>
         </label>
-        <label>頻度（必須）<select id="task-repeat">
+        <label>頻度（必須）
+          <select id="task-repeat">
             <option value="毎日">毎日</option>
             <option value="毎週">毎週</option>
             <option value="隔週">隔週</option>
@@ -84,6 +74,18 @@
       </div>
     </div>
 
+    <!-- 伝言メモモーダル -->
+    <div id="memo-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>伝言メモ</h2>
+        <textarea id="memo-content" rows="6"></textarea>
+        <div class="modal-buttons">
+          <button id="save-memo-btn">保存</button>
+          <button id="close-memo-modal">閉じる</button>
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
+
