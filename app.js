@@ -1,14 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // モーダル初期化
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
   document.getElementById("memoViewModal").classList.add("hidden");
   document.getElementById("memoViewModal").style.display = "none";
-
-  // フォーム初期化イベント登録
-  document.getElementById("taskForm")?.addEventListener("submit", addTaskFromForm);
-  document.getElementById("memoForm")?.addEventListener("submit", addMemoFromForm);
-  document.getElementById("eventForm")?.addEventListener("submit", addEventFromForm);
 });
 
 // ログイン処理
@@ -139,15 +133,32 @@ function addTaskFromForm(e) {
   hideModal();
 }
 
-// 編集モーダル表示
+// タスク編集モーダル
 function showEditTaskModal(task) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
   modal.classList.remove("hidden");
   modal.style.display = "flex";
 
-  content.innerHTML = document.getElementById("editTaskTemplate").innerHTML;
-  document.getElementById("editTaskTitle").textContent = task.dataset.name;
+  content.innerHTML = `
+    <form id="editTaskForm">
+      <h3 id="editTaskTitle">${task.dataset.name}</h3>
+      <label>ステータス<span class="required">*</span><br>
+        <select id="editStatus">
+          <option>未対応</option><option>対応中</option><option>完了</option>
+        </select></label>
+      <label>担当者<span class="required">*</span><br>
+        <select id="editAssignee">
+          <option>なし</option><option>つみき</option><option>ぬみき</option>
+        </select></label>
+      <label>完了予定日<br><input type="date" id="editDueDate"></label>
+      <label>メモ<br><textarea id="editNote"></textarea></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>`;
+
   document.getElementById("editStatus").value = task.dataset.status;
   document.getElementById("editAssignee").value = task.dataset.assignee;
   document.getElementById("editDueDate").value = task.dataset.dueDate || "";
@@ -165,22 +176,18 @@ function showEditTaskModal(task) {
     task.dataset.dueDate = newDueDate;
     task.dataset.note = newNote;
 
-    const due = newDueDate ? new Date(newDueDate + "T00:00:00") : null;
-    const today = new Date();
-    const isOverdue = due && due < today;
-
-    task.innerHTML = isOverdue
-      ? `<strong>${task.dataset.name}</strong><br>メモ: ${newNote}<br>完了予定日: ${newDueDate}`
-      : `<strong>${task.dataset.name}</strong>`;
-
-    task.onclick = () => showEditTaskModal(task);
+    task.innerHTML =
+      `<strong>${task.dataset.name}</strong><br>メモ: ${newNote}<br>完了予定日: ${newDueDate}`;
 
     task.remove();
+    const today = new Date();
+    const due = newDueDate ? new Date(newDueDate + "T00:00:00") : null;
+    const isOverdue = due && due < today;
     if (isOverdue && newStatus !== "完了") {
       document.getElementById("tasks-overdue").appendChild(task);
     } else {
-      const target = document.getElementById(`tasks-${newAssignee}-${newStatus}`);
-      target?.appendChild(task);
+      const container = document.getElementById(`tasks-${newAssignee}-${newStatus}`);
+      container?.appendChild(task);
     }
 
     hideModal();
@@ -213,12 +220,23 @@ function addMemoFromForm(e) {
 }
 
 function hideMemoModal() {
-  const modal = document.getElementById("memoViewModal");
-  modal.classList.add("hidden");
-  modal.style.display = "none";
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
 }
 
-// 予定追加
+// 予定追加＋今週/今月分類
+function isSameWeek(date, reference) {
+  const ref = new Date(reference);
+  const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 6);
+  return date >= startOfWeek && date <= endOfWeek;
+}
+function isSameMonth(date, reference) {
+  return date.getFullYear() === reference.getFullYear() &&
+         date.getMonth() === reference.getMonth();
+}
+
 function addEventFromForm(e) {
   e.preventDefault();
   const date = document.getElementById("eventDate").value;
@@ -227,39 +245,107 @@ function addEventFromForm(e) {
   const content = document.getElementById("eventContent").value;
   const note = document.getElementById("eventNote").value;
 
-  const today = new Date();
-  const eventDate = new Date(date + "T00:00:00");
-  if (!date || !content.trim()) return;
+  if (!date || !content.trim()) {
+    alert("日付と内容は必須です！");
+    return;
+  }
 
-  if (eventDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+  const eventDate = new Date(`${date}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (eventDate < today) {
     hideModal();
     return;
   }
 
   const event = document.createElement("div");
   event.className = "event-item";
-  const timeStr = hour && minute ? `${hour}:${minute}` : "";
-  event.innerHTML = `<strong>${date}</strong> ${timeStr} - ${content}`;
+  const time = hour && minute ? `${hour}:${minute}` : "";
+  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
   event.dataset.date = date;
   event.dataset.hour = hour;
   event.dataset.minute = minute;
   event.dataset.content = content;
   event.dataset.note = note;
 
-  event.onclick = () => {
-    alert(`日付: ${date}\n時間: ${timeStr}\n内容: ${content}\nメモ: ${note}`);
-  };
+  event.onclick = () => openEditEventModal(event);
 
-  const day = eventDate.getDay();
-  const diff = (eventDate.getDate() - today.getDate() + 7 - day + today.getDay()) % 7;
-  const isThisWeek = diff >= 0 && diff < 7;
-  const isThisMonth = eventDate.getMonth() === today.getMonth();
-
-  if (isThisWeek) {
+  if (isSameWeek(eventDate, today)) {
     document.getElementById("calendar-week").appendChild(event);
-  } else if (isThisMonth) {
+  } else if (isSameMonth(eventDate, today)) {
     document.getElementById("calendar-month").appendChild(event);
   }
 
   hideModal();
+}
+
+// 予定編集モーダル
+function openEditEventModal(eventDiv) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  content.innerHTML = `
+    <form id="editEventForm">
+      <h3>予定の編集</h3>
+      <label>日付<span class="required">*</span><br>
+        <input type="date" id="editEventDate" value="${eventDiv.dataset.date}" required></label>
+      <label>時間（時・分）<br>
+        <select id="editEventHour"></select>
+        <select id="editEventMinute">
+          <option value="">--</option>
+          <option>00</option><option>15</option><option>30</option><option>45</option>
+        </select></label>
+      <label>内容<span class="required">*</span><br>
+        <input id="editEventContent" value="${eventDiv.dataset.content}" required></label>
+      <label>メモ<br><textarea id="editEventNote">${eventDiv.dataset.note || ""}</textarea></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  `;
+
+  const hourSelect = document.getElementById("editEventHour");
+  for (let i = 0; i < 24; i++) {
+    const opt = document.createElement("option");
+    opt.value = String(i).padStart(2, "0");
+    opt.textContent = i;
+    if (eventDiv.dataset.hour === opt.value) opt.selected = true;
+    hourSelect.appendChild(opt);
+  }
+  document.getElementById("editEventMinute").value = eventDiv.dataset.minute || "";
+
+  document.getElementById("editEventForm").onsubmit = (e) => {
+    e.preventDefault();
+    const newDate = document.getElementById("editEventDate").value;
+    const newHour = document.getElementById("editEventHour").value;
+    const newMinute = document.getElementById("editEventMinute").value;
+    const newContent = document.getElementById("editEventContent").value;
+    const newNote = document.getElementById("editEventNote").value;
+
+    eventDiv.dataset.date = newDate;
+    eventDiv.dataset.hour = newHour;
+    eventDiv.dataset.minute = newMinute;
+    eventDiv.dataset.content = newContent;
+    eventDiv.dataset.note = newNote;
+
+    const timeStr = newHour && newMinute ? `${newHour}:${newMinute}` : "";
+    eventDiv.innerHTML = `<strong>${newDate}</strong> ${timeStr} - ${newContent}`;
+
+    const newDateObj = new Date(`${newDate}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    eventDiv.remove();
+    if (isSameWeek(newDateObj, today)) {
+      document.getElementById("calendar-week").appendChild(eventDiv);
+    } else if (isSameMonth(newDateObj, today)) {
+      document.getElementById("calendar-month").appendChild(eventDiv);
+    }
+
+    hideModal();
+  };
 }
