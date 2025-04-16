@@ -1,3 +1,5 @@
+const db = firebase.firestore();
+
 // Firestoreの db は HTML 側で初期化されている前提です
 
 document.addEventListener("DOMContentLoaded", () => {
