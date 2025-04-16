@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("memoViewModal").style.display = "none";
 });
 
-// ログイン処理
 function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -41,7 +40,6 @@ function login() {
   }
 }
 
-// モーダル表示処理（タスク／メモ／予定）
 function showModal(type) {
   const modal = document.getElementById("modal");
   const modalContent = document.getElementById("modalContent");
@@ -73,8 +71,18 @@ function showModal(type) {
         </div>
       </form>`;
     document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
-  }
-  else if (type === "event") {
+  } else if (type === "memo") {
+    modalContent.innerHTML = `
+      <form id="memoForm">
+        <h3>伝言メモ追加</h3>
+        <label>メモ<span class="required">*</span><br><textarea id="memoText" required></textarea></label>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>`;
+    document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
+  } else if (type === "event") {
     modalContent.innerHTML = `
       <form id="eventForm">
         <h3>予定を追加</h3>
@@ -101,14 +109,109 @@ function showModal(type) {
   }
 }
 
-// モーダルを閉じる
 function hideModal() {
   const modal = document.getElementById("modal");
   modal.classList.add("hidden");
   modal.style.display = "none";
 }
 
-// 🔧 addTaskFromForm の中で誤ってログイン画面に戻してしまうような処理は含まれていないことを確認済みです。
-// ただし、今後のデバッグのために必要な処理が追加される場合は、慎重に取り扱ってください。
+function addTaskFromForm(e) {
+  e.preventDefault();
+  const name = document.getElementById("taskName").value;
+  const status = document.getElementById("status").value;
+  const frequency = document.getElementById("frequency").value;
+  const assignee = document.getElementById("assignee").value;
+  const dueDate = document.getElementById("dueDate").value;
+  const note = document.getElementById("note").value;
 
-// この状態でタスク追加モーダルの "OK" ボタンを押してもログイン画面に戻ることはなくなります。
+  db.collection("tasks").add({
+    name,
+    status,
+    frequency,
+    assignee,
+    dueDate: dueDate || null,
+    note: note || "",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then((docRef) => {
+    console.log("タスクを保存しました", docRef.id);
+    createTaskElement(name, status, frequency, assignee, dueDate, note, docRef.id);
+    hideModal();
+  }).catch((error) => {
+    console.error("Firestore保存エラー:", error);
+    alert("タスクの保存に失敗しました");
+  });
+}
+
+function createTaskElement(name, status, frequency, assignee, dueDate, note, id) {
+  const task = document.createElement("div");
+  task.className = "task-item";
+  task.dataset.id = id;
+  task.dataset.name = name;
+  task.dataset.status = status;
+  task.dataset.frequency = frequency;
+  task.dataset.assignee = assignee;
+  task.dataset.dueDate = dueDate;
+  task.dataset.note = note;
+  task.innerHTML = `<strong>${name}</strong><br>メモ: ${note || "なし"}<br>完了予定日: ${dueDate || ""}`;
+  task.onclick = () => openEditTaskModal(task);
+  document.getElementById(`tasks-${assignee}-${status}`)?.appendChild(task);
+}
+
+function openEditTaskModal(task) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  content.innerHTML = `
+    <form id="editTaskForm">
+      <h3 id="editTaskTitle">${task.dataset.name}</h3>
+      <label>ステータス<span class="required">*</span><br>
+        <select id="editStatus">
+          <option>未対応</option><option>対応中</option><option>完了</option>
+        </select></label>
+      <label>担当者<span class="required">*</span><br>
+        <select id="editAssignee">
+          <option>なし</option><option>つみき</option><option>ぬみき</option>
+        </select></label>
+      <label>完了予定日<br><input type="date" id="editDueDate"></label>
+      <label>メモ<br><textarea id="editNote"></textarea></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>`;
+
+  document.getElementById("editStatus").value = task.dataset.status;
+  document.getElementById("editAssignee").value = task.dataset.assignee;
+  document.getElementById("editDueDate").value = task.dataset.dueDate || "";
+  document.getElementById("editNote").value = task.dataset.note || "";
+
+  document.getElementById("editTaskForm").onsubmit = (e) => {
+    e.preventDefault();
+    const newStatus = document.getElementById("editStatus").value;
+    const newAssignee = document.getElementById("editAssignee").value;
+    const newDueDate = document.getElementById("editDueDate").value;
+    const newNote = document.getElementById("editNote").value;
+    const id = task.dataset.id;
+
+    db.collection("tasks").doc(id).update({
+      status: newStatus,
+      assignee: newAssignee,
+      dueDate: newDueDate || null,
+      note: newNote || ""
+    }).then(() => {
+      task.dataset.status = newStatus;
+      task.dataset.assignee = newAssignee;
+      task.dataset.dueDate = newDueDate;
+      task.dataset.note = newNote;
+      task.innerHTML = `<strong>${task.dataset.name}</strong><br>メモ: ${newNote || "なし"}<br>完了予定日: ${newDueDate || ""}`;
+      task.onclick = () => openEditTaskModal(task);
+      task.remove();
+      document.getElementById(`tasks-${newAssignee}-${newStatus}`)?.appendChild(task);
+      hideModal();
+    });
+  };
+}
+
+
