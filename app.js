@@ -2,6 +2,26 @@ const db = window.db;
 
 // Firestoreの db は HTML 側で初期化されている前提です
 
+function isSameWeek(date, reference) {
+  const ref = new Date(reference);
+  const day = ref.getDay();
+  const startOfWeek = new Date(ref);
+  startOfWeek.setDate(ref.getDate() - day);
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 6);
+  return date >= startOfWeek && date <= endOfWeek;
+}
+
+function isSameMonth(date, reference) {
+  return date.getFullYear() === reference.getFullYear() && date.getMonth() === reference.getMonth();
+}
+
+function isNextMonthOrLater(date, reference) {
+  const nextMonth = new Date(reference.getFullYear(), reference.getMonth() + 1, 1);
+  return date >= nextMonth;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
@@ -53,20 +73,12 @@ function showModal(type) {
         </div>
       </form>`;
     document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
-
-  } else if (type === "memo") {
-    modalContent.innerHTML = `
-      <form id="memoForm">
-        <h3>伝言メモ追加</h3>
-        <label>メモ<span class="required">*</span><br><textarea id="memoText" required></textarea></label>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>`;
-    document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
-
-  } else if (type === "event") {
+  }
+  else if (type === "event") {
+    const modal = document.getElementById("modal");
+    const modalContent = document.getElementById("modalContent");
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
     modalContent.innerHTML = `
       <form id="eventForm">
         <h3>予定を追加</h3>
@@ -82,7 +94,6 @@ function showModal(type) {
           <button type="submit">OK</button>
         </div>
       </form>`;
-
     const hourSel = document.getElementById("eventHour");
     for (let i = 0; i < 24; i++) {
       const op = document.createElement("option");
@@ -101,114 +112,113 @@ function hideModal() {
   modal.style.display = "none";
 }
 
-// タスクの表示要素を作成
-function createTaskElement(name, status, frequency, assignee, dueDate, note, id) {
-  const task = document.createElement("div");
-  task.className = "task-item";
-  task.dataset.name = name;
-  task.dataset.status = status;
-  task.dataset.frequency = frequency;
-  task.dataset.assignee = assignee;
-  task.dataset.dueDate = dueDate;
-  task.dataset.note = note;
-  task.dataset.id = id;
-  task.innerHTML = `
-    <strong>${name}</strong><br>
-    メモ: ${note || "なし"}<br>
-    完了予定日: ${dueDate || ""}
-  `;
-  task.onclick = () => showEditTaskModal(task);
-  document.getElementById(`tasks-${assignee}-${status}`)?.appendChild(task);
-}
-
-// タスク追加処理（Firestore保存あり）
-function addTaskFromForm(e) {
+// 予定追加
+function addEventFromForm(e) {
   e.preventDefault();
-  const name = document.getElementById("taskName").value;
-  const status = document.getElementById("status").value;
-  const frequency = document.getElementById("frequency").value;
-  const assignee = document.getElementById("assignee").value;
-  const dueDate = document.getElementById("dueDate").value;
-  const note = document.getElementById("note").value;
+  const date = document.getElementById("eventDate").value;
+  const hour = document.getElementById("eventHour").value;
+  const minute = document.getElementById("eventMinute").value;
+  const content = document.getElementById("eventContent").value;
+  const note = document.getElementById("eventNote").value;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const eventDate = new Date(date + "T00:00:00");
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  if (eventDate <= yesterday) return hideModal();
 
-  db.collection("tasks").add({
-    name,
-    status,
-    frequency,
-    assignee,
-    dueDate: dueDate || null,
-    note: note || "",
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then((docRef) => {
-    console.log("タスクを保存しました", docRef.id);
-    createTaskElement(name, status, frequency, assignee, dueDate, note, docRef.id);
-    hideModal();
-  }).catch((error) => {
-    console.error("Firestore保存エラー:", error);
-    alert("タスクの保存に失敗しました");
-  });
+  const eventDiv = document.createElement("div");
+  eventDiv.className = "event-item";
+  const time = hour && minute ? `${hour}:${minute}` : "";
+  eventDiv.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
+  eventDiv.dataset.date = date;
+  eventDiv.dataset.hour = hour;
+  eventDiv.dataset.minute = minute;
+  eventDiv.dataset.content = content;
+  eventDiv.dataset.note = note;
+  eventDiv.onclick = () => openEditEventModal(eventDiv);
+
+  if (isSameWeek(eventDate, today)) {
+    document.getElementById("calendar-week").appendChild(eventDiv);
+  } else if (isSameMonth(eventDate, today)) {
+    document.getElementById("calendar-month").appendChild(eventDiv);
+  } else if (isNextMonthOrLater(eventDate, today)) {
+    document.getElementById("calendar-future").appendChild(eventDiv);
+  }
+  hideModal();
 }
 
-// タスク編集用モーダル
-function showEditTaskModal(task) {
+function openEditEventModal(eventDiv) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
   modal.classList.remove("hidden");
   modal.style.display = "flex";
 
   content.innerHTML = `
-    <form id="editTaskForm">
-      <h3>${task.dataset.name}</h3>
-      <label>ステータス<span class="required">*</span><br>
-        <select id="editStatus">
-          <option>未対応</option><option>対応中</option><option>完了</option>
+    <form id="editEventForm">
+      <h3>予定の編集</h3>
+      <label>日付<span class="required">*</span><br>
+        <input type="date" id="editEventDate" value="${eventDiv.dataset.date}" required></label>
+      <label>時間（時・分）<br>
+        <select id="editEventHour"></select>
+        <select id="editEventMinute">
+          <option value="">--</option>
+          <option>00</option><option>15</option><option>30</option><option>45</option>
         </select></label>
-      <label>担当者<span class="required">*</span><br>
-        <select id="editAssignee">
-          <option>なし</option><option>つみき</option><option>ぬみき</option>
-        </select></label>
-      <label>完了予定日<br><input type="date" id="editDueDate"></label>
-      <label>メモ<br><textarea id="editNote"></textarea></label>
+      <label>内容<span class="required">*</span><br>
+        <input id="editEventContent" value="${eventDiv.dataset.content}" required></label>
+      <label>メモ<br><textarea id="editEventNote">${eventDiv.dataset.note || ""}</textarea></label>
       <div class="modal-buttons">
         <button type="button" onclick="hideModal()">キャンセル</button>
         <button type="submit">保存</button>
       </div>
-    </form>`;
+    </form>
+  `;
 
-  document.getElementById("editStatus").value = task.dataset.status;
-  document.getElementById("editAssignee").value = task.dataset.assignee;
-  document.getElementById("editDueDate").value = task.dataset.dueDate || "";
-  document.getElementById("editNote").value = task.dataset.note || "";
+  const hourSelect = document.getElementById("editEventHour");
+  for (let i = 0; i < 24; i++) {
+    const opt = document.createElement("option");
+    opt.value = String(i).padStart(2, "0");
+    opt.textContent = i;
+    if (eventDiv.dataset.hour === opt.value) opt.selected = true;
+    hourSelect.appendChild(opt);
+  }
 
-  document.getElementById("editTaskForm").onsubmit = (e) => {
+  document.getElementById("editEventMinute").value = eventDiv.dataset.minute || "";
+
+  document.getElementById("editEventForm").onsubmit = (e) => {
     e.preventDefault();
-    const newStatus = document.getElementById("editStatus").value;
-    const newAssignee = document.getElementById("editAssignee").value;
-    const newDueDate = document.getElementById("editDueDate").value;
-    const newNote = document.getElementById("editNote").value;
-    const taskId = task.dataset.id;
+    const newDate = document.getElementById("editEventDate").value;
+    const newHour = document.getElementById("editEventHour").value;
+    const newMinute = document.getElementById("editEventMinute").value;
+    const newContent = document.getElementById("editEventContent").value;
+    const newNote = document.getElementById("editEventNote").value;
 
-    db.collection("tasks").doc(taskId).update({
-      status: newStatus,
-      assignee: newAssignee,
-      dueDate: newDueDate || null,
-      note: newNote || ""
-    }).then(() => {
-      console.log("タスクを更新しました", taskId);
-      task.dataset.status = newStatus;
-      task.dataset.assignee = newAssignee;
-      task.dataset.dueDate = newDueDate;
-      task.dataset.note = newNote;
-      task.innerHTML = `
-        <strong>${task.dataset.name}</strong><br>
-        メモ: ${newNote || "なし"}<br>
-        完了予定日: ${newDueDate || ""}
-      `;
-      task.onclick = () => showEditTaskModal(task);
-      hideModal();
-    }).catch((error) => {
-      console.error("Firestore更新エラー:", error);
-      alert("タスクの更新に失敗しました");
-    });
+    eventDiv.dataset.date = newDate;
+    eventDiv.dataset.hour = newHour;
+    eventDiv.dataset.minute = newMinute;
+    eventDiv.dataset.content = newContent;
+    eventDiv.dataset.note = newNote;
+
+    const timeStr = newHour && newMinute ? `${newHour}:${newMinute}` : "";
+    eventDiv.innerHTML = `<strong>${newDate}</strong> ${timeStr} - ${newContent}`;
+    eventDiv.onclick = () => openEditEventModal(eventDiv);
+
+    eventDiv.remove();
+    const dateObj = new Date(newDate + "T00:00:00");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    if (dateObj <= yesterday) return hideModal();
+
+    if (isSameWeek(dateObj, today)) {
+      document.getElementById("calendar-week").appendChild(eventDiv);
+    } else if (isSameMonth(dateObj, today)) {
+      document.getElementById("calendar-month").appendChild(eventDiv);
+    } else if (isNextMonthOrLater(dateObj, today)) {
+      document.getElementById("calendar-future").appendChild(eventDiv);
+    }
+    hideModal();
   };
 }
