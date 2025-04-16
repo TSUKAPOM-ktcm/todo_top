@@ -127,10 +127,28 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note, id)
   task.dataset.assignee = assignee;
   task.dataset.dueDate = dueDate;
   task.dataset.note = note;
-  task.innerHTML = `<strong>${name}</strong><br>メモ: ${note || "なし"}<br>完了予定日: ${dueDate || ""}`;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = dueDate ? new Date(dueDate + "T00:00:00") : null;
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isOverdue = due && due <= yesterday && status !== "完了";
+
+  // 表示内容の条件分岐（過去日なら詳細表示、それ以外はタスク名のみ）
+  task.innerHTML = isOverdue
+    ? `<strong>${name}</strong><br>メモ: ${note || "なし"}<br>完了予定日: ${dueDate || ""}`
+    : `<strong>${name}</strong>`;
+
   task.onclick = () => openEditTaskModal(task);
-  document.getElementById(`tasks-${assignee}-${status}`)?.appendChild(task);
+
+  if (isOverdue) {
+    document.getElementById("tasks-overdue")?.appendChild(task);
+  } else {
+    document.getElementById(`tasks-${assignee}-${status}`)?.appendChild(task);
+  }
 }
+
 
 function openEditTaskModal(task) {
   const modal = document.getElementById("modal");
@@ -180,14 +198,32 @@ function openEditTaskModal(task) {
       task.dataset.assignee = newAssignee;
       task.dataset.dueDate = newDueDate;
       task.dataset.note = newNote;
-      task.innerHTML = `<strong>${task.dataset.name}</strong><br>メモ: ${newNote || "なし"}<br>完了予定日: ${newDueDate || ""}`;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const due = newDueDate ? new Date(newDueDate + "T00:00:00") : null;
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const isOverdue = due && due <= yesterday && newStatus !== "完了";
+
+      task.innerHTML = isOverdue
+        ? `<strong>${task.dataset.name}</strong><br>メモ: ${newNote || "なし"}<br>完了予定日: ${newDueDate || ""}`
+        : `<strong>${task.dataset.name}</strong>`;
+
       task.onclick = () => openEditTaskModal(task);
       task.remove();
-      document.getElementById(`tasks-${newAssignee}-${newStatus}`)?.appendChild(task);
+
+      if (isOverdue) {
+        document.getElementById("tasks-overdue")?.appendChild(task);
+      } else {
+        document.getElementById(`tasks-${newAssignee}-${newStatus}`)?.appendChild(task);
+      }
+
       hideModal();
     });
   };
 }
+
 
 function addMemoFromForm(e) {
   e.preventDefault();
