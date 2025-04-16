@@ -1,4 +1,4 @@
-const db = window.db; 
+const db = window.db;
 
 // Firestoreの db は HTML 側で初期化されている前提です
 
@@ -138,24 +138,69 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note) {
     メモ: ${note || "なし"}<br>
     完了予定日: ${dueDate || ""}
   `;
+  task.onclick = () => showEditTaskModal(task);
   document.getElementById(`tasks-${assignee}-${status}`)?.appendChild(task);
+}
+
+// タスク編集用モーダル（追加）
+function showEditTaskModal(task) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  content.innerHTML = `
+    <form id="editTaskForm">
+      <h3>${task.querySelector("strong").textContent}</h3>
+      <label>ステータス<span class="required">*</span><br>
+        <select id="editStatus">
+          <option>未対応</option><option>対応中</option><option>完了</option>
+        </select></label>
+      <label>担当者<span class="required">*</span><br>
+        <select id="editAssignee">
+          <option>なし</option><option>つみき</option><option>ぬみき</option>
+        </select></label>
+      <label>完了予定日<br><input type="date" id="editDueDate"></label>
+      <label>メモ<br><textarea id="editNote"></textarea></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>`;
+
+  document.getElementById("editStatus").value = task.dataset.status;
+  document.getElementById("editAssignee").value = task.dataset.assignee;
+  document.getElementById("editDueDate").value = task.dataset.dueDate || "";
+  document.getElementById("editNote").value = task.dataset.note || "";
+
+  document.getElementById("editTaskForm").onsubmit = (e) => {
+    e.preventDefault();
+    task.dataset.status = document.getElementById("editStatus").value;
+    task.dataset.assignee = document.getElementById("editAssignee").value;
+    task.dataset.dueDate = document.getElementById("editDueDate").value;
+    task.dataset.note = document.getElementById("editNote").value;
+    task.innerHTML = `
+      <strong>${task.dataset.name}</strong><br>
+      メモ: ${task.dataset.note || "なし"}<br>
+      完了予定日: ${task.dataset.dueDate || ""}
+    `;
+    task.onclick = () => showEditTaskModal(task);
+    hideModal();
+  };
 }
 
 // 伝言メモ追加処理
 function addMemoFromForm(e) {
   e.preventDefault();
   const memoText = document.getElementById("memoText").value.trim();
-
   if (!memoText) {
     alert("メモを入力してください！");
     return;
   }
-
   const memo = document.createElement("div");
   memo.className = "memo-item";
   memo.dataset.full = memoText;
   memo.textContent = memoText.length > 100 ? memoText.slice(0, 100) + "…" : memoText;
-
   memo.onclick = () => {
     document.getElementById("fullMemoText").textContent = memoText;
     document.getElementById("memoViewModal").classList.remove("hidden");
@@ -165,7 +210,6 @@ function addMemoFromForm(e) {
       hideMemoModal();
     };
   };
-
   document.getElementById("memos").appendChild(memo);
   hideModal();
 }
@@ -196,7 +240,7 @@ function addEventFromForm(e) {
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   if (eventDate <= yesterday) {
-    hideModal(); // 昨日以前は表示しない
+    hideModal();
     return;
   }
 
@@ -210,13 +254,15 @@ function addEventFromForm(e) {
 
   const time = hour && minute ? `${hour}:${minute}` : "";
   event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
-  // ※ 編集モーダル対応は未実装
-  document.getElementById("calendar-week").appendChild(event);
 
+  event.onclick = () => {
+    alert(`予定：${date} ${time}\n${content}\n${note}`);
+  };
+
+  document.getElementById("calendar-week").appendChild(event);
   hideModal();
 }
 
-// 補助関数
 function isSameWeek(date, reference) {
   const ref = new Date(reference);
   const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
@@ -234,4 +280,3 @@ function isNextMonthOrLater(date, reference) {
   const refYear = reference.getFullYear();
   return date > new Date(refYear, refMonth + 1, 0);
 }
-
