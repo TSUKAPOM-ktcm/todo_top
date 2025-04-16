@@ -2,25 +2,25 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>こたちゃんすくすく計画</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <div id="loginScreen">
+  <!-- ログイン画面 -->
+  <div id="loginScreen" class="login-screen">
     <h1 class="app-title">こたちゃん<br>すくすく計画</h1>
-    <img src="bear.png" class="bear-icon" alt="くま"/>
-    <input type="email" id="email" placeholder="メールアドレス"/>
-    <input type="password" id="password" placeholder="パスワード"/>
+    <img src="bear.png" alt="くま" class="bear-icon" />
+    <input type="email" id="email" placeholder="メールアドレス" />
+    <input type="password" id="password" placeholder="パスワード" />
     <button onclick="login()">ログイン</button>
   </div>
 
-  <div id="mainScreen" class="hidden">
+  <!-- メイン画面 -->
+  <div id="mainScreen" class="main-screen hidden">
     <header>
       <h2>こたちゃんすくすく計画🐻</h2>
-      <div class="header-buttons">
+      <div class="button-group">
         <button onclick="showModal('task')">タスクを追加</button>
         <button onclick="showModal('memo')">伝言メモ追加</button>
         <button onclick="showModal('event')">予定を追加</button>
@@ -28,23 +28,30 @@
     </header>
 
     <div class="container">
+      <!-- 左列：未完了タスク -->
       <div class="tasks-column">
         <h3>期日が過ぎているタスク</h3>
-        <div id="tasks-overdue"></div>
-
+        <div id="overdueTasks"></div>
         <h3>未完了の担当者別タスク</h3>
-        <h4>なし（未対応）</h4><div id="tasks-なし-未対応"></div>
-        <h4>つみき（未対応）</h4><div id="tasks-つみき-未対応"></div>
-        <h4>ぬみき（未対応）</h4><div id="tasks-ぬみき-未対応"></div>
-        <h4>つみき（対応中）</h4><div id="tasks-つみき-対応中"></div>
-        <h4>ぬみき（対応中）</h4><div id="tasks-ぬみき-対応中"></div>
+        <div id="none-pending"><h4>なし（未対応）</h4></div>
+        <div id="tsumiki-pending"><h4>つみき（未対応）</h4></div>
+        <div id="numiki-pending"><h4>ぬみき（未対応）</h4></div>
+        <div id="tsumiki-progress"><h4>つみき（対応中）</h4></div>
+        <div id="numiki-progress"><h4>ぬみき（対応中）</h4></div>
       </div>
 
+      <!-- 右列：カレンダー＋メモ -->
       <div class="right-column">
         <div class="calendar">
           <h3>カレンダー</h3>
-          <h4>今週の予定</h4><div id="calendar-week"></div>
-          <h4>今月の予定</h4><div id="calendar-month"></div>
+          <div class="calendar-section">
+            <h4>今週の予定</h4>
+            <div id="thisWeekEvents"></div>
+          </div>
+          <div class="calendar-section">
+            <h4>今月の予定</h4>
+            <div id="thisMonthEvents"></div>
+          </div>
         </div>
 
         <div class="memo">
@@ -55,111 +62,10 @@
     </div>
   </div>
 
-  <!-- モーダル -->
-  <div class="modal hidden" id="modal" style="display: none;">
-    <div class="modal-content">
-
-      <!-- タスクフォーム -->
-      <form id="taskForm" class="task-form hidden">
-        <h3>タスクを追加</h3>
-        <label>タスク名 <span class="required">＊</span><input id="taskName" required /></label>
-        <label>ステータス <span class="required">＊</span>
-          <select id="status" required>
-            <option>未対応</option><option>対応中</option><option>完了</option>
-          </select>
-        </label>
-        <label>頻度 <span class="required">＊</span>
-          <select id="frequency" required>
-            <option>毎日</option><option>毎週</option><option>隔週</option><option>毎月</option><option>都度</option>
-          </select>
-        </label>
-        <label>担当者 <span class="required">＊</span>
-          <select id="assignee" required>
-            <option>なし</option><option>つみき</option><option>ぬみき</option>
-          </select>
-        </label>
-        <label>完了予定日 <input type="date" id="dueDate" /></label>
-        <label>メモ <textarea id="note"></textarea></label>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>
-
-      <!-- タスク編集 -->
-      <form id="editForm" class="task-form hidden">
-        <h3 id="editTaskTitle">タスク編集</h3>
-        <label>ステータス <span class="required">＊</span>
-          <select id="editStatus">
-            <option>未対応</option><option>対応中</option><option>完了</option>
-          </select>
-        </label>
-        <label>担当者 <span class="required">＊</span>
-          <select id="editAssignee">
-            <option>なし</option><option>つみき</option><option>ぬみき</option>
-          </select>
-        </label>
-        <label>完了予定日 <input type="date" id="editDueDate" /></label>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>
-
-      <!-- メモ追加 -->
-      <form id="memoForm" class="task-form hidden">
-        <h3>伝言メモ追加</h3>
-        <label>メモ <span class="required">＊</span>
-          <textarea id="memoText" required></textarea>
-        </label>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>
-
-      <!-- 予定 -->
-      <form id="eventForm" class="task-form hidden">
-        <h3>予定を追加</h3>
-        <label>日付 <span class="required">＊</span>
-          <input type="date" id="eventDate" required />
-        </label>
-        <label>時間（時・分）
-          <div style="display: flex; gap: 0.5rem;">
-            <select id="eventHour">
-              <option value="">--</option>
-              ${[...Array(24).keys()].map(i => `<option value="${i}">${i}</option>`).join('')}
-            </select>
-            <select id="eventMinute">
-              <option value="">--</option>
-              <option value="00">00</option>
-              <option value="15">15</option>
-              <option value="30">30</option>
-              <option value="45">45</option>
-            </select>
-          </div>
-        </label>
-        <label>内容 <span class="required">＊</span>
-          <input id="eventContent" required />
-        </label>
-        <label>メモ <textarea id="eventNote"></textarea></label>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- メモ閲覧 -->
-  <div class="modal hidden" id="memoViewModal" style="display: none;">
-    <div class="modal-content">
-      <h3 style="color: #ff77aa;">メモの内容</h3>
-      <p id="fullMemoText"></p>
-      <div class="modal-buttons">
-        <button id="deleteMemoBtn">削除</button>
-        <button onclick="hideMemoModal()">キャンセル</button>
-      </div>
+  <!-- モーダル（1つで共通）-->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content" id="modalContent">
+      <!-- 内容はJSで動的に変更 -->
     </div>
   </div>
 
