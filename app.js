@@ -356,17 +356,25 @@ function openEditEventModal(eventDiv) {
     eventDiv.innerHTML = `<strong>${newDate}</strong> ${timeStr} - ${newContent}`;
     eventDiv.onclick = () => openEditEventModal(eventDiv);
 
-    // 再分類
-    const newDateObj = new Date(`${newDate}T00:00:00`);
+    // 再分類処理
+    eventDiv.remove();
+    const dateObj = new Date(newDate + "T00:00:00");
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
 
-    eventDiv.remove();
-    if (isSameWeek(newDateObj, today)) {
+    if (dateObj <= yesterday) {
+      // 昨日以前ならどこにも表示しない
+      hideModal();
+      return;
+    }
+
+    if (isSameWeek(dateObj, today)) {
       document.getElementById("calendar-week").appendChild(eventDiv);
-    } else if (isSameMonth(newDateObj, today)) {
+    } else if (isSameMonth(dateObj, today)) {
       document.getElementById("calendar-month").appendChild(eventDiv);
-    } else if (isNextMonthOrLater(newDateObj, today)) {
+    } else if (isNextMonthOrLater(dateObj, today)) {
       document.getElementById("calendar-future").appendChild(eventDiv);
     }
 
