@@ -125,8 +125,11 @@ function addTaskFromForm(e) {
   const note = document.getElementById("note").value;
 
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const due = dueDate ? new Date(dueDate + "T00:00:00") : null;
-  const isOverdue = due && due < today;
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isOverdue = due && due <= yesterday;
 
   const task = document.createElement("div");
   task.className = "task-item";
@@ -265,8 +268,12 @@ function addEventFromForm(e) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const eventDate = new Date(date + "T00:00:00");
-  if (eventDate < today) {
-    hideModal();
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if (eventDate <= yesterday) {
+    hideModal(); // 昨日以前の予定は無視
     return;
   }
 
@@ -280,7 +287,6 @@ function addEventFromForm(e) {
 
   const time = hour && minute ? `${hour}:${minute}` : "";
   event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
-
   event.onclick = () => openEditEventModal(event);
 
   if (isSameWeek(eventDate, today)) {
