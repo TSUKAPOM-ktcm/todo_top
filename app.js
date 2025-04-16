@@ -1,3 +1,18 @@
+document.addEventListener("DOMContentLoaded", () => {
+  // 初期状態の設定
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("mainScreen").classList.add("hidden");
+
+  document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
+  document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
+  document.getElementById("eventForm").addEventListener("submit", addEventFromForm);
+});
+
+// ログイン
 function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -9,45 +24,33 @@ function login() {
   }
 }
 
+// モーダル操作
 function showModal(type) {
-  document.getElementById("modal").classList.remove("hidden");
-  document.getElementById("modal").style.display = "flex";
+  const modal = document.getElementById("modal");
+  document.querySelectorAll(".task-form").forEach(f => f.classList.add("hidden"));
 
-  ["taskForm", "memoForm", "editForm", "eventForm"].forEach(id => {
-    const form = document.getElementById(id);
-    if (form) form.classList.add("hidden");
-  });
+  if (type === "task") {
+    document.getElementById("taskForm").classList.remove("hidden");
+  } else if (type === "memo") {
+    document.getElementById("memoForm").classList.remove("hidden");
+  } else if (type === "event") {
+    document.getElementById("eventForm").classList.remove("hidden");
+  } else if (type === "edit") {
+    document.getElementById("editForm").classList.remove("hidden");
+  }
 
-  if (type === "task") document.getElementById("taskForm").classList.remove("hidden");
-  else if (type === "memo") document.getElementById("memoForm").classList.remove("hidden");
-  else if (type === "edit") document.getElementById("editForm").classList.remove("hidden");
-  else if (type === "event") document.getElementById("eventForm").classList.remove("hidden");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+  modal.dataset.type = type;
 }
 
 function hideModal() {
-  const modal = document.getElementById("modal");
-  modal.classList.add("hidden");
-  modal.style.display = "none";
-
-  ["taskForm", "memoForm", "editForm", "eventForm"].forEach(id => {
-    const form = document.getElementById(id);
-    if (form) form.reset();
-  });
-
-  document.getElementById("editTaskTitle").textContent = "";
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
 }
 
-function hideMemoModal() {
-  const modal = document.getElementById("memoViewModal");
-  modal.classList.add("hidden");
-  modal.style.display = "none";
-  document.getElementById("fullMemoText").textContent = "";
-  document.getElementById("deleteMemoBtn").onclick = null;
-}
-
-// ================= タスク =====================
-
-document.getElementById("taskForm").addEventListener("submit", function (e) {
+// タスク追加
+function addTaskFromForm(e) {
   e.preventDefault();
   const name = document.getElementById("taskName").value;
   const status = document.getElementById("status").value;
@@ -56,161 +59,143 @@ document.getElementById("taskForm").addEventListener("submit", function (e) {
   const dueDate = document.getElementById("dueDate").value;
   const note = document.getElementById("note").value;
 
-  const div = document.createElement("div");
-  div.className = "task-item";
-  div.dataset.name = name;
-  div.dataset.status = status;
-  div.dataset.frequency = frequency;
-  div.dataset.assignee = assignee;
-  div.dataset.dueDate = dueDate;
-  div.dataset.note = note;
-  div.innerHTML = `<strong>${name}</strong><br>メモ: ${note || ""}<br>完了予定日: ${dueDate || ""}`;
-
-  div.onclick = () => openEditModal(div);
-  placeTask(div);
+  const task = { name, status, frequency, assignee, dueDate, note };
+  renderTask(task);
   hideModal();
-});
-
-function placeTask(div) {
-  const status = div.dataset.status;
-  const assignee = div.dataset.assignee;
-  const due = div.dataset.dueDate;
-  const today = new Date().toISOString().split("T")[0];
-
-  if (due && due < today && status !== "完了") {
-    document.getElementById("tasks-overdue").appendChild(div);
-  } else {
-    const box = document.getElementById(`tasks-${assignee}-${status}`);
-    if (box) box.appendChild(div);
-  }
+  e.target.reset();
 }
 
-function openEditModal(div) {
-  const form = document.getElementById("editForm");
-  document.getElementById("editTaskTitle").textContent = div.dataset.name;
-  document.getElementById("editStatus").value = div.dataset.status;
-  document.getElementById("editAssignee").value = div.dataset.assignee;
-  document.getElementById("editDueDate").value = div.dataset.dueDate || "";
+function renderTask(task) {
+  const overdueArea = document.getElementById("tasks-overdue");
 
+  const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "完了";
+  if (isOverdue) {
+    const div = createTaskElement(task);
+    overdueArea.appendChild(div);
+    return;
+  }
+
+  if (task.status === "完了") return;
+
+  const containerId = `tasks-${task.assignee}-${task.status}`;
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const div = createTaskElement(task);
+  container.appendChild(div);
+}
+
+function createTaskElement(task) {
+  const div = document.createElement("div");
+  div.className = "task-item";
+  div.innerHTML = `
+    <strong>${task.name}</strong><br>
+    頻度: ${task.frequency} ／ 完了予定日: ${task.dueDate || ""}<br>
+    メモ: ${task.note || ""}
+  `;
+  div.addEventListener("click", () => openEditModal(task, div));
+  return div;
+}
+
+function openEditModal(task, element) {
   showModal("edit");
+  document.getElementById("editTaskTitle").textContent = task.name;
+  document.getElementById("editStatus").value = task.status;
+  document.getElementById("editAssignee").value = task.assignee;
+  document.getElementById("editDueDate").value = task.dueDate || "";
 
-  form.onsubmit = function (e) {
+  document.getElementById("editForm").onsubmit = function (e) {
     e.preventDefault();
-    div.dataset.status = document.getElementById("editStatus").value;
-    div.dataset.assignee = document.getElementById("editAssignee").value;
-    div.dataset.dueDate = document.getElementById("editDueDate").value;
-    div.innerHTML = `<strong>${div.dataset.name}</strong><br>メモ: ${div.dataset.note || ""}<br>完了予定日: ${div.dataset.dueDate || ""}`;
-
-    div.remove();
-    placeTask(div);
+    task.status = document.getElementById("editStatus").value;
+    task.assignee = document.getElementById("editAssignee").value;
+    task.dueDate = document.getElementById("editDueDate").value;
+    element.remove();
+    renderTask(task);
     hideModal();
   };
 }
 
-// =============== メモ ==================
-
-document.getElementById("memoForm").addEventListener("submit", function (e) {
+// メモ追加・クリック
+function addMemoFromForm(e) {
   e.preventDefault();
-  const text = document.getElementById("memoText").value;
+  const memo = document.getElementById("memoText").value;
+  if (!memo.trim()) return;
+
   const div = document.createElement("div");
   div.className = "memo-item";
-  div.dataset.full = text;
-  div.textContent = text.length > 100 ? text.slice(0, 100) + "…" : text;
-
-  div.onclick = () => {
-    document.getElementById("fullMemoText").textContent = text;
-    document.getElementById("memoViewModal").classList.remove("hidden");
-    document.getElementById("memoViewModal").style.display = "flex";
-    document.getElementById("deleteMemoBtn").onclick = () => {
-      div.remove();
-      hideMemoModal();
-    };
-  };
-
+  div.textContent = memo.length > 100 ? memo.slice(0, 100) + "…" : memo;
+  div.dataset.fullText = memo;
+  div.addEventListener("click", () => openMemoModal(div));
   document.getElementById("memos").appendChild(div);
+
+  e.target.reset();
   hideModal();
-});
+}
 
-// =============== 予定 ==================
+function openMemoModal(memoElement) {
+  const modal = document.getElementById("memoViewModal");
+  document.getElementById("fullMemoText").textContent = memoElement.dataset.fullText;
+  document.getElementById("deleteMemoBtn").onclick = function () {
+    memoElement.remove();
+    hideMemoModal();
+  };
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+}
 
-document.getElementById("eventForm").addEventListener("submit", function (e) {
+function hideMemoModal() {
+  const modal = document.getElementById("memoViewModal");
+  modal.classList.add("hidden");
+  modal.style.display = "none";
+}
+
+// 予定追加
+function addEventFromForm(e) {
   e.preventDefault();
   const date = document.getElementById("eventDate").value;
   const hour = document.getElementById("eventHour").value;
   const minute = document.getElementById("eventMinute").value;
+  const time = hour && minute ? `${hour}:${minute}` : "";
   const content = document.getElementById("eventContent").value;
   const note = document.getElementById("eventNote").value;
 
-  const today = new Date().toISOString().split("T")[0];
-  if (!date || date < today) {
-    hideModal(); return;
-  }
+  const event = { date, time, content, note };
+  renderEvent(event);
+  e.target.reset();
+  hideModal();
+}
+
+function renderEvent(event) {
+  const now = new Date();
+  const date = new Date(event.date);
+  const containerId = date - now <= 7 * 86400000 ? "calendar-week" : "calendar-month";
+  const container = document.getElementById(containerId);
 
   const div = document.createElement("div");
   div.className = "event-item";
-  div.dataset.date = date;
-  div.dataset.hour = hour;
-  div.dataset.minute = minute;
-  div.dataset.content = content;
-  div.dataset.note = note;
+  div.textContent = `${event.date} ${event.time || ""} ${event.content}`;
+  div.addEventListener("click", () => openEventModal(div, event));
+  container.appendChild(div);
+}
 
-  div.innerHTML = `<strong>${date}</strong> ${hour && minute ? `${hour}:${minute}` : ""} - ${content}`;
-  div.onclick = () => openEditEvent(div);
-
-  const d = new Date(date);
-  const now = new Date();
-  if (isSameWeek(d, now)) {
-    document.getElementById("calendar-week").appendChild(div);
-  } else if (isSameMonth(d, now)) {
-    document.getElementById("calendar-month").appendChild(div);
-  }
-
-  hideModal();
-});
-
-function openEditEvent(div) {
-  const form = document.getElementById("eventForm");
-  form.classList.remove("hidden");
-  document.getElementById("eventDate").value = div.dataset.date;
-  document.getElementById("eventHour").value = div.dataset.hour;
-  document.getElementById("eventMinute").value = div.dataset.minute;
-  document.getElementById("eventContent").value = div.dataset.content;
-  document.getElementById("eventNote").value = div.dataset.note;
-
+function openEventModal(div, event) {
   showModal("event");
+  document.getElementById("eventDate").value = event.date;
+  document.getElementById("eventHour").value = event.time?.split(":")[0] || "";
+  document.getElementById("eventMinute").value = event.time?.split(":")[1] || "";
+  document.getElementById("eventContent").value = event.content;
+  document.getElementById("eventNote").value = event.note;
 
-  form.onsubmit = function (e) {
+  document.getElementById("eventForm").onsubmit = function (e) {
     e.preventDefault();
-    div.dataset.date = document.getElementById("eventDate").value;
-    div.dataset.hour = document.getElementById("eventHour").value;
-    div.dataset.minute = document.getElementById("eventMinute").value;
-    div.dataset.content = document.getElementById("eventContent").value;
-    div.dataset.note = document.getElementById("eventNote").value;
+    event.date = document.getElementById("eventDate").value;
+    const hour = document.getElementById("eventHour").value;
+    const min = document.getElementById("eventMinute").value;
+    event.time = hour && min ? `${hour}:${min}` : "";
+    event.content = document.getElementById("eventContent").value;
+    event.note = document.getElementById("eventNote").value;
 
-    div.innerHTML = `<strong>${div.dataset.date}</strong> ${div.dataset.hour && div.dataset.minute ? `${div.dataset.hour}:${div.dataset.minute}` : ""} - ${div.dataset.content}`;
-    div.remove();
-
-    const d = new Date(div.dataset.date);
-    const now = new Date();
-    if (isSameWeek(d, now)) {
-      document.getElementById("calendar-week").appendChild(div);
-    } else if (isSameMonth(d, now)) {
-      document.getElementById("calendar-month").appendChild(div);
-    }
-
+    div.textContent = `${event.date} ${event.time || ""} ${event.content}`;
     hideModal();
   };
-}
-
-function isSameWeek(date1, date2) {
-  const start = new Date(date2);
-  start.setDate(date2.getDate() - date2.getDay());
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-  return date1 >= start && date1 <= end;
-}
-
-function isSameMonth(date1, date2) {
-  return date1.getFullYear() === date2.getFullYear() &&
-         date1.getMonth() === date2.getMonth();
 }
