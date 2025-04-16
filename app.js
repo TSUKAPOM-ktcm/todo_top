@@ -1,15 +1,19 @@
-// Firebase初期化（設定コードをここに入れる）
+// ✅ Firebase設定（プロジェクトごとの設定をここに貼り付ける）
 const firebaseConfig = {
-  apiKey: "あなたのAPIキー",
-  authDomain: "xxx.firebaseapp.com",
-  projectId: "xxx",
-  ...
+  apiKey: "AIzaSyCoPHxST4Dra0Ucs5bRWgKRvxlTGt7x_r4",
+  authDomain: "kotachan-sukusuku.firebaseapp.com",
+  projectId: "kotachan-sukusuku",
+  storageBucket: "kotachan-sukusuku.firebasestorage.app",
+  messagingSenderId: "407032223624",
+  appId: "1:407032223624:web:443b371b85c5905c69cc3d"
 };
 
+// ✅ 初期化（これがないとFirebase使えないよ！）
 firebase.initializeApp(firebaseConfig);
 
-// Firestore使うなら
+// ✅ Firestore（リアルタイムDB）
 const db = firebase.firestore();
+
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
