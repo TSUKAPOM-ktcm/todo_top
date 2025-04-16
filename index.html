@@ -20,7 +20,7 @@
   <div id="mainScreen" class="main-screen hidden">
     <header>
       <h2>こたちゃんすくすく計画🐻</h2>
-      <div class="button-group">
+      <div class="header-buttons">
         <button onclick="showModal('task')">タスクを追加</button>
         <button onclick="showModal('memo')">伝言メモ追加</button>
         <button onclick="showModal('event')">予定を追加</button>
@@ -28,29 +28,29 @@
     </header>
 
     <div class="container">
-      <!-- 左列：未完了タスク -->
+      <!-- 左カラム：未完了タスク -->
       <div class="tasks-column">
         <h3>期日が過ぎているタスク</h3>
-        <div id="overdueTasks"></div>
+        <div id="tasks-overdue"></div>
+
         <h3>未完了の担当者別タスク</h3>
-        <div id="none-pending"><h4>なし（未対応）</h4></div>
-        <div id="tsumiki-pending"><h4>つみき（未対応）</h4></div>
-        <div id="numiki-pending"><h4>ぬみき（未対応）</h4></div>
-        <div id="tsumiki-progress"><h4>つみき（対応中）</h4></div>
-        <div id="numiki-progress"><h4>ぬみき（対応中）</h4></div>
+        <div id="tasks-なし-未対応"><h4>なし（未対応）</h4></div>
+        <div id="tasks-つみき-未対応"><h4>つみき（未対応）</h4></div>
+        <div id="tasks-ぬみき-未対応"><h4>ぬみき（未対応）</h4></div>
+        <div id="tasks-つみき-対応中"><h4>つみき（対応中）</h4></div>
+        <div id="tasks-ぬみき-対応中"><h4>ぬみき（対応中）</h4></div>
       </div>
 
-      <!-- 右列：カレンダー＋メモ -->
+      <!-- 右カラム：予定 + メモ -->
       <div class="right-column">
         <div class="calendar">
-          <h3>カレンダー</h3>
           <div class="calendar-section">
             <h4>今週の予定</h4>
-            <div id="thisWeekEvents"></div>
+            <div id="calendar-week"></div>
           </div>
           <div class="calendar-section">
             <h4>今月の予定</h4>
-            <div id="thisMonthEvents"></div>
+            <div id="calendar-month"></div>
           </div>
         </div>
 
@@ -62,10 +62,22 @@
     </div>
   </div>
 
-  <!-- モーダル（1つで共通）-->
+  <!-- モーダル -->
   <div id="modal" class="modal hidden">
     <div class="modal-content" id="modalContent">
-      <!-- 内容はJSで動的に変更 -->
+      <!-- JSで中身を差し替える -->
+    </div>
+  </div>
+
+  <!-- メモ表示専用モーダル -->
+  <div class="modal hidden" id="memoViewModal" style="display: none;">
+    <div class="modal-content">
+      <h3 style="color: #ff77aa;">メモの内容</h3>
+      <p id="fullMemoText"></p>
+      <div class="modal-buttons">
+        <button id="deleteMemoBtn">削除</button>
+        <button onclick="hideMemoModal()">キャンセル</button>
+      </div>
     </div>
   </div>
 
