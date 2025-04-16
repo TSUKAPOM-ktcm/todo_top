@@ -89,6 +89,11 @@ function showModal(type) {
   }
 }
 
+function hideModal() {
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
+}
+
 function addTaskFromForm(e) {
   e.preventDefault();
   const name = document.getElementById("taskName").value;
@@ -184,3 +189,173 @@ function openEditTaskModal(task) {
   };
 }
 
+function addMemoFromForm(e) {
+  e.preventDefault();
+  const text = document.getElementById("memoText").value.trim();
+  if (!text) return;
+
+  const memo = document.createElement("div");
+  memo.className = "memo-item";
+  memo.textContent = text.length > 100 ? text.slice(0, 100) + "…" : text;
+  memo.dataset.full = text;
+
+  memo.onclick = () => {
+    document.getElementById("fullMemoText").textContent = text;
+    document.getElementById("memoViewModal").classList.remove("hidden");
+    document.getElementById("memoViewModal").style.display = "flex";
+    document.getElementById("deleteMemoBtn").onclick = () => {
+      memo.remove();
+      hideMemoModal();
+    };
+  };
+
+  document.getElementById("memos").appendChild(memo);
+  hideModal();
+}
+
+function hideMemoModal() {
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
+}
+
+function addEventFromForm(e) {
+  e.preventDefault();
+  const date = document.getElementById("eventDate").value;
+  const hour = document.getElementById("eventHour").value;
+  const minute = document.getElementById("eventMinute").value;
+  const content = document.getElementById("eventContent").value;
+  const note = document.getElementById("eventNote").value;
+
+  if (!date || !content.trim()) return;
+
+  const eventDate = new Date(date + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  if (eventDate <= yesterday) {
+    hideModal(); // 昨日以前は無視
+    return;
+  }
+
+  const event = document.createElement("div");
+  event.className = "event-item";
+  event.dataset.date = date;
+  event.dataset.hour = hour;
+  event.dataset.minute = minute;
+  event.dataset.content = content;
+  event.dataset.note = note;
+
+  const time = hour && minute ? `${hour}:${minute}` : "";
+  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
+  event.onclick = () => openEditEventModal(event);
+
+  if (isSameWeek(eventDate, today)) {
+    document.getElementById("calendar-week").appendChild(event);
+  } else if (isSameMonth(eventDate, today)) {
+    document.getElementById("calendar-month").appendChild(event);
+  } else if (isNextMonthOrLater(eventDate, today)) {
+    document.getElementById("calendar-future").appendChild(event);
+  }
+
+  hideModal();
+}
+
+function openEditEventModal(eventDiv) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  content.innerHTML = `
+    <form id="editEventForm">
+      <h3>予定の編集</h3>
+      <label>日付<span class="required">*</span><br>
+        <input type="date" id="editEventDate" value="${eventDiv.dataset.date}" required></label>
+      <label>時間（時・分）<br>
+        <select id="editEventHour"></select>
+        <select id="editEventMinute">
+          <option value="">--</option>
+          <option>00</option><option>15</option><option>30</option><option>45</option>
+        </select></label>
+      <label>内容<span class="required">*</span><br>
+        <input id="editEventContent" value="${eventDiv.dataset.content}" required></label>
+      <label>メモ<br><textarea id="editEventNote">${eventDiv.dataset.note || ""}</textarea></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>`;
+
+  const hourSelect = document.getElementById("editEventHour");
+  for (let i = 0; i < 24; i++) {
+    const opt = document.createElement("option");
+    opt.value = String(i).padStart(2, "0");
+    opt.textContent = i;
+    if (eventDiv.dataset.hour === opt.value) opt.selected = true;
+    hourSelect.appendChild(opt);
+  }
+
+  document.getElementById("editEventMinute").value = eventDiv.dataset.minute || "";
+
+  document.getElementById("editEventForm").onsubmit = (e) => {
+    e.preventDefault();
+    const newDate = document.getElementById("editEventDate").value;
+    const newHour = document.getElementById("editEventHour").value;
+    const newMinute = document.getElementById("editEventMinute").value;
+    const newContent = document.getElementById("editEventContent").value;
+    const newNote = document.getElementById("editEventNote").value;
+
+    eventDiv.dataset.date = newDate;
+    eventDiv.dataset.hour = newHour;
+    eventDiv.dataset.minute = newMinute;
+    eventDiv.dataset.content = newContent;
+    eventDiv.dataset.note = newNote;
+
+    const timeStr = newHour && newMinute ? `${newHour}:${newMinute}` : "";
+    eventDiv.innerHTML = `<strong>${newDate}</strong> ${timeStr} - ${newContent}`;
+    eventDiv.onclick = () => openEditEventModal(eventDiv);
+
+    eventDiv.remove();
+    const dateObj = new Date(newDate + "T00:00:00");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (dateObj <= yesterday) {
+      hideModal(); return;
+    }
+
+    if (isSameWeek(dateObj, today)) {
+      document.getElementById("calendar-week").appendChild(eventDiv);
+    } else if (isSameMonth(dateObj, today)) {
+      document.getElementById("calendar-month").appendChild(eventDiv);
+    } else if (isNextMonthOrLater(dateObj, today)) {
+      document.getElementById("calendar-future").appendChild(eventDiv);
+    }
+
+    hideModal();
+  };
+}
+
+function isSameWeek(date, reference) {
+  const ref = new Date(reference);
+  const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 6);
+  return date >= startOfWeek && date <= endOfWeek;
+}
+
+function isSameMonth(date, reference) {
+  return date.getFullYear() === reference.getFullYear() &&
+         date.getMonth() === reference.getMonth();
+}
+
+function isNextMonthOrLater(date, reference) {
+  const refYear = reference.getFullYear();
+  const refMonth = reference.getMonth();
+  return date >= new Date(refYear, refMonth + 1, 1);
+}
