@@ -46,6 +46,7 @@ function hideModal() {
   document.getElementById("taskForm").reset();
   document.getElementById("memoForm").reset();
   document.getElementById("editForm").reset();
+  document.getElementById("editTaskTitle").textContent = "";
 }
 
 function hideMemoModal() {
@@ -54,14 +55,6 @@ function hideMemoModal() {
   memoModal.style.display = "none";
   document.getElementById("fullMemoText").textContent = "";
   document.getElementById("deleteMemoBtn").onclick = null;
-}
-
-function confirmModal() {
-  const type = document.getElementById("modal").dataset.type;
-  hideModal();
-  if (type === "memo") {
-    addMemo();
-  }
 }
 
 function addTaskFromForm(e) {
@@ -92,19 +85,26 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note) {
   taskDiv.dataset.note = note;
 
   taskDiv.innerHTML = `
-    <strong class="task-title">${name}</strong><br>
-    頻度: ${frequency} ／ 予定日: ${dueDate || "（未設定）"}<br>
-    メモ: ${note || "なし"}
+    <strong>${name}</strong><br>
+    メモ: ${note || "なし"}<br>
+    予定日: ${dueDate || "（未設定）"}
   `;
 
   taskDiv.addEventListener("click", () => {
     openEditModal(taskDiv);
   });
 
-  const containerId = `tasks-${assignee}-${status}`;
-  const container = document.getElementById(containerId);
-  if (container) {
-    container.appendChild(taskDiv);
+  // 期日が過ぎていて未完了なら「期限切れ」エリアに出す
+  const today = new Date();
+  const taskDue = dueDate ? new Date(dueDate + "T00:00:00") : null;
+  if (taskDue && taskDue < today && status !== "完了") {
+    document.getElementById("tasks-overdue").appendChild(taskDiv);
+  } else {
+    const containerId = `tasks-${assignee}-${status}`;
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.appendChild(taskDiv);
+    }
   }
 }
 
@@ -116,6 +116,7 @@ function openEditModal(taskDiv) {
   newForm.querySelector("#editTaskId").value = taskDiv.dataset.taskId;
   newForm.querySelector("#editStatus").value = taskDiv.dataset.status;
   newForm.querySelector("#editAssignee").value = taskDiv.dataset.assignee;
+  document.getElementById("editTaskTitle").textContent = taskDiv.dataset.name;
 
   showModal("edit");
 
@@ -130,10 +131,17 @@ function openEditModal(taskDiv) {
     if (newStatus === "完了") {
       taskDiv.remove();
     } else {
-      const newContainerId = `tasks-${newAssignee}-${newStatus}`;
-      const container = document.getElementById(newContainerId);
-      if (container) {
-        container.appendChild(taskDiv);
+      const dueDate = taskDiv.dataset.dueDate;
+      const today = new Date();
+      const taskDue = dueDate ? new Date(dueDate + "T00:00:00") : null;
+      if (taskDue && taskDue < today) {
+        document.getElementById("tasks-overdue").appendChild(taskDiv);
+      } else {
+        const newContainerId = `tasks-${newAssignee}-${newStatus}`;
+        const container = document.getElementById(newContainerId);
+        if (container) {
+          container.appendChild(taskDiv);
+        }
       }
     }
 
@@ -148,7 +156,6 @@ function addMemoFromForm(e) {
     const memoDiv = document.createElement("div");
     memoDiv.className = "memo-item";
     memoDiv.dataset.fullText = memo;
-
     memoDiv.textContent = memo.length > 100 ? memo.slice(0, 100) + "…" : memo;
 
     memoDiv.addEventListener("click", () => {
@@ -156,8 +163,7 @@ function addMemoFromForm(e) {
       const memoModal = document.getElementById("memoViewModal");
       memoModal.classList.remove("hidden");
       memoModal.style.display = "flex";
-
-      document.getElementById("deleteMemoBtn").onclick = function () {
+      document.getElementById("deleteMemoBtn").onclick = () => {
         memoDiv.remove();
         hideMemoModal();
       };
@@ -171,7 +177,6 @@ function addMemoFromForm(e) {
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
-
   document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
   document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
 });
