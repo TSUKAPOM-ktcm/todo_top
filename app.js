@@ -17,7 +17,7 @@ function login() {
   }
 }
 
-// モーダル表示
+// モーダル表示（初期化付き）
 function showModal(type) {
   const modal = document.getElementById("modal");
   const modalContent = document.getElementById("modalContent");
@@ -49,8 +49,7 @@ function showModal(type) {
         </div>
       </form>`;
     document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
-
-  } else if (type === "memo") {
+      } else if (type === "memo") {
     modalContent.innerHTML = `
       <form id="memoForm">
         <h3>伝言メモ追加</h3>
@@ -89,11 +88,30 @@ function showModal(type) {
   }
 }
 
-// モーダル閉じる
+// モーダルを閉じる
 function hideModal() {
   const modal = document.getElementById("modal");
   modal.classList.add("hidden");
   modal.style.display = "none";
+}
+
+// ユーティリティ：日付比較関数
+function isSameWeek(date, reference) {
+  const ref = new Date(reference);
+  const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 6);
+  return date >= startOfWeek && date <= endOfWeek;
+}
+
+function isSameMonth(date, reference) {
+  return date.getFullYear() === reference.getFullYear() && date.getMonth() === reference.getMonth();
+}
+
+function isNextMonthOrLater(date, reference) {
+  const refMonth = reference.getMonth();
+  const refYear = reference.getFullYear();
+  return date > new Date(refYear, refMonth + 1, 0);
 }
 
 // タスク追加
@@ -117,11 +135,12 @@ function addTaskFromForm(e) {
   task.dataset.assignee = assignee;
   task.dataset.dueDate = dueDate;
   task.dataset.note = note;
-  task.innerHTML = isOverdue
+
+  task.innerHTML = isOverdue && status !== "完了"
     ? `<strong>${name}</strong><br>メモ: ${note}<br>完了予定日: ${dueDate}`
     : `<strong>${name}</strong>`;
 
-  task.addEventListener("click", () => showEditTaskModal(task));
+  task.onclick = () => showEditTaskModal(task);
 
   if (isOverdue && status !== "完了") {
     document.getElementById("tasks-overdue").appendChild(task);
@@ -176,13 +195,18 @@ function showEditTaskModal(task) {
     task.dataset.dueDate = newDueDate;
     task.dataset.note = newNote;
 
-    task.innerHTML =
-      `<strong>${task.dataset.name}</strong><br>メモ: ${newNote}<br>完了予定日: ${newDueDate}`;
-
-    task.remove();
     const today = new Date();
     const due = newDueDate ? new Date(newDueDate + "T00:00:00") : null;
     const isOverdue = due && due < today;
+
+    task.innerHTML =
+      isOverdue && newStatus !== "完了"
+        ? `<strong>${task.dataset.name}</strong><br>メモ: ${newNote}<br>完了予定日: ${newDueDate}`
+        : `<strong>${task.dataset.name}</strong>`;
+
+    task.onclick = () => showEditTaskModal(task);
+
+    task.remove();
     if (isOverdue && newStatus !== "完了") {
       document.getElementById("tasks-overdue").appendChild(task);
     } else {
@@ -224,19 +248,7 @@ function hideMemoModal() {
   document.getElementById("memoViewModal").style.display = "none";
 }
 
-// 予定追加＋今週/今月分類
-function isSameWeek(date, reference) {
-  const ref = new Date(reference);
-  const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(endOfWeek.getDate() + 6);
-  return date >= startOfWeek && date <= endOfWeek;
-}
-function isSameMonth(date, reference) {
-  return date.getFullYear() === reference.getFullYear() &&
-         date.getMonth() === reference.getMonth();
-}
-
+// 予定追加
 function addEventFromForm(e) {
   e.preventDefault();
   const date = document.getElementById("eventDate").value;
@@ -250,10 +262,9 @@ function addEventFromForm(e) {
     return;
   }
 
-  const eventDate = new Date(`${date}T00:00:00`);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
+  const eventDate = new Date(date + "T00:00:00");
   if (eventDate < today) {
     hideModal();
     return;
@@ -261,13 +272,14 @@ function addEventFromForm(e) {
 
   const event = document.createElement("div");
   event.className = "event-item";
-  const time = hour && minute ? `${hour}:${minute}` : "";
-  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
   event.dataset.date = date;
   event.dataset.hour = hour;
   event.dataset.minute = minute;
   event.dataset.content = content;
   event.dataset.note = note;
+
+  const time = hour && minute ? `${hour}:${minute}` : "";
+  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
 
   event.onclick = () => openEditEventModal(event);
 
@@ -275,12 +287,13 @@ function addEventFromForm(e) {
     document.getElementById("calendar-week").appendChild(event);
   } else if (isSameMonth(eventDate, today)) {
     document.getElementById("calendar-month").appendChild(event);
+  } else if (isNextMonthOrLater(eventDate, today)) {
+    document.getElementById("calendar-future").appendChild(event);
   }
 
   hideModal();
 }
 
-// 予定編集モーダル
 function openEditEventModal(eventDiv) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -316,6 +329,7 @@ function openEditEventModal(eventDiv) {
     if (eventDiv.dataset.hour === opt.value) opt.selected = true;
     hourSelect.appendChild(opt);
   }
+
   document.getElementById("editEventMinute").value = eventDiv.dataset.minute || "";
 
   document.getElementById("editEventForm").onsubmit = (e) => {
@@ -334,7 +348,9 @@ function openEditEventModal(eventDiv) {
 
     const timeStr = newHour && newMinute ? `${newHour}:${newMinute}` : "";
     eventDiv.innerHTML = `<strong>${newDate}</strong> ${timeStr} - ${newContent}`;
+    eventDiv.onclick = () => openEditEventModal(eventDiv);
 
+    // 再分類
     const newDateObj = new Date(`${newDate}T00:00:00`);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -344,6 +360,8 @@ function openEditEventModal(eventDiv) {
       document.getElementById("calendar-week").appendChild(eventDiv);
     } else if (isSameMonth(newDateObj, today)) {
       document.getElementById("calendar-month").appendChild(eventDiv);
+    } else if (isNextMonthOrLater(newDateObj, today)) {
+      document.getElementById("calendar-future").appendChild(eventDiv);
     }
 
     hideModal();
