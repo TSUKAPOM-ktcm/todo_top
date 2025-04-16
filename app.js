@@ -43,10 +43,17 @@ function hideModal() {
   const modal = document.getElementById("modal");
   modal.classList.add("hidden");
   modal.style.display = "none";
-
   document.getElementById("taskForm").reset();
   document.getElementById("memoForm").reset();
   document.getElementById("editForm").reset();
+}
+
+function hideMemoModal() {
+  const memoModal = document.getElementById("memoViewModal");
+  memoModal.classList.add("hidden");
+  memoModal.style.display = "none";
+  document.getElementById("fullMemoText").textContent = "";
+  document.getElementById("deleteMemoBtn").onclick = null;
 }
 
 function confirmModal() {
@@ -102,19 +109,13 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note) {
 }
 
 function openEditModal(taskDiv) {
-  // 編集フォームを再生成
   const oldForm = document.getElementById("editForm");
   const newForm = oldForm.cloneNode(true);
   oldForm.parentNode.replaceChild(newForm, oldForm);
 
-  // 再取得して中身を反映
-  const id = taskDiv.dataset.taskId;
-  const status = taskDiv.dataset.status;
-  const assignee = taskDiv.dataset.assignee;
-
-  newForm.querySelector("#editTaskId").value = id;
-  newForm.querySelector("#editStatus").value = status;
-  newForm.querySelector("#editAssignee").value = assignee;
+  newForm.querySelector("#editTaskId").value = taskDiv.dataset.taskId;
+  newForm.querySelector("#editStatus").value = taskDiv.dataset.status;
+  newForm.querySelector("#editAssignee").value = taskDiv.dataset.assignee;
 
   showModal("edit");
 
@@ -142,20 +143,34 @@ function openEditModal(taskDiv) {
 
 function addMemoFromForm(e) {
   e.preventDefault();
-  const memo = document.getElementById("memoText").value;
-  if (memo.trim()) {
+  const memo = document.getElementById("memoText").value.trim();
+  if (memo) {
     const memoDiv = document.createElement("div");
-    memoDiv.textContent = memo;
     memoDiv.className = "memo-item";
+    memoDiv.dataset.fullText = memo;
+
+    memoDiv.textContent = memo.length > 100 ? memo.slice(0, 100) + "…" : memo;
+
+    memoDiv.addEventListener("click", () => {
+      document.getElementById("fullMemoText").textContent = memo;
+      const memoModal = document.getElementById("memoViewModal");
+      memoModal.classList.remove("hidden");
+      memoModal.style.display = "flex";
+
+      document.getElementById("deleteMemoBtn").onclick = function () {
+        memoDiv.remove();
+        hideMemoModal();
+      };
+    });
+
     document.getElementById("memos").appendChild(memoDiv);
   }
   hideModal();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("modal");
-  modal.classList.add("hidden");
-  modal.style.display = "none";
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
 
   document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
   document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
