@@ -1,4 +1,4 @@
-const db = firebase.firestore();
+const db = window.db; 
 
 // Firestoreの db は HTML 側で初期化されている前提です
 
