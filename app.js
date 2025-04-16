@@ -1,3 +1,4 @@
+
 function login() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
@@ -14,22 +15,19 @@ function showModal(type) {
   const taskForm = document.getElementById("taskForm");
   const memoForm = document.getElementById("memoForm");
   const editForm = document.getElementById("editForm");
+  const eventForm = document.getElementById("eventForm");
   const modalText = document.getElementById("modalText");
   const confirmButtons = document.getElementById("confirmButtons");
 
-  taskForm.classList.add("hidden");
-  memoForm.classList.add("hidden");
-  editForm.classList.add("hidden");
+  [taskForm, memoForm, editForm, eventForm].forEach(f => f.classList.add("hidden"));
   modalText.style.display = "none";
   confirmButtons.style.display = "none";
 
-  if (type === "task") {
-    taskForm.classList.remove("hidden");
-  } else if (type === "memo") {
-    memoForm.classList.remove("hidden");
-  } else if (type === "edit") {
-    editForm.classList.remove("hidden");
-  } else {
+  if (type === "task") taskForm.classList.remove("hidden");
+  else if (type === "memo") memoForm.classList.remove("hidden");
+  else if (type === "edit") editForm.classList.remove("hidden");
+  else if (type === "event") eventForm.classList.remove("hidden");
+  else {
     modalText.style.display = "block";
     confirmButtons.style.display = "flex";
   }
@@ -40,23 +38,22 @@ function showModal(type) {
 }
 
 function hideModal() {
-  const modal = document.getElementById("modal");
-  modal.classList.add("hidden");
-  modal.style.display = "none";
-  document.getElementById("taskForm").reset();
-  document.getElementById("memoForm").reset();
-  document.getElementById("editForm").reset();
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
+  ["taskForm", "memoForm", "editForm", "eventForm"].forEach(id => {
+    const form = document.getElementById(id);
+    if (form) form.reset();
+  });
   document.getElementById("editTaskTitle").textContent = "";
 }
 
 function hideMemoModal() {
-  const memoModal = document.getElementById("memoViewModal");
-  memoModal.classList.add("hidden");
-  memoModal.style.display = "none";
+  const modal = document.getElementById("memoViewModal");
+  modal.classList.add("hidden");
+  modal.style.display = "none";
   document.getElementById("fullMemoText").textContent = "";
   document.getElementById("deleteMemoBtn").onclick = null;
 }
-
 function addTaskFromForm(e) {
   e.preventDefault();
   const name = document.getElementById("taskName").value;
@@ -133,17 +130,15 @@ function openEditModal(taskDiv) {
     if (newStatus === "完了") {
       taskDiv.remove();
     } else {
-      const today = new Date();
       const taskDue = newDueDate ? new Date(newDueDate + "T00:00:00") : null;
       taskDiv.innerHTML = `
         <strong>${taskDiv.dataset.name}</strong><br>
         メモ: ${taskDiv.dataset.note || "なし"}<br>
         完了予定日: ${newDueDate || ""}
       `;
-
       taskDiv.onclick = () => openEditModal(taskDiv);
 
-      if (taskDue && taskDue < today) {
+      if (taskDue && taskDue < new Date()) {
         document.getElementById("tasks-overdue").appendChild(taskDiv);
       } else {
         const newContainerId = `tasks-${newAssignee}-${newStatus}`;
@@ -169,9 +164,9 @@ function addMemoFromForm(e) {
 
     memoDiv.addEventListener("click", () => {
       document.getElementById("fullMemoText").textContent = memo;
-      const memoModal = document.getElementById("memoViewModal");
-      memoModal.classList.remove("hidden");
-      memoModal.style.display = "flex";
+      const modal = document.getElementById("memoViewModal");
+      modal.classList.remove("hidden");
+      modal.style.display = "flex";
       document.getElementById("deleteMemoBtn").onclick = () => {
         memoDiv.remove();
         hideMemoModal();
@@ -183,9 +178,61 @@ function addMemoFromForm(e) {
   hideModal();
 }
 
+function addEventFromForm(e) {
+  e.preventDefault();
+  const date = document.getElementById("eventDate").value;
+  const hour = document.getElementById("eventHour").value;
+  const minute = document.getElementById("eventMinute").value;
+  const content = document.getElementById("eventContent").value;
+  const note = document.getElementById("eventNote").value;
+
+  if (!date || !content.trim()) {
+    alert("日付と内容は必須です！");
+    return;
+  }
+
+  const datetime = new Date(`${date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0") || "00"}:00`);
+  const today = new Date();
+  const isThisWeek = isSameWeek(datetime, today);
+  const isThisMonth = isSameMonth(datetime, today);
+
+  const eventDiv = document.createElement("div");
+  eventDiv.className = "event-item";
+  eventDiv.innerHTML = `<strong>${date}</strong> ${hour && minute ? `${hour}:${minute}` : ""} - ${content}`;
+  eventDiv.dataset.date = date;
+  eventDiv.dataset.hour = hour;
+  eventDiv.dataset.minute = minute;
+  eventDiv.dataset.content = content;
+  eventDiv.dataset.note = note;
+
+  eventDiv.onclick = () => {
+    const fullText = `日付: ${date}\n時間: ${hour || ""}:${minute || ""}\n内容: ${content}\nメモ: ${note || ""}`;
+    alert(fullText);
+  };
+
+  if (isThisWeek) document.getElementById("calendar-week").appendChild(eventDiv);
+  else if (isThisMonth) document.getElementById("calendar-month").appendChild(eventDiv);
+
+  hideModal();
+}
+
+function isSameWeek(date1, reference) {
+  const oneDay = 86400000;
+  const dayOfWeek = reference.getDay();
+  const start = new Date(reference.getFullYear(), reference.getMonth(), reference.getDate() - dayOfWeek);
+  const end = new Date(start.getTime() + 6 * oneDay);
+  return date1 >= start && date1 <= end;
+}
+
+function isSameMonth(date1, reference) {
+  return date1.getFullYear() === reference.getFullYear() && date1.getMonth() === reference.getMonth();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
+
   document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
   document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
+  document.getElementById("eventForm").addEventListener("submit", addEventFromForm);
 });
