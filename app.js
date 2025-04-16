@@ -1,3 +1,16 @@
+// Firebase初期化（設定コードをここに入れる）
+const firebaseConfig = {
+  apiKey: "あなたのAPIキー",
+  authDomain: "xxx.firebaseapp.com",
+  projectId: "xxx",
+  ...
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// Firestore使うなら
+const db = firebase.firestore();
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
