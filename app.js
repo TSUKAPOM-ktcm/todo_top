@@ -1,3 +1,6 @@
+// app.js（最新版）
+// 機能：ログイン・モーダル制御・タスク/メモ/予定の追加・編集・分類表示対応済
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
@@ -22,24 +25,35 @@ function login() {
 // モーダル制御
 function showModal(type) {
   const modal = document.getElementById("modal");
-  const modalContent = document.getElementById("modalContent");
   modal.classList.remove("hidden");
   modal.style.display = "flex";
 
-  if (type === "task") {
-    modalContent.innerHTML = document.getElementById("taskFormTemplate").innerHTML;
-    document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
+  // 全フォームを隠す
+  ["taskForm", "memoForm", "eventForm"].forEach(id => {
+    const form = document.getElementById(id);
+    if (form) form.classList.add("hidden");
+  });
+
+  // 指定フォームだけ表示
+  const form = document.getElementById(type + "Form");
+  if (form) {
+    form.classList.remove("hidden");
   }
 }
 
-// モーダル非表示
+// モーダル閉じる
 function hideModal() {
-  const modal = document.getElementById("modal");
-  modal.classList.add("hidden");
-  modal.style.display = "none";
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
 }
 
-// タスク追加処理
+// メモ表示用モーダル
+function hideMemoModal() {
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
+}
+
+// タスク追加
 function addTaskFromForm(e) {
   e.preventDefault();
   const name = document.getElementById("taskName").value;
@@ -49,38 +63,119 @@ function addTaskFromForm(e) {
   const dueDate = document.getElementById("dueDate").value;
   const note = document.getElementById("note").value;
 
-  createTaskElement(name, status, frequency, assignee, dueDate, note);
+  const task = document.createElement("div");
+  task.className = "task-item";
+  task.dataset.name = name;
+  task.dataset.status = status;
+  task.dataset.frequency = frequency;
+  task.dataset.assignee = assignee;
+  task.dataset.dueDate = dueDate;
+  task.dataset.note = note;
+
+  const today = new Date();
+  const taskDue = dueDate ? new Date(dueDate + "T00:00:00") : null;
+  const isOverdue = taskDue && taskDue < today;
+
+  if (isOverdue && status !== "完了") {
+    task.innerHTML = `<strong>${name}</strong><br>メモ: ${note}<br>完了予定日: ${dueDate}`;
+    document.getElementById("tasks-overdue").appendChild(task);
+  } else {
+    task.innerHTML = `<strong>${name}</strong>`;
+    const id = `tasks-${assignee}-${status}`;
+    const container = document.getElementById(id);
+    if (container) container.appendChild(task);
+  }
+
+  task.onclick = () => showEditTask(task);
   hideModal();
 }
 
-// タスクアイテム生成
-function createTaskElement(name, status, frequency, assignee, dueDate, note) {
-  if (status === "完了") return;
+// 編集モーダル（今回は alert 簡易表示）
+function showEditTask(taskDiv) {
+  const name = taskDiv.dataset.name;
+  const assignee = taskDiv.dataset.assignee;
+  const status = taskDiv.dataset.status;
+  const dueDate = taskDiv.dataset.dueDate;
+  const note = taskDiv.dataset.note;
 
-  const taskDiv = document.createElement("div");
-  taskDiv.className = "task-item";
+  alert(
+    `タスク名：${name}
+ステータス：${status}
+担当者：${assignee}
+完了予定日：${dueDate || ""}
+メモ：${note || ""}`
+  );
+}
 
-  const today = new Date();
-  const due = dueDate ? new Date(dueDate + "T00:00:00") : null;
-  const isOverdue = due && due < today;
+// メモ追加
+function addMemoFromForm(e) {
+  e.preventDefault();
+  const memo = document.getElementById("memoText").value.trim();
+  if (memo) {
+    const div = document.createElement("div");
+    div.className = "memo-item";
+    div.textContent = memo.length > 100 ? memo.slice(0, 100) + "…" : memo;
+    div.dataset.full = memo;
 
-  if (isOverdue) {
-    taskDiv.innerHTML = `
-      <strong>${name}</strong><br>
-      メモ: ${note || "なし"}<br>
-      完了予定日: ${dueDate || ""}
-    `;
-    document.getElementById("tasks-overdue").appendChild(taskDiv);
-  } else {
-    taskDiv.innerHTML = `<strong>${name}</strong>`;
-    const id = `tasks-${assignee}-${status}`;
-    const container = document.getElementById(id);
-    if (container) container.appendChild(taskDiv);
+    div.onclick = () => {
+      document.getElementById("fullMemoText").textContent = memo;
+      document.getElementById("memoViewModal").classList.remove("hidden");
+      document.getElementById("memoViewModal").style.display = "flex";
+      document.getElementById("deleteMemoBtn").onclick = () => {
+        div.remove();
+        hideMemoModal();
+      };
+    };
+
+    document.getElementById("memos").appendChild(div);
+    hideModal();
+  }
+}
+
+// 予定追加
+function addEventFromForm(e) {
+  e.preventDefault();
+  const date = document.getElementById("eventDate").value;
+  const hour = document.getElementById("eventHour").value;
+  const minute = document.getElementById("eventMinute").value;
+  const content = document.getElementById("eventContent").value;
+
+  if (!date || !content.trim()) {
+    alert("日付と内容は必須です！");
+    return;
   }
 
-  // 編集モーダル開く
-  taskDiv.addEventListener("click", () => {
-    alert(`編集画面（仮）\nタスク名: ${name}\n担当: ${assignee}\nステータス: ${status}`);
-    // ここに編集モーダルを追加してもOK
-  });
+  const event = document.createElement("div");
+  event.className = "event-item";
+  const time = hour && minute ? `${hour}:${minute}` : "";
+  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
+
+  const now = new Date();
+  const evDate = new Date(date + "T00:00:00");
+  const isSameMonth = evDate.getMonth() === now.getMonth();
+  const isSameWeek = Math.abs(evDate - now) / (1000 * 60 * 60 * 24) <= 7;
+
+  if (isSameWeek) {
+    document.getElementById("calendar-week").appendChild(event);
+  } else if (isSameMonth) {
+    document.getElementById("calendar-month").appendChild(event);
+  }
+
+  hideModal();
 }
+
+// イベント登録
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
+  document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
+  document.getElementById("eventForm").addEventListener("submit", addEventFromForm);
+
+  // 時間選択（時）
+  const hourSel = document.getElementById("eventHour");
+  for (let i = 0; i < 24; i++) {
+    const op = document.createElement("option");
+    op.value = String(i).padStart(2, "0");
+    op.textContent = i;
+    hourSel?.appendChild(op);
+  }
+});
