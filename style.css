@@ -116,11 +116,10 @@ header h2 {
   margin: 0.7rem 0 0.3rem;
   color: #555;
 }
-
 #tasks, #memos, #calendar,
 #tasks-なし-未対応, #tasks-つみき-未対応, #tasks-ぬみき-未対応,
 #tasks-つみき-対応中, #tasks-ぬみき-対応中,
-#tasks-overdue {
+#tasks-overdue, #calendar-week, #calendar-month {
   background: #fff;
   padding: 1rem;
   border-radius: 1rem;
@@ -128,8 +127,7 @@ header h2 {
   min-height: 60px;
 }
 
-/* 🍈 タスクアイテム */
-.task-item {
+.task-item, .event-item {
   background: #e2fbe2;
   border-radius: 1rem;
   padding: 0.6rem 1rem;
@@ -140,11 +138,10 @@ header h2 {
   transition: background 0.2s ease;
 }
 
-.task-item:hover {
+.task-item:hover, .event-item:hover {
   background: #d2f2d2;
 }
 
-/* 💬 メモアイテム */
 .memo-item {
   background: #fff8f2;
   border-radius: 1rem;
@@ -159,7 +156,6 @@ header h2 {
   background: #ffeedd;
 }
 
-/* モーダル */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -246,5 +242,8 @@ header h2 {
   .modal-content {
     margin: 1rem;
   }
-}
 
+  .calendar > div {
+    flex-direction: column;
+  }
+}
