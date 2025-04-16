@@ -2,26 +2,6 @@ const db = window.db;
 
 // Firestoreの db は HTML 側で初期化されている前提です
 
-function isSameWeek(date, reference) {
-  const ref = new Date(reference);
-  const day = ref.getDay();
-  const startOfWeek = new Date(ref);
-  startOfWeek.setDate(ref.getDate() - day);
-  startOfWeek.setHours(0, 0, 0, 0);
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(endOfWeek.getDate() + 6);
-  return date >= startOfWeek && date <= endOfWeek;
-}
-
-function isSameMonth(date, reference) {
-  return date.getFullYear() === reference.getFullYear() && date.getMonth() === reference.getMonth();
-}
-
-function isNextMonthOrLater(date, reference) {
-  const nextMonth = new Date(reference.getFullYear(), reference.getMonth() + 1, 1);
-  return date >= nextMonth;
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
@@ -110,9 +90,8 @@ function showModal(type) {
 }
 
 function hideModal() {
-  const modal = document.getElementById("modal");
-  modal.classList.add("hidden");
-  modal.style.display = "none";
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
 }
 
 function addTaskFromForm(e) {
@@ -133,12 +112,8 @@ function addTaskFromForm(e) {
     note: note || "",
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then((docRef) => {
-    console.log("タスクを保存しました", docRef.id);
     createTaskElement(name, status, frequency, assignee, dueDate, note, docRef.id);
     hideModal();
-  }).catch((error) => {
-    console.error("Firestore保存エラー:", error);
-    alert("タスクの保存に失敗しました");
   });
 }
 
@@ -214,4 +189,114 @@ function openEditTaskModal(task) {
   };
 }
 
+function addMemoFromForm(e) {
+  e.preventDefault();
+  const memoText = document.getElementById("memoText").value.trim();
+  if (!memoText) return;
 
+  const memo = document.createElement("div");
+  memo.className = "memo-item";
+  memo.dataset.full = memoText;
+  memo.textContent = memoText.length > 100 ? memoText.slice(0, 100) + "…" : memoText;
+
+  memo.onclick = () => {
+    document.getElementById("fullMemoText").textContent = memoText;
+    document.getElementById("memoViewModal").classList.remove("hidden");
+    document.getElementById("memoViewModal").style.display = "flex";
+    document.getElementById("deleteMemoBtn").onclick = () => {
+      memo.remove();
+      hideMemoModal();
+    };
+  };
+
+  document.getElementById("memos").appendChild(memo);
+  hideModal();
+}
+
+function hideMemoModal() {
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
+}
+
+function addEventFromForm(e) {
+  e.preventDefault();
+  const date = document.getElementById("eventDate").value;
+  const hour = document.getElementById("eventHour").value;
+  const minute = document.getElementById("eventMinute").value;
+  const content = document.getElementById("eventContent").value.trim();
+  const note = document.getElementById("eventNote").value.trim();
+
+  if (!date || !content) return;
+
+  const event = document.createElement("div");
+  event.className = "event-item";
+  event.dataset.date = date;
+  event.dataset.hour = hour;
+  event.dataset.minute = minute;
+  event.dataset.content = content;
+  event.dataset.note = note;
+
+  const time = hour && minute ? `${hour}:${minute}` : "";
+  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
+  event.onclick = () => openEditEventModal(event);
+  document.getElementById("calendar-week").appendChild(event);
+  hideModal();
+}
+
+function openEditEventModal(eventDiv) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  content.innerHTML = `
+    <form id="editEventForm">
+      <h3>予定の編集</h3>
+      <label>日付<span class="required">*</span><br>
+        <input type="date" id="editEventDate" value="${eventDiv.dataset.date}" required></label>
+      <label>時間（時・分）<br>
+        <select id="editEventHour"></select>
+        <select id="editEventMinute">
+          <option value="">--</option>
+          <option>00</option><option>15</option><option>30</option><option>45</option>
+        </select></label>
+      <label>内容<span class="required">*</span><br>
+        <input id="editEventContent" value="${eventDiv.dataset.content}" required></label>
+      <label>メモ<br><textarea id="editEventNote">${eventDiv.dataset.note || ""}</textarea></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>`;
+
+  const hourSelect = document.getElementById("editEventHour");
+  for (let i = 0; i < 24; i++) {
+    const opt = document.createElement("option");
+    opt.value = String(i).padStart(2, "0");
+    opt.textContent = i;
+    if (eventDiv.dataset.hour === opt.value) opt.selected = true;
+    hourSelect.appendChild(opt);
+  }
+
+  document.getElementById("editEventMinute").value = eventDiv.dataset.minute || "";
+
+  document.getElementById("editEventForm").onsubmit = (e) => {
+    e.preventDefault();
+    const newDate = document.getElementById("editEventDate").value;
+    const newHour = document.getElementById("editEventHour").value;
+    const newMinute = document.getElementById("editEventMinute").value;
+    const newContent = document.getElementById("editEventContent").value;
+    const newNote = document.getElementById("editEventNote").value;
+
+    eventDiv.dataset.date = newDate;
+    eventDiv.dataset.hour = newHour;
+    eventDiv.dataset.minute = newMinute;
+    eventDiv.dataset.content = newContent;
+    eventDiv.dataset.note = newNote;
+
+    const timeStr = newHour && newMinute ? `${newHour}:${newMinute}` : "";
+    eventDiv.innerHTML = `<strong>${newDate}</strong> ${timeStr} - ${newContent}`;
+    eventDiv.onclick = () => openEditEventModal(eventDiv);
+    hideModal();
+  };
+}
