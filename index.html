@@ -1,8 +1,7 @@
-<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>こたちゃんすくすく計画</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -19,8 +18,8 @@
   <!-- メイン画面 -->
   <div id="mainScreen" class="main-screen hidden">
     <header>
-      <h2>こたちゃんすくすく計画🐻</h2>
-      <div class="header-buttons">
+      <span class="title">こたちゃんすくすく計画🐻</span>
+      <div class="top-buttons">
         <button onclick="showModal('task')">タスクを追加</button>
         <button onclick="showModal('memo')">伝言メモ追加</button>
         <button onclick="showModal('event')">予定を追加</button>
@@ -28,51 +27,97 @@
     </header>
 
     <div class="container">
-      <!-- 左カラム：未完了タスク -->
       <div class="tasks-column">
         <h3>期日が過ぎているタスク</h3>
-        <div id="tasks-overdue"></div>
+        <div id="tasks-overdue" class="task-box"></div>
 
         <h3>未完了の担当者別タスク</h3>
-        <div id="tasks-なし-未対応"><h4>なし（未対応）</h4></div>
-        <div id="tasks-つみき-未対応"><h4>つみき（未対応）</h4></div>
-        <div id="tasks-ぬみき-未対応"><h4>ぬみき（未対応）</h4></div>
-        <div id="tasks-つみき-対応中"><h4>つみき（対応中）</h4></div>
-        <div id="tasks-ぬみき-対応中"><h4>ぬみき（対応中）</h4></div>
+        <h4>なし（未対応）</h4>
+        <div id="tasks-なし-未対応" class="task-box"></div>
+        <h4>つみき（未対応）</h4>
+        <div id="tasks-つみき-未対応" class="task-box"></div>
+        <h4>ぬみき（未対応）</h4>
+        <div id="tasks-ぬみき-未対応" class="task-box"></div>
+        <h4>つみき（対応中）</h4>
+        <div id="tasks-つみき-対応中" class="task-box"></div>
+        <h4>ぬみき（対応中）</h4>
+        <div id="tasks-ぬみき-対応中" class="task-box"></div>
       </div>
 
-      <!-- 右カラム：予定 + メモ -->
       <div class="right-column">
-        <div class="calendar">
-          <div class="calendar-section">
-            <h4>今週の予定</h4>
-            <div id="calendar-week"></div>
-          </div>
-          <div class="calendar-section">
-            <h4>今月の予定</h4>
-            <div id="calendar-month"></div>
-          </div>
-        </div>
+        <h3>今週の予定</h3>
+        <div id="calendar-week" class="calendar-box"></div>
 
-        <div class="memo">
-          <h3>伝言メモ</h3>
-          <div id="memos"></div>
-        </div>
+        <h3>今月の予定</h3>
+        <div id="calendar-month" class="calendar-box"></div>
+
+        <h3>伝言メモ</h3>
+        <div id="memos" class="memo-box"></div>
       </div>
     </div>
   </div>
 
   <!-- モーダル -->
   <div id="modal" class="modal hidden">
-    <div class="modal-content" id="modalContent">
-      <!-- JSで中身を差し替える -->
+    <div class="modal-content">
+      <p id="modalText">新しいタスクを追加しますか？</p>
+
+      <form id="taskForm" class="hidden">
+        <h3>タスクを追加</h3>
+        <label>タスク名 <span class="required">*</span><br><input id="taskName" required></label>
+        <label>ステータス <span class="required">*</span><br>
+          <select id="status">
+            <option>未対応</option><option>対応中</option><option>完了</option>
+          </select>
+        </label>
+        <label>頻度 <span class="required">*</span><br>
+          <select id="frequency">
+            <option>毎日</option><option>毎週</option><option>隔週</option><option>毎月</option><option>都度</option>
+          </select>
+        </label>
+        <label>担当者 <span class="required">*</span><br>
+          <select id="assignee">
+            <option>なし</option><option>つみき</option><option>ぬみき</option>
+          </select>
+        </label>
+        <label>完了予定日<br><input type="date" id="dueDate"></label>
+        <label>メモ<br><textarea id="note"></textarea></label>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
+
+      <form id="memoForm" class="hidden">
+        <h3>伝言メモ追加</h3>
+        <label>メモ <span class="required">*</span><br><textarea id="memoText" required></textarea></label>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
+
+      <form id="eventForm" class="hidden">
+        <h3>予定を追加</h3>
+        <label>日付 <span class="required">*</span><br><input type="date" id="eventDate" required></label>
+        <label>時間（時・分）<br>
+          <select id="eventHour"><option value="">--</option></select>
+          <select id="eventMinute"><option value="">--</option><option>00</option><option>15</option><option>30</option><option>45</option></select>
+        </label>
+        <label>内容 <span class="required">*</span><br><input id="eventContent" required></label>
+        <label>メモ<br><textarea id="eventNote"></textarea></label>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- メモ表示専用モーダル -->
-  <div class="modal hidden" id="memoViewModal" style="display: none;">
+  <!-- モーダル: メモ全文表示 -->
+  <div id="memoViewModal" class="modal hidden">
     <div class="modal-content">
-      <h3 style="color: #ff77aa;">メモの内容</h3>
+      <h3>メモの内容</h3>
       <p id="fullMemoText"></p>
       <div class="modal-buttons">
         <button id="deleteMemoBtn">削除</button>
@@ -80,6 +125,27 @@
       </div>
     </div>
   </div>
+
+  <!-- 編集モーダル：タスク -->
+  <form id="editForm" class="hidden">
+    <input type="hidden" id="editTaskId">
+    <h3 id="editTaskTitle"></h3>
+    <label>ステータス <span class="required">*</span><br>
+      <select id="editStatus">
+        <option>未対応</option><option>対応中</option><option>完了</option>
+      </select>
+    </label>
+    <label>担当者 <span class="required">*</span><br>
+      <select id="editAssignee">
+        <option>なし</option><option>つみき</option><option>ぬみき</option>
+      </select>
+    </label>
+    <label>完了予定日<br><input type="date" id="editDueDate"></label>
+    <div class="modal-buttons">
+      <button type="button" onclick="hideModal()">キャンセル</button>
+      <button type="submit">OK</button>
+    </div>
+  </form>
 
   <script src="app.js"></script>
 </body>
