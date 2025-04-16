@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: "Rounded Mplus 1c", "Hiragino Maru Gothic Pro", "Yu Gothic UI", sans-serif;
+  font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic Pro", "Yu Gothic UI", sans-serif;
   background: #fff8f2;
   color: #4d2c2c;
   overflow-x: hidden;
@@ -28,7 +28,7 @@ input, select, textarea {
   border-radius: 1rem;
   padding: 0.5rem;
   border: 2px solid #ffddee;
-  background: #fff0f7;
+  background: white; /* ← ここを修正 */
   width: 100%;
   box-sizing: border-box;
 }
