@@ -1,11 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
-
 body {
   margin: 0;
   font-family: 'Kosugi Maru', sans-serif;
-  background: #fffaf3;
-  color: #5b4338;
-  overflow-x: hidden;
+  background: #fff8f2;
+  color: #5a3e36;
 }
 
 .hidden {
@@ -14,59 +11,44 @@ body {
 
 .login-screen {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 4rem 1rem;
+  background: #fff3f9;
 }
 
 .app-title {
-  font-size: 2.8rem;
-  font-weight: bold;
-  color: #5b4338;
-  line-height: 1.4;
-  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  color: #ff77aa;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
-.big-title {
-  font-size: 3.2rem;
-}
-
-.bear-icon.large {
-  width: 180px;
-  max-width: 60%;
-}
-
-.input-group {
-  margin: 1.2rem auto;
+.bear-icon {
+  width: 120px;
+  margin: 1rem 0;
 }
 
 input[type="email"],
 input[type="password"] {
-  font-size: 1.2rem;
-  padding: 0.6rem 1rem;
-  border-radius: 2rem;
-  border: 3px solid transparent;
-  background: #ffeaf4;
+  display: block;
+  margin: 0.5rem auto;
+  padding: 0.7rem;
   width: 80%;
-  max-width: 320px;
-  font-weight: bold;
-  color: #5b4338;
-  text-align: center;
-  box-shadow: 0 0 6px rgba(255, 192, 203, 0.5);
+  max-width: 300px;
+  border: 2px solid #ffddee;
+  border-radius: 1rem;
+  background: #fff0f7;
 }
 
 button {
-  font-size: 1.1rem;
-  padding: 0.6rem 1.5rem;
-  background: #ffa8b0;
-  color: white;
+  padding: 0.7rem 1.5rem;
+  background: #ffb6c1;
   border: none;
-  border-radius: 2rem;
+  border-radius: 1.5rem;
+  color: white;
+  font-size: 1rem;
+  margin-top: 1rem;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: background 0.3s ease;
-}
-
-button:hover {
-  background: #ff92a0;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
 }
 
 .main-screen {
@@ -75,20 +57,15 @@ button:hover {
 
 header {
   background: #ffe0ec;
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-  font-size: 1.5rem;
   border-bottom: 2px dashed #ffbad2;
 }
 
-header h2 {
-  margin: 0;
-  color: #5b4338;
-  font-size: 1.6rem;
+.header-buttons button {
+  margin-left: 0.5rem;
 }
 
 .container {
@@ -106,144 +83,95 @@ header h2 {
   padding: 1rem;
 }
 
-.tasks-column h3, .memo h3, .calendar h3 {
+h3, h4 {
   color: #ff77aa;
-  margin-top: 0;
+  margin-top: 0.5rem;
 }
 
-.tasks-column h4 {
-  font-size: 1.1rem;
-  margin: 0.7rem 0 0.3rem;
-  color: #555;
-}
-#tasks, #memos, #calendar,
-#tasks-なし-未対応, #tasks-つみき-未対応, #tasks-ぬみき-未対応,
-#tasks-つみき-対応中, #tasks-ぬみき-対応中,
-#tasks-overdue, #calendar-week, #calendar-month {
+#tasks-overdue,
+[id^="tasks-"],
+#calendar-week,
+#calendar-month,
+#memos {
+  margin-top: 0.5rem;
   background: #fff;
   padding: 1rem;
   border-radius: 1rem;
-  margin-bottom: 1rem;
-  min-height: 60px;
+  min-height: 80px;
 }
 
-.task-item, .event-item {
-  background: #e2fbe2;
+.task-item, .memo-item, .event-item {
+  background: #d5f8d0;
+  padding: 0.5rem;
   border-radius: 1rem;
-  padding: 0.6rem 1rem;
-  margin: 0.5rem 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
+  margin-bottom: 0.5rem;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 
-.task-item:hover, .event-item:hover {
-  background: #d2f2d2;
-}
-
-.memo-item {
-  background: #fff8f2;
-  border-radius: 1rem;
-  padding: 0.6rem 1rem;
-  margin: 0.5rem 0;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.memo-item:hover {
-  background: #ffeedd;
+.task-item:hover,
+.memo-item:hover,
+.event-item:hover {
+  background: #c8f2c2;
 }
 
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.3);
-  display: none;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
 }
 
 .modal-content {
-  background: #fff0f7;
+  background: #ffeef5;
   border-radius: 1.5rem;
-  padding: 2rem 3rem;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  padding: 2rem;
   width: 90%;
   max-width: 500px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.task-form label {
-  display: block;
-  margin: 1rem 0 0.4rem;
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.modal-buttons button {
+  min-width: 100px;
+}
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   text-align: left;
-  font-weight: bold;
 }
 
 .task-form input,
 .task-form select,
 .task-form textarea {
-  width: 100%;
-  padding: 0.6rem;
-  font-size: 1rem;
-  border: 2px solid #ffd6e0;
+  padding: 0.5rem;
   border-radius: 1rem;
-  background: #fff;
-  font-family: 'Kosugi Maru', sans-serif;
-  box-shadow: 0 2px 4px rgba(255,192,203,0.3) inset;
-  transition: 0.2s ease;
-}
-
-.task-form input:focus,
-.task-form select:focus,
-.task-form textarea:focus {
-  outline: none;
-  border-color: #ff77aa;
-  background: #fff8fb;
+  border: 2px solid #ffddee;
+  background: #fff0f7;
+  font-family: inherit;
 }
 
 .required {
   color: red;
-  margin-left: 0.3rem;
-}
-
-.modal-buttons {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-}
-
-.modal-buttons button {
-  width: 120px;
-  font-size: 1rem;
-  padding: 0.6rem 1rem;
-  border-radius: 2rem;
-  white-space: nowrap;
 }
 
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
   }
-
-  .app-title {
-    font-size: 2.2rem;
-  }
-
-  header {
+  .header-buttons {
     flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .modal-content {
-    margin: 1rem;
-  }
-
-  .calendar > div {
-    flex-direction: column;
+    gap: 0.5rem;
   }
 }
