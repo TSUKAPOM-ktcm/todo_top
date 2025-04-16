@@ -87,14 +87,13 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note) {
   taskDiv.innerHTML = `
     <strong>${name}</strong><br>
     メモ: ${note || "なし"}<br>
-    予定日: ${dueDate || "（未設定）"}
+    完了予定日: ${dueDate || ""}
   `;
 
   taskDiv.addEventListener("click", () => {
     openEditModal(taskDiv);
   });
 
-  // 期日が過ぎていて未完了なら「期限切れ」エリアに出す
   const today = new Date();
   const taskDue = dueDate ? new Date(dueDate + "T00:00:00") : null;
   if (taskDue && taskDue < today && status !== "完了") {
@@ -116,6 +115,7 @@ function openEditModal(taskDiv) {
   newForm.querySelector("#editTaskId").value = taskDiv.dataset.taskId;
   newForm.querySelector("#editStatus").value = taskDiv.dataset.status;
   newForm.querySelector("#editAssignee").value = taskDiv.dataset.assignee;
+  newForm.querySelector("#editDueDate").value = taskDiv.dataset.dueDate || "";
   document.getElementById("editTaskTitle").textContent = taskDiv.dataset.name;
 
   showModal("edit");
@@ -124,16 +124,25 @@ function openEditModal(taskDiv) {
     e.preventDefault();
     const newStatus = newForm.querySelector("#editStatus").value;
     const newAssignee = newForm.querySelector("#editAssignee").value;
+    const newDueDate = newForm.querySelector("#editDueDate").value;
 
     taskDiv.dataset.status = newStatus;
     taskDiv.dataset.assignee = newAssignee;
+    taskDiv.dataset.dueDate = newDueDate;
 
     if (newStatus === "完了") {
       taskDiv.remove();
     } else {
-      const dueDate = taskDiv.dataset.dueDate;
       const today = new Date();
-      const taskDue = dueDate ? new Date(dueDate + "T00:00:00") : null;
+      const taskDue = newDueDate ? new Date(newDueDate + "T00:00:00") : null;
+      taskDiv.innerHTML = `
+        <strong>${taskDiv.dataset.name}</strong><br>
+        メモ: ${taskDiv.dataset.note || "なし"}<br>
+        完了予定日: ${newDueDate || ""}
+      `;
+
+      taskDiv.onclick = () => openEditModal(taskDiv);
+
       if (taskDue && taskDue < today) {
         document.getElementById("tasks-overdue").appendChild(taskDiv);
       } else {
