@@ -127,7 +127,7 @@ header h2 {
   min-height: 60px;
 }
 
-/* 🍈 マカロン風グリーンのタスクアイテム */
+/* 🍈 タスクアイテム */
 .task-item {
   background: #e2fbe2;
   border-radius: 1rem;
@@ -143,12 +143,19 @@ header h2 {
   background: #d2f2d2;
 }
 
+/* 💬 メモアイテム */
 .memo-item {
-  background: #fefefe;
+  background: #fff8f2;
   border-radius: 1rem;
   padding: 0.6rem 1rem;
   margin: 0.5rem 0;
   font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.memo-item:hover {
+  background: #ffeedd;
 }
 
 /* モーダル */
@@ -239,3 +246,4 @@ header h2 {
     margin: 1rem;
   }
 }
+
