@@ -101,6 +101,26 @@ function hideModal() {
   modal.style.display = "none";
 }
 
+// タスクの表示要素を作成
+function createTaskElement(name, status, frequency, assignee, dueDate, note, id) {
+  const task = document.createElement("div");
+  task.className = "task-item";
+  task.dataset.name = name;
+  task.dataset.status = status;
+  task.dataset.frequency = frequency;
+  task.dataset.assignee = assignee;
+  task.dataset.dueDate = dueDate;
+  task.dataset.note = note;
+  task.dataset.id = id;
+  task.innerHTML = `
+    <strong>${name}</strong><br>
+    メモ: ${note || "なし"}<br>
+    完了予定日: ${dueDate || ""}
+  `;
+  task.onclick = () => showEditTaskModal(task);
+  document.getElementById(`tasks-${assignee}-${status}`)?.appendChild(task);
+}
+
 // タスク追加処理（Firestore保存あり）
 function addTaskFromForm(e) {
   e.preventDefault();
@@ -121,7 +141,7 @@ function addTaskFromForm(e) {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then((docRef) => {
     console.log("タスクを保存しました", docRef.id);
-    createTaskElement(name, status, frequency, assignee, dueDate, note);
+    createTaskElement(name, status, frequency, assignee, dueDate, note, docRef.id);
     hideModal();
   }).catch((error) => {
     console.error("Firestore保存エラー:", error);
@@ -129,20 +149,7 @@ function addTaskFromForm(e) {
   });
 }
 
-// タスクの表示要素を作成
-function createTaskElement(name, status, frequency, assignee, dueDate, note) {
-  const task = document.createElement("div");
-  task.className = "task-item";
-  task.innerHTML = `
-    <strong>${name}</strong><br>
-    メモ: ${note || "なし"}<br>
-    完了予定日: ${dueDate || ""}
-  `;
-  task.onclick = () => showEditTaskModal(task);
-  document.getElementById(`tasks-${assignee}-${status}`)?.appendChild(task);
-}
-
-// タスク編集用モーダル（追加）
+// タスク編集用モーダル
 function showEditTaskModal(task) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -151,7 +158,7 @@ function showEditTaskModal(task) {
 
   content.innerHTML = `
     <form id="editTaskForm">
-      <h3>${task.querySelector("strong").textContent}</h3>
+      <h3>${task.dataset.name}</h3>
       <label>ステータス<span class="required">*</span><br>
         <select id="editStatus">
           <option>未対応</option><option>対応中</option><option>完了</option>
@@ -175,108 +182,33 @@ function showEditTaskModal(task) {
 
   document.getElementById("editTaskForm").onsubmit = (e) => {
     e.preventDefault();
-    task.dataset.status = document.getElementById("editStatus").value;
-    task.dataset.assignee = document.getElementById("editAssignee").value;
-    task.dataset.dueDate = document.getElementById("editDueDate").value;
-    task.dataset.note = document.getElementById("editNote").value;
-    task.innerHTML = `
-      <strong>${task.dataset.name}</strong><br>
-      メモ: ${task.dataset.note || "なし"}<br>
-      完了予定日: ${task.dataset.dueDate || ""}
-    `;
-    task.onclick = () => showEditTaskModal(task);
-    hideModal();
+    const newStatus = document.getElementById("editStatus").value;
+    const newAssignee = document.getElementById("editAssignee").value;
+    const newDueDate = document.getElementById("editDueDate").value;
+    const newNote = document.getElementById("editNote").value;
+    const taskId = task.dataset.id;
+
+    db.collection("tasks").doc(taskId).update({
+      status: newStatus,
+      assignee: newAssignee,
+      dueDate: newDueDate || null,
+      note: newNote || ""
+    }).then(() => {
+      console.log("タスクを更新しました", taskId);
+      task.dataset.status = newStatus;
+      task.dataset.assignee = newAssignee;
+      task.dataset.dueDate = newDueDate;
+      task.dataset.note = newNote;
+      task.innerHTML = `
+        <strong>${task.dataset.name}</strong><br>
+        メモ: ${newNote || "なし"}<br>
+        完了予定日: ${newDueDate || ""}
+      `;
+      task.onclick = () => showEditTaskModal(task);
+      hideModal();
+    }).catch((error) => {
+      console.error("Firestore更新エラー:", error);
+      alert("タスクの更新に失敗しました");
+    });
   };
-}
-
-// 伝言メモ追加処理
-function addMemoFromForm(e) {
-  e.preventDefault();
-  const memoText = document.getElementById("memoText").value.trim();
-  if (!memoText) {
-    alert("メモを入力してください！");
-    return;
-  }
-  const memo = document.createElement("div");
-  memo.className = "memo-item";
-  memo.dataset.full = memoText;
-  memo.textContent = memoText.length > 100 ? memoText.slice(0, 100) + "…" : memoText;
-  memo.onclick = () => {
-    document.getElementById("fullMemoText").textContent = memoText;
-    document.getElementById("memoViewModal").classList.remove("hidden");
-    document.getElementById("memoViewModal").style.display = "flex";
-    document.getElementById("deleteMemoBtn").onclick = () => {
-      memo.remove();
-      hideMemoModal();
-    };
-  };
-  document.getElementById("memos").appendChild(memo);
-  hideModal();
-}
-
-function hideMemoModal() {
-  document.getElementById("memoViewModal").classList.add("hidden");
-  document.getElementById("memoViewModal").style.display = "none";
-}
-
-// 予定追加処理
-function addEventFromForm(e) {
-  e.preventDefault();
-  const date = document.getElementById("eventDate").value;
-  const hour = document.getElementById("eventHour").value;
-  const minute = document.getElementById("eventMinute").value;
-  const content = document.getElementById("eventContent").value.trim();
-  const note = document.getElementById("eventNote").value.trim();
-
-  if (!date || !content) {
-    alert("日付と内容は必須です！");
-    return;
-  }
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const eventDate = new Date(date + "T00:00:00");
-
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  if (eventDate <= yesterday) {
-    hideModal();
-    return;
-  }
-
-  const event = document.createElement("div");
-  event.className = "event-item";
-  event.dataset.date = date;
-  event.dataset.hour = hour;
-  event.dataset.minute = minute;
-  event.dataset.content = content;
-  event.dataset.note = note;
-
-  const time = hour && minute ? `${hour}:${minute}` : "";
-  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
-
-  event.onclick = () => {
-    alert(`予定：${date} ${time}\n${content}\n${note}`);
-  };
-
-  document.getElementById("calendar-week").appendChild(event);
-  hideModal();
-}
-
-function isSameWeek(date, reference) {
-  const ref = new Date(reference);
-  const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(endOfWeek.getDate() + 6);
-  return date >= startOfWeek && date <= endOfWeek;
-}
-
-function isSameMonth(date, reference) {
-  return date.getFullYear() === reference.getFullYear() && date.getMonth() === reference.getMonth();
-}
-
-function isNextMonthOrLater(date, reference) {
-  const refMonth = reference.getMonth();
-  const refYear = reference.getFullYear();
-  return date > new Date(refYear, refMonth + 1, 0);
 }
