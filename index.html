@@ -6,12 +6,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>こたちゃんすくすく計画</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Firebase App (core) -->
+  <!-- Firebase SDKの読み込み -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-
-<!-- Firestore使う場合（データ同期のため） -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
+<!-- Firebase初期化 -->
+<script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyCoPHxST4Dra0Ucs5bRWgKRvxlTGt7x_r4",
+  authDomain: "kotachan-sukusuku.firebaseapp.com",
+  projectId: "kotachan-sukusuku",
+  storageBucket: "kotachan-sukusuku.firebasestorage.app",
+  messagingSenderId: "407032223624",
+  appId: "1:407032223624:web:443b371b85c5905c69cc3d"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
+<!-- メインのアプリJS -->
+<script src="app.js"></script>
+  
 </head>
 <body>
   <!-- ログイン画面 -->
