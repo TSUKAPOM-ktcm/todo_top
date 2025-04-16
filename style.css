@@ -28,7 +28,7 @@ input, select, textarea {
   border-radius: 1rem;
   padding: 0.5rem;
   border: 2px solid #ffddee;
-  background: white; /* ← ここを修正 */
+  background: white;
   width: 100%;
   box-sizing: border-box;
 }
@@ -44,6 +44,7 @@ textarea {
 
 h3, h4 {
   font-weight: bold;
+  margin-bottom: 0.5rem;
 }
 
 .login-screen {
