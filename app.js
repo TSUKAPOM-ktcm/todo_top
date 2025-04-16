@@ -1,7 +1,6 @@
-
 function login() {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
   if (email === "test@example.com" && password === "password") {
     document.getElementById("loginScreen").classList.add("hidden");
     document.getElementById("mainScreen").classList.remove("hidden");
@@ -11,39 +10,30 @@ function login() {
 }
 
 function showModal(type) {
-  const modal = document.getElementById("modal");
-  const taskForm = document.getElementById("taskForm");
-  const memoForm = document.getElementById("memoForm");
-  const editForm = document.getElementById("editForm");
-  const eventForm = document.getElementById("eventForm");
-  const modalText = document.getElementById("modalText");
-  const confirmButtons = document.getElementById("confirmButtons");
+  document.getElementById("modal").classList.remove("hidden");
+  document.getElementById("modal").style.display = "flex";
 
-  [taskForm, memoForm, editForm, eventForm].forEach(f => f.classList.add("hidden"));
-  modalText.style.display = "none";
-  confirmButtons.style.display = "none";
+  ["taskForm", "memoForm", "editForm", "eventForm"].forEach(id => {
+    const form = document.getElementById(id);
+    if (form) form.classList.add("hidden");
+  });
 
-  if (type === "task") taskForm.classList.remove("hidden");
-  else if (type === "memo") memoForm.classList.remove("hidden");
-  else if (type === "edit") editForm.classList.remove("hidden");
-  else if (type === "event") eventForm.classList.remove("hidden");
-  else {
-    modalText.style.display = "block";
-    confirmButtons.style.display = "flex";
-  }
-
-  modal.style.display = "flex";
-  modal.classList.remove("hidden");
-  modal.dataset.type = type;
+  if (type === "task") document.getElementById("taskForm").classList.remove("hidden");
+  else if (type === "memo") document.getElementById("memoForm").classList.remove("hidden");
+  else if (type === "edit") document.getElementById("editForm").classList.remove("hidden");
+  else if (type === "event") document.getElementById("eventForm").classList.remove("hidden");
 }
 
 function hideModal() {
-  document.getElementById("modal").classList.add("hidden");
-  document.getElementById("modal").style.display = "none";
+  const modal = document.getElementById("modal");
+  modal.classList.add("hidden");
+  modal.style.display = "none";
+
   ["taskForm", "memoForm", "editForm", "eventForm"].forEach(id => {
     const form = document.getElementById(id);
     if (form) form.reset();
   });
+
   document.getElementById("editTaskTitle").textContent = "";
 }
 
@@ -54,7 +44,10 @@ function hideMemoModal() {
   document.getElementById("fullMemoText").textContent = "";
   document.getElementById("deleteMemoBtn").onclick = null;
 }
-function addTaskFromForm(e) {
+
+// ================= タスク =====================
+
+document.getElementById("taskForm").addEventListener("submit", function (e) {
   e.preventDefault();
   const name = document.getElementById("taskName").value;
   const status = document.getElementById("status").value;
@@ -63,122 +56,84 @@ function addTaskFromForm(e) {
   const dueDate = document.getElementById("dueDate").value;
   const note = document.getElementById("note").value;
 
-  createTaskElement(name, status, frequency, assignee, dueDate, note);
+  const div = document.createElement("div");
+  div.className = "task-item";
+  div.dataset.name = name;
+  div.dataset.status = status;
+  div.dataset.frequency = frequency;
+  div.dataset.assignee = assignee;
+  div.dataset.dueDate = dueDate;
+  div.dataset.note = note;
+  div.innerHTML = `<strong>${name}</strong><br>メモ: ${note || ""}<br>完了予定日: ${dueDate || ""}`;
+
+  div.onclick = () => openEditModal(div);
+  placeTask(div);
   hideModal();
-}
+});
 
-function createTaskElement(name, status, frequency, assignee, dueDate, note) {
-  if (status === "完了") return;
+function placeTask(div) {
+  const status = div.dataset.status;
+  const assignee = div.dataset.assignee;
+  const due = div.dataset.dueDate;
+  const today = new Date().toISOString().split("T")[0];
 
-  const taskDiv = document.createElement("div");
-  taskDiv.className = "task-item";
-  const id = "task-" + Date.now();
-  taskDiv.dataset.taskId = id;
-  taskDiv.dataset.status = status;
-  taskDiv.dataset.assignee = assignee;
-  taskDiv.dataset.name = name;
-  taskDiv.dataset.frequency = frequency;
-  taskDiv.dataset.dueDate = dueDate;
-  taskDiv.dataset.note = note;
-
-  taskDiv.innerHTML = `
-    <strong>${name}</strong><br>
-    メモ: ${note || "なし"}<br>
-    完了予定日: ${dueDate || ""}
-  `;
-
-  taskDiv.addEventListener("click", () => {
-    openEditModal(taskDiv);
-  });
-
-  const today = new Date();
-  const taskDue = dueDate ? new Date(dueDate + "T00:00:00") : null;
-  if (taskDue && taskDue < today && status !== "完了") {
-    document.getElementById("tasks-overdue").appendChild(taskDiv);
+  if (due && due < today && status !== "完了") {
+    document.getElementById("tasks-overdue").appendChild(div);
   } else {
-    const containerId = `tasks-${assignee}-${status}`;
-    const container = document.getElementById(containerId);
-    if (container) {
-      container.appendChild(taskDiv);
-    }
+    const box = document.getElementById(`tasks-${assignee}-${status}`);
+    if (box) box.appendChild(div);
   }
 }
 
-function openEditModal(taskDiv) {
-  const oldForm = document.getElementById("editForm");
-  const newForm = oldForm.cloneNode(true);
-  oldForm.parentNode.replaceChild(newForm, oldForm);
-
-  newForm.querySelector("#editTaskId").value = taskDiv.dataset.taskId;
-  newForm.querySelector("#editStatus").value = taskDiv.dataset.status;
-  newForm.querySelector("#editAssignee").value = taskDiv.dataset.assignee;
-  newForm.querySelector("#editDueDate").value = taskDiv.dataset.dueDate || "";
-  document.getElementById("editTaskTitle").textContent = taskDiv.dataset.name;
+function openEditModal(div) {
+  const form = document.getElementById("editForm");
+  document.getElementById("editTaskTitle").textContent = div.dataset.name;
+  document.getElementById("editStatus").value = div.dataset.status;
+  document.getElementById("editAssignee").value = div.dataset.assignee;
+  document.getElementById("editDueDate").value = div.dataset.dueDate || "";
 
   showModal("edit");
 
-  newForm.addEventListener("submit", function (e) {
+  form.onsubmit = function (e) {
     e.preventDefault();
-    const newStatus = newForm.querySelector("#editStatus").value;
-    const newAssignee = newForm.querySelector("#editAssignee").value;
-    const newDueDate = newForm.querySelector("#editDueDate").value;
+    div.dataset.status = document.getElementById("editStatus").value;
+    div.dataset.assignee = document.getElementById("editAssignee").value;
+    div.dataset.dueDate = document.getElementById("editDueDate").value;
+    div.innerHTML = `<strong>${div.dataset.name}</strong><br>メモ: ${div.dataset.note || ""}<br>完了予定日: ${div.dataset.dueDate || ""}`;
 
-    taskDiv.dataset.status = newStatus;
-    taskDiv.dataset.assignee = newAssignee;
-    taskDiv.dataset.dueDate = newDueDate;
-
-    if (newStatus === "完了") {
-      taskDiv.remove();
-    } else {
-      const taskDue = newDueDate ? new Date(newDueDate + "T00:00:00") : null;
-      taskDiv.innerHTML = `
-        <strong>${taskDiv.dataset.name}</strong><br>
-        メモ: ${taskDiv.dataset.note || "なし"}<br>
-        完了予定日: ${newDueDate || ""}
-      `;
-      taskDiv.onclick = () => openEditModal(taskDiv);
-
-      if (taskDue && taskDue < new Date()) {
-        document.getElementById("tasks-overdue").appendChild(taskDiv);
-      } else {
-        const newContainerId = `tasks-${newAssignee}-${newStatus}`;
-        const container = document.getElementById(newContainerId);
-        if (container) {
-          container.appendChild(taskDiv);
-        }
-      }
-    }
-
+    div.remove();
+    placeTask(div);
     hideModal();
-  });
+  };
 }
 
-function addMemoFromForm(e) {
+// =============== メモ ==================
+
+document.getElementById("memoForm").addEventListener("submit", function (e) {
   e.preventDefault();
-  const memo = document.getElementById("memoText").value.trim();
-  if (memo) {
-    const memoDiv = document.createElement("div");
-    memoDiv.className = "memo-item";
-    memoDiv.dataset.fullText = memo;
-    memoDiv.textContent = memo.length > 100 ? memo.slice(0, 100) + "…" : memo;
+  const text = document.getElementById("memoText").value;
+  const div = document.createElement("div");
+  div.className = "memo-item";
+  div.dataset.full = text;
+  div.textContent = text.length > 100 ? text.slice(0, 100) + "…" : text;
 
-    memoDiv.addEventListener("click", () => {
-      document.getElementById("fullMemoText").textContent = memo;
-      const modal = document.getElementById("memoViewModal");
-      modal.classList.remove("hidden");
-      modal.style.display = "flex";
-      document.getElementById("deleteMemoBtn").onclick = () => {
-        memoDiv.remove();
-        hideMemoModal();
-      };
-    });
+  div.onclick = () => {
+    document.getElementById("fullMemoText").textContent = text;
+    document.getElementById("memoViewModal").classList.remove("hidden");
+    document.getElementById("memoViewModal").style.display = "flex";
+    document.getElementById("deleteMemoBtn").onclick = () => {
+      div.remove();
+      hideMemoModal();
+    };
+  };
 
-    document.getElementById("memos").appendChild(memoDiv);
-  }
+  document.getElementById("memos").appendChild(div);
   hideModal();
-}
+});
 
-function addEventFromForm(e) {
+// =============== 予定 ==================
+
+document.getElementById("eventForm").addEventListener("submit", function (e) {
   e.preventDefault();
   const date = document.getElementById("eventDate").value;
   const hour = document.getElementById("eventHour").value;
@@ -186,53 +141,76 @@ function addEventFromForm(e) {
   const content = document.getElementById("eventContent").value;
   const note = document.getElementById("eventNote").value;
 
-  if (!date || !content.trim()) {
-    alert("日付と内容は必須です！");
-    return;
+  const today = new Date().toISOString().split("T")[0];
+  if (!date || date < today) {
+    hideModal(); return;
   }
 
-  const datetime = new Date(`${date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0") || "00"}:00`);
-  const today = new Date();
-  const isThisWeek = isSameWeek(datetime, today);
-  const isThisMonth = isSameMonth(datetime, today);
+  const div = document.createElement("div");
+  div.className = "event-item";
+  div.dataset.date = date;
+  div.dataset.hour = hour;
+  div.dataset.minute = minute;
+  div.dataset.content = content;
+  div.dataset.note = note;
 
-  const eventDiv = document.createElement("div");
-  eventDiv.className = "event-item";
-  eventDiv.innerHTML = `<strong>${date}</strong> ${hour && minute ? `${hour}:${minute}` : ""} - ${content}`;
-  eventDiv.dataset.date = date;
-  eventDiv.dataset.hour = hour;
-  eventDiv.dataset.minute = minute;
-  eventDiv.dataset.content = content;
-  eventDiv.dataset.note = note;
+  div.innerHTML = `<strong>${date}</strong> ${hour && minute ? `${hour}:${minute}` : ""} - ${content}`;
+  div.onclick = () => openEditEvent(div);
 
-  eventDiv.onclick = () => {
-    const fullText = `日付: ${date}\n時間: ${hour || ""}:${minute || ""}\n内容: ${content}\nメモ: ${note || ""}`;
-    alert(fullText);
-  };
-
-  if (isThisWeek) document.getElementById("calendar-week").appendChild(eventDiv);
-  else if (isThisMonth) document.getElementById("calendar-month").appendChild(eventDiv);
+  const d = new Date(date);
+  const now = new Date();
+  if (isSameWeek(d, now)) {
+    document.getElementById("calendar-week").appendChild(div);
+  } else if (isSameMonth(d, now)) {
+    document.getElementById("calendar-month").appendChild(div);
+  }
 
   hideModal();
+});
+
+function openEditEvent(div) {
+  const form = document.getElementById("eventForm");
+  form.classList.remove("hidden");
+  document.getElementById("eventDate").value = div.dataset.date;
+  document.getElementById("eventHour").value = div.dataset.hour;
+  document.getElementById("eventMinute").value = div.dataset.minute;
+  document.getElementById("eventContent").value = div.dataset.content;
+  document.getElementById("eventNote").value = div.dataset.note;
+
+  showModal("event");
+
+  form.onsubmit = function (e) {
+    e.preventDefault();
+    div.dataset.date = document.getElementById("eventDate").value;
+    div.dataset.hour = document.getElementById("eventHour").value;
+    div.dataset.minute = document.getElementById("eventMinute").value;
+    div.dataset.content = document.getElementById("eventContent").value;
+    div.dataset.note = document.getElementById("eventNote").value;
+
+    div.innerHTML = `<strong>${div.dataset.date}</strong> ${div.dataset.hour && div.dataset.minute ? `${div.dataset.hour}:${div.dataset.minute}` : ""} - ${div.dataset.content}`;
+    div.remove();
+
+    const d = new Date(div.dataset.date);
+    const now = new Date();
+    if (isSameWeek(d, now)) {
+      document.getElementById("calendar-week").appendChild(div);
+    } else if (isSameMonth(d, now)) {
+      document.getElementById("calendar-month").appendChild(div);
+    }
+
+    hideModal();
+  };
 }
 
-function isSameWeek(date1, reference) {
-  const oneDay = 86400000;
-  const dayOfWeek = reference.getDay();
-  const start = new Date(reference.getFullYear(), reference.getMonth(), reference.getDate() - dayOfWeek);
-  const end = new Date(start.getTime() + 6 * oneDay);
+function isSameWeek(date1, date2) {
+  const start = new Date(date2);
+  start.setDate(date2.getDate() - date2.getDay());
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
   return date1 >= start && date1 <= end;
 }
 
-function isSameMonth(date1, reference) {
-  return date1.getFullYear() === reference.getFullYear() && date1.getMonth() === reference.getMonth();
+function isSameMonth(date1, date2) {
+  return date1.getFullYear() === date2.getFullYear() &&
+         date1.getMonth() === date2.getMonth();
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("modal").classList.add("hidden");
-  document.getElementById("modal").style.display = "none";
-
-  document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
-  document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
-  document.getElementById("eventForm").addEventListener("submit", addEventFromForm);
-});
