@@ -33,16 +33,34 @@ function showModal(type) {
   modal.style.display = "flex";
 
   if (type === "task") {
-    // 実際はタスク追加フォームをここで innerHTML に挿入
-    modalContent.innerHTML = `<form id="taskForm">...</form>`;
-    // 例: document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
-  } else if (type === "memo") {
-    modalContent.innerHTML = `<form id="memoForm">...</form>`;
-  } else if (type === "event") {
-    modalContent.innerHTML = `<form id="eventForm">...</form>`;
+    modalContent.innerHTML = `
+      <form id="taskForm">
+        <h3>タスクを追加</h3>
+        <label>タスク名<span class="required">*</span><br><input id="taskName" required></label>
+        <label>ステータス<span class="required">*</span><br>
+          <select id="status">
+            <option>未対応</option><option>対応中</option><option>完了</option>
+          </select></label>
+        <label>頻度<span class="required">*</span><br>
+          <select id="frequency">
+            <option>毎日</option><option>毎週</option><option>隔週</option><option>毎月</option><option>都度</option>
+          </select></label>
+        <label>担当者<span class="required">*</span><br>
+          <select id="assignee">
+            <option>なし</option><option>つみき</option><option>ぬみき</option>
+          </select></label>
+        <label>完了予定日<br><input type="date" id="dueDate"></label>
+        <label>メモ<br><textarea id="note"></textarea></label>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>`;
+    document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
   }
 }
 window.showModal = showModal;
+
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
@@ -252,7 +270,22 @@ function openEditTaskModal(task) {
 
   document.getElementById("editTaskForm").onsubmit = (e) => {
     e.preventDefault();
-    // 保存処理などここに入る
+    const newStatus = document.getElementById("editStatus").value;
+    const newAssignee = document.getElementById("editAssignee").value;
+    const newDueDate = document.getElementById("editDueDate").value;
+    const newNote = document.getElementById("editNote").value;
+    const id = task.dataset.id;
+
+    db.collection("tasks").doc(id).update({
+      status: newStatus,
+      assignee: newAssignee,
+      dueDate: newDueDate || null,
+      note: newNote || ""
+    }).then(() => {
+      hideModal();
+    }).catch((error) => {
+      console.error("更新エラー:", error);
+    });// 保存処理などここに入る
   };
 }
 window.openEditTaskModal = openEditTaskModal;
