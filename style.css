@@ -203,11 +203,34 @@ header {
 @media (max-width: 768px) {
   header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    gap: 0.8rem;
+    text-align: center;
+  }
+
+  .title {
+    font-size: 1.4rem;
+    word-break: keep-all;
+    white-space: nowrap;
+  }
+
+  .top-buttons {
+    flex-direction: column;
+    align-items: stretch;
     gap: 0.5rem;
+    width: 100%;
+  }
+
+  .top-buttons button {
+    width: 90%;
+    margin: 0 auto;
   }
 
   .container {
     flex-direction: column;
+  }
+
+  .task-box, .calendar-box, .memo-box {
+    min-height: auto;
   }
 }
