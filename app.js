@@ -9,6 +9,37 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("memoViewModal").style.display = "none";
 });
 
+  // 🔄 Firestoreリアルタイム同期（tasks）
+  db.collection("tasks").onSnapshot((snapshot) => {
+    // 一旦全削除（上書き）
+    const taskContainers = document.querySelectorAll("[id^='tasks-']");
+    taskContainers.forEach(container => container.innerHTML = "");
+    document.getElementById("tasks-overdue").innerHTML = "";
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const id = doc.id;
+
+      if (data.status === "完了") return; // 完了は表示しない
+
+      const due = data.dueDate ? new Date(data.dueDate + "T00:00:00") : null;
+      const isOverdue = due && due <= yesterday;
+
+      if (isOverdue) {
+        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id, true);
+      } else {
+        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
+      }
+    });
+  });
+});
+
+
 function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
