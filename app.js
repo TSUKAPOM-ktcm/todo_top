@@ -246,6 +246,17 @@ function addMemoFromForm(e) {
   };
 
   document.getElementById("memos").appendChild(memo);
+
+    // Firestoreに保存
+  db.collection("memos").add({
+    text,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    console.log("Firestoreにメモを保存しました");
+  }).catch((error) => {
+    console.error("Firestoreメモ保存エラー:", error);
+  });
+  
   hideModal();
 }
 
@@ -294,6 +305,20 @@ function addEventFromForm(e) {
   } else if (isNextMonthOrLater(eventDate, today)) {
     document.getElementById("calendar-future").appendChild(event);
   }
+
+    // Firestoreに保存
+  db.collection("events").add({
+    date,
+    hour,
+    minute,
+    content,
+    note,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    console.log("Firestoreに予定を保存しました");
+  }).catch((error) => {
+    console.error("Firestore予定保存エラー:", error);
+  });
 
   hideModal();
 }
@@ -372,10 +397,26 @@ function openEditEventModal(eventDiv) {
       document.getElementById("calendar-future").appendChild(eventDiv);
     }
 
+    // Firestoreに保存（編集＝再追加）
+    db.collection("events").add({
+      date: newDate,
+      hour: newHour,
+      minute: newMinute,
+      content: newContent,
+      note: newNote,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      console.log("Firestoreに予定（編集）を保存しました");
+    }).catch((error) => {
+      console.error("Firestore予定保存エラー（編集）:", error);
+    });
+
     hideModal();
   };
 }
 
+
+// 判定用補助関数
 function isSameWeek(date, reference) {
   const ref = new Date(reference);
   const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
