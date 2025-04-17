@@ -221,7 +221,7 @@ function openEditTaskModal(task) {
   document.getElementById("editDueDate").value = task.dataset.dueDate || "";
   document.getElementById("editNote").value = task.dataset.note || "";
 
-  document.getElementById("editTaskForm").onsubmit = (e) => {
+  document.getElementById("editTaskForm").onsubmit = async (e) => {
     e.preventDefault();
     const newStatus = document.getElementById("editStatus").value;
     const newAssignee = document.getElementById("editAssignee").value;
@@ -229,41 +229,22 @@ function openEditTaskModal(task) {
     const newNote = document.getElementById("editNote").value;
     const id = task.dataset.id;
 
-    db.collection("tasks").doc(id).update({
-      status: newStatus,
-      assignee: newAssignee,
-      dueDate: newDueDate || null,
-      note: newNote || ""
-    }).then(() => {
-      task.dataset.status = newStatus;
-      task.dataset.assignee = newAssignee;
-      task.dataset.dueDate = newDueDate;
-      task.dataset.note = newNote;
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const due = newDueDate ? new Date(newDueDate + "T00:00:00") : null;
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const isOverdue = due && due <= yesterday && newStatus !== "完了";
-
-      task.innerHTML = isOverdue
-        ? `<strong>${task.dataset.name}</strong><br>メモ: ${newNote || "なし"}<br>完了予定日: ${newDueDate || ""}`
-        : `<strong>${task.dataset.name}</strong>`;
-
-      task.onclick = () => openEditTaskModal(task);
-      task.remove();
-
-      if (isOverdue) {
-        document.getElementById("tasks-overdue")?.appendChild(task);
-      } else {
-        document.getElementById(`tasks-${newAssignee}-${newStatus}`)?.appendChild(task);
-      }
-
+    try {
+      await db.collection("tasks").doc(id).update({
+        status: newStatus,
+        assignee: newAssignee,
+        dueDate: newDueDate || null,
+        note: newNote || ""
+      });
+      // ✅ 表示の再描画は onSnapshot に任せるのでここでは何もしない！
       hideModal();
-    });
+    } catch (err) {
+      console.error("タスク更新エラー:", err);
+      alert("タスクの更新に失敗しました");
+    }
   };
 }
+
 
 
 function addMemoFromForm(e) {
