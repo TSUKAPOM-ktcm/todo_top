@@ -129,6 +129,8 @@ function login() {
     });
 }
 
+window.login = login; // 🔧 これでグローバル化！HTMLから使えるよ！
+
 function showModal(type) {
   const modal = document.getElementById("modal");
   const modalContent = document.getElementById("modalContent");
