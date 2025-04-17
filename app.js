@@ -197,53 +197,67 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note, id)
 }
 
 
-function openEditTaskModal(task) {
+function openEditEventModal(eventDiv) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
   modal.classList.remove("hidden");
   modal.style.display = "flex";
 
   content.innerHTML = `
-    <form id="editTaskForm">
-      <h3 id="editTaskTitle">${task.dataset.name}</h3>
-      <label>ステータス<span class="required">*</span><br>
-        <select id="editStatus">
-          <option>未対応</option><option>対応中</option><option>完了</option>
+    <form id="editEventForm">
+      <h3>予定の編集</h3>
+      <label>日付<span class="required">*</span><br>
+        <input type="date" id="editEventDate" value="${eventDiv.dataset.date}" required></label>
+      <label>時間（時・分）<br>
+        <select id="editEventHour"></select>
+        <select id="editEventMinute">
+          <option value="">--</option>
+          <option>00</option><option>15</option><option>30</option><option>45</option>
         </select></label>
-      <label>担当者<span class="required">*</span><br>
-        <select id="editAssignee">
-          <option>なし</option><option>つみき</option><option>ぬみき</option>
-        </select></label>
-      <label>完了予定日<br><input type="date" id="editDueDate"></label>
-      <label>メモ<br><textarea id="editNote"></textarea></label>
+      <label>内容<span class="required">*</span><br>
+        <input id="editEventContent" value="${eventDiv.dataset.content}" required></label>
+      <label>メモ<br><textarea id="editEventNote">${eventDiv.dataset.note || ""}</textarea></label>
       <div class="modal-buttons">
         <button type="button" onclick="hideModal()">キャンセル</button>
         <button type="submit">保存</button>
-        <button type="button" style="background:#aaa;" onclick="deleteTask('${task.dataset.id}')">タスクを削除</button>
       </div>
     </form>`;
 
-  document.getElementById("editStatus").value = task.dataset.status;
-  document.getElementById("editAssignee").value = task.dataset.assignee;
-  document.getElementById("editDueDate").value = task.dataset.dueDate || "";
-  document.getElementById("editNote").value = task.dataset.note || "";
+  const hourSelect = document.getElementById("editEventHour");
+  for (let i = 0; i < 24; i++) {
+    const opt = document.createElement("option");
+    opt.value = String(i).padStart(2, "0");
+    opt.textContent = i;
+    if (eventDiv.dataset.hour === opt.value) opt.selected = true;
+    hourSelect.appendChild(opt);
+  }
 
-  document.getElementById("editTaskForm").onsubmit = (e) => {
+  document.getElementById("editEventMinute").value = eventDiv.dataset.minute || "";
+
+  document.getElementById("editEventForm").onsubmit = (e) => {
     e.preventDefault();
-    const newStatus = document.getElementById("editStatus").value;
-    const newAssignee = document.getElementById("editAssignee").value;
-    const newDueDate = document.getElementById("editDueDate").value;
-    const newNote = document.getElementById("editNote").value;
-    const id = task.dataset.id;
+    const newDate = document.getElementById("editEventDate").value;
+    const newHour = document.getElementById("editEventHour").value;
+    const newMinute = document.getElementById("editEventMinute").value;
+    const newContent = document.getElementById("editEventContent").value;
+    const newNote = document.getElementById("editEventNote").value;
+    const eventId = eventDiv.dataset.id; // ← 🔑
 
-    db.collection("tasks").doc(id).update({
-      status: newStatus,
-      assignee: newAssignee,
-      dueDate: newDueDate || null,
-      note: newNote || ""
+    // Firestoreに上書き保存！
+    db.collection("events").doc(eventId).update({
+      date: newDate,
+      hour: newHour,
+      minute: newMinute,
+      content: newContent,
+      note: newNote,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-      hideModal(); // ✅ 表示の更新は Firestore同期に任せるので削除！
+      console.log("Firestoreに予定を上書き保存しました");
+    }).catch((error) => {
+      console.error("Firestore予定保存エラー（編集）:", error);
     });
+
+    hideModal();
   };
 }
 
