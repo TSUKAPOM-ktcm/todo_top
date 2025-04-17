@@ -32,11 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").style.display = "none";
   document.getElementById("memoViewModal").classList.add("hidden");
   document.getElementById("memoViewModal").style.display = "none";
-});
 
-  // 🔄 Firestoreリアルタイム同期（tasks）
+    // 🔄 Firestoreリアルタイム同期（tasks）
   db.collection("tasks").onSnapshot((snapshot) => {
-    // 一旦全削除（上書き）
     const taskContainers = document.querySelectorAll("[id^='tasks-']");
     taskContainers.forEach(container => container.innerHTML = "");
     document.getElementById("tasks-overdue").innerHTML = "";
@@ -50,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = doc.data();
       const id = doc.id;
 
-      if (data.status === "完了") return; // 完了は表示しない
+      if (data.status === "完了") return;
 
       const due = data.dueDate ? new Date(data.dueDate + "T00:00:00") : null;
       const isOverdue = due && due <= yesterday;
@@ -62,9 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-});
 
-// 🔄 Firestoreリアルタイム同期（events）
+  // 🔄 Firestoreリアルタイム同期（events）
   db.collection("events").onSnapshot((snapshot) => {
     document.getElementById("calendar-week").innerHTML = "";
     document.getElementById("calendar-month").innerHTML = "";
@@ -130,118 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-
-
-function showModal(type) {
-  const modal = document.getElementById("modal");
-  const modalContent = document.getElementById("modalContent");
-  modal.classList.remove("hidden");
-  modal.style.display = "flex";
-
-  if (type === "task") {
-    modalContent.innerHTML = `
-      <form id="taskForm">
-        <h3>タスクを追加</h3>
-        <label>タスク名<span class="required">*</span><br><input id="taskName" required></label>
-        <label>ステータス<span class="required">*</span><br>
-          <select id="status">
-            <option>未対応</option><option>対応中</option><option>完了</option>
-          </select></label>
-        <label>頻度<span class="required">*</span><br>
-          <select id="frequency">
-            <option>毎日</option><option>毎週</option><option>隔週</option><option>毎月</option><option>都度</option>
-          </select></label>
-        <label>担当者<span class="required">*</span><br>
-          <select id="assignee">
-            <option>なし</option><option>つみき</option><option>ぬみき</option>
-          </select></label>
-        <label>完了予定日<br><input type="date" id="dueDate"></label>
-        <label>メモ<br><textarea id="note"></textarea></label>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>`;
-    document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
-  } else if (type === "memo") {
-    modalContent.innerHTML = `
-      <form id="memoForm">
-        <h3>伝言メモ追加</h3>
-        <label>メモ<span class="required">*</span><br><textarea id="memoText" required></textarea></label>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>`;
-    document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
-  } else if (type === "event") {
-    modalContent.innerHTML = `
-      <form id="eventForm">
-        <h3>予定を追加</h3>
-        <label>日付<span class="required">*</span><br><input type="date" id="eventDate" required></label>
-        <label>時間（時・分）<br>
-          <select id="eventHour"><option value="">--</option></select>
-          <select id="eventMinute"><option value="">--</option><option>00</option><option>15</option><option>30</option><option>45</option></select>
-        </label>
-        <label>内容<span class="required">*</span><br><input id="eventContent" required></label>
-        <label>メモ<br><textarea id="eventNote"></textarea></label>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>`;
-    const hourSel = document.getElementById("eventHour");
-    for (let i = 0; i < 24; i++) {
-      const op = document.createElement("option");
-      op.value = String(i).padStart(2, "0");
-      op.textContent = i;
-      hourSel.appendChild(op);
-    }
-    document.getElementById("eventForm").addEventListener("submit", addEventFromForm);
-    } else if (type === "template") {
-    modalContent.innerHTML = `
-      <form id="templateForm">
-        <h3>どのタスクを追加しますか？</h3>
-        <label><input type="checkbox" name="frequency" value="毎日"> 毎日</label><br>
-        <label><input type="checkbox" name="frequency" value="毎週"> 毎週</label><br>
-        <label><input type="checkbox" name="frequency" value="毎月"> 毎月</label><br>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>`;
-    document.getElementById("templateForm").addEventListener("submit", addTemplateTasks);
-  }
-}
-function addTemplateTasks(e) {
-  e.preventDefault();
-  const selected = Array.from(document.querySelectorAll("input[name='frequency']:checked")).map(cb => cb.value);
-  if (!selected.length) return hideModal();
-
-  db.collection("templates").get().then(snapshot => {
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (selected.includes(data.frequency) && data.status !== "完了") {
-        const id = "template_" + Date.now() + Math.random().toString(36).substring(2, 8);
-
-        // Firestoreのtasksコレクションにも保存
-        db.collection("tasks").doc(id).set({
-          name: data.name,
-          status: data.status,
-          frequency: data.frequency,
-          assignee: data.assignee,
-          dueDate: data.dueDate || null,
-          note: data.note || "",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        // タスクエリアにタスク名のみ表示（クリック編集可）
-        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
-      }
-    });
-    hideModal();
-  });
-} 
 
 
 
