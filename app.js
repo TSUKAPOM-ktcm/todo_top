@@ -109,13 +109,14 @@ function addTemplateTasks(e) {
   db.collection("templates").get().then(snapshot => {
     snapshot.forEach(doc => {
       const data = doc.data();
-      if (selected.includes(data.frequency)) {
+      if (selected.includes(data.frequency) && data.status !== "完了") {
         createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, doc.id);
       }
     });
     hideModal();
   });
-} 
+}
+
 
 
 function hideModal() {
