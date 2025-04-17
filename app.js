@@ -12,12 +12,23 @@ document.addEventListener("DOMContentLoaded", () => {
 function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  if (email === "test@example.com" && password === "password") {
-    document.getElementById("loginScreen").classList.add("hidden");
-    document.getElementById("mainScreen").classList.remove("hidden");
-  } else {
-    alert("IDかパスワードが違います");
-  }
+
+  db.collection("users")
+    .where("email", "==", email)
+    .where("password", "==", password)
+    .get()
+    .then((querySnapshot) => {
+      if (!querySnapshot.empty) {
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("mainScreen").classList.remove("hidden");
+      } else {
+        alert("IDかパスワードが違います");
+      }
+    })
+    .catch((error) => {
+      console.error("ログイン時のエラー:", error);
+      alert("ログインに失敗しました");
+    });
 }
 
 function showModal(type) {
