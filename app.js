@@ -110,12 +110,26 @@ function addTemplateTasks(e) {
     snapshot.forEach(doc => {
       const data = doc.data();
       if (selected.includes(data.frequency) && data.status !== "完了") {
-        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, doc.id);
+        const id = "template_" + Date.now() + Math.random().toString(36).substring(2, 8);
+
+        // Firestoreのtasksコレクションにも保存
+        db.collection("tasks").doc(id).set({
+          name: data.name,
+          status: data.status,
+          frequency: data.frequency,
+          assignee: data.assignee,
+          dueDate: data.dueDate || null,
+          note: data.note || "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // タスクエリアにタスク名のみ表示（クリック編集可）
+        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
       }
     });
     hideModal();
   });
-}
+} 
 
 
 
