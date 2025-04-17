@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 🔄 Firestoreリアルタイム同期（events）
-  db.collection("events").onSnapshot((snapshot) => {
+ db.collection("events").onSnapshot((snapshot) => {
     document.getElementById("calendar-week").innerHTML = "";
     document.getElementById("calendar-month").innerHTML = "";
     document.getElementById("calendar-future").innerHTML = "";
@@ -74,10 +74,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = doc.data();
       const eventDate = new Date(data.date + "T00:00:00");
 
-      if (eventDate < today) return;
+      if (eventDate < today || data.deleted) return;
+
+      // 既存の同一IDのイベントがあれば削除してから再表示（重複防止）
+      const existing = document.querySelector(`[data-id='${doc.id}']`);
+      if (existing) existing.remove();
 
       const event = document.createElement("div");
       event.className = "event-item";
+      event.dataset.id = doc.id;
       event.dataset.date = data.date;
       event.dataset.hour = data.hour;
       event.dataset.minute = data.minute;
@@ -97,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
 
   // 🔄 Firestoreリアルタイム同期（memos）
   db.collection("memos").onSnapshot((snapshot) => {
@@ -213,6 +219,7 @@ function openEditTaskModal(task) {
       <div class="modal-buttons">
         <button type="button" onclick="hideModal()">キャンセル</button>
         <button type="submit">保存</button>
+        <button type="button" style="background:#aaa;" onclick="deleteTask('${task.dataset.id}')">タスクを削除</button>
       </div>
     </form>`;
 
@@ -221,7 +228,7 @@ function openEditTaskModal(task) {
   document.getElementById("editDueDate").value = task.dataset.dueDate || "";
   document.getElementById("editNote").value = task.dataset.note || "";
 
-  document.getElementById("editTaskForm").onsubmit = async (e) => {
+  document.getElementById("editTaskForm").onsubmit = (e) => {
     e.preventDefault();
     const newStatus = document.getElementById("editStatus").value;
     const newAssignee = document.getElementById("editAssignee").value;
@@ -229,21 +236,17 @@ function openEditTaskModal(task) {
     const newNote = document.getElementById("editNote").value;
     const id = task.dataset.id;
 
-    try {
-      await db.collection("tasks").doc(id).update({
-        status: newStatus,
-        assignee: newAssignee,
-        dueDate: newDueDate || null,
-        note: newNote || ""
-      });
-      // ✅ 表示の再描画は onSnapshot に任せるのでここでは何もしない！
-      hideModal();
-    } catch (err) {
-      console.error("タスク更新エラー:", err);
-      alert("タスクの更新に失敗しました");
-    }
+    db.collection("tasks").doc(id).update({
+      status: newStatus,
+      assignee: newAssignee,
+      dueDate: newDueDate || null,
+      note: newNote || ""
+    }).then(() => {
+      hideModal(); // ✅ 表示の更新は Firestore同期に任せるので削除！
+    });
   };
 }
+
 
 
 
@@ -457,4 +460,15 @@ function isNextMonthOrLater(date, reference) {
   const refYear = reference.getFullYear();
   const refMonth = reference.getMonth();
   return date >= new Date(refYear, refMonth + 1, 1);
+}
+
+function deleteTask(id) {
+  db.collection("tasks").doc(id).update({ deleted: true })
+    .then(() => {
+      console.log("✅ タスクを削除フラグつけました");
+      hideModal();
+    })
+    .catch((err) => {
+      console.error("❌ タスク削除に失敗", err);
+    });
 }
