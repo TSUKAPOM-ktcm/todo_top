@@ -86,8 +86,37 @@ function showModal(type) {
       hourSel.appendChild(op);
     }
     document.getElementById("eventForm").addEventListener("submit", addEventFromForm);
+    } else if (type === "template") {
+    modalContent.innerHTML = `
+      <form id="templateForm">
+        <h3>どのタスクを追加しますか？</h3>
+        <label><input type="checkbox" name="frequency" value="毎日"> 毎日</label><br>
+        <label><input type="checkbox" name="frequency" value="毎週"> 毎週</label><br>
+        <label><input type="checkbox" name="frequency" value="毎月"> 毎月</label><br>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>`;
+    document.getElementById("templateForm").addEventListener("submit", addTemplateTasks);
   }
 }
+function addTemplateTasks(e) {
+  e.preventDefault();
+  const selected = Array.from(document.querySelectorAll("input[name='frequency']:checked")).map(cb => cb.value);
+  if (!selected.length) return hideModal();
+
+  db.collection("templates").get().then(snapshot => {
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (selected.includes(data.frequency)) {
+        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, doc.id);
+      }
+    });
+    hideModal();
+  });
+} 
+
 
 function hideModal() {
   document.getElementById("modal").classList.add("hidden");
