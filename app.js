@@ -2,6 +2,31 @@ const db = window.db;
 
 // Firestoreの db は HTML 側で初期化されている前提です
 
+function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  db.collection("users")
+    .where("email", "==", email)
+    .where("password", "==", password)
+    .get()
+    .then((querySnapshot) => {
+      if (!querySnapshot.empty) {
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("mainScreen").classList.remove("hidden");
+      } else {
+        alert("IDかパスワードが違います");
+      }
+    })
+    .catch((error) => {
+      console.error("ログイン時のエラー:", error);
+      alert("ログインに失敗しました");
+    });
+}
+
+window.login = login; // 🔧 これでグローバル化！HTMLから使えるよ！
+
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
@@ -106,30 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
-function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  db.collection("users")
-    .where("email", "==", email)
-    .where("password", "==", password)
-    .get()
-    .then((querySnapshot) => {
-      if (!querySnapshot.empty) {
-        document.getElementById("loginScreen").classList.add("hidden");
-        document.getElementById("mainScreen").classList.remove("hidden");
-      } else {
-        alert("IDかパスワードが違います");
-      }
-    })
-    .catch((error) => {
-      console.error("ログイン時のエラー:", error);
-      alert("ログインに失敗しました");
-    });
-}
-
-window.login = login; // 🔧 これでグローバル化！HTMLから使えるよ！
 
 function showModal(type) {
   const modal = document.getElementById("modal");
