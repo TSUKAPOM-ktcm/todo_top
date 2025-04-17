@@ -39,6 +39,73 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// 🔄 Firestoreリアルタイム同期（events）
+  db.collection("events").onSnapshot((snapshot) => {
+    document.getElementById("calendar-week").innerHTML = "";
+    document.getElementById("calendar-month").innerHTML = "";
+    document.getElementById("calendar-future").innerHTML = "";
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const eventDate = new Date(data.date + "T00:00:00");
+
+      if (eventDate < today) return;
+
+      const event = document.createElement("div");
+      event.className = "event-item";
+      event.dataset.date = data.date;
+      event.dataset.hour = data.hour;
+      event.dataset.minute = data.minute;
+      event.dataset.content = data.content;
+      event.dataset.note = data.note;
+
+      const time = data.hour && data.minute ? `${data.hour}:${data.minute}` : "";
+      event.innerHTML = `<strong>${data.date}</strong> ${time} - ${data.content}`;
+      event.onclick = () => openEditEventModal(event);
+
+      if (isSameWeek(eventDate, today)) {
+        document.getElementById("calendar-week").appendChild(event);
+      } else if (isSameMonth(eventDate, today)) {
+        document.getElementById("calendar-month").appendChild(event);
+      } else if (isNextMonthOrLater(eventDate, today)) {
+        document.getElementById("calendar-future").appendChild(event);
+      }
+    });
+  });
+
+  // 🔄 Firestoreリアルタイム同期（memos）
+  db.collection("memos").onSnapshot((snapshot) => {
+    document.getElementById("memos").innerHTML = "";
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const id = doc.id;
+      if (data.deleted) return;
+
+      const memo = document.createElement("div");
+      memo.className = "memo-item";
+      memo.dataset.full = data.text;
+      memo.textContent = data.text.length > 100 ? data.text.slice(0, 100) + "…" : data.text;
+
+      memo.onclick = () => {
+        document.getElementById("fullMemoText").textContent = data.text;
+        document.getElementById("memoViewModal").classList.remove("hidden");
+        document.getElementById("memoViewModal").style.display = "flex";
+        document.getElementById("deleteMemoBtn").onclick = () => {
+          db.collection("memos").doc(id).update({ deleted: true });
+          memo.remove();
+          hideMemoModal();
+        };
+      };
+
+      document.getElementById("memos").appendChild(memo);
+    });
+  });
+});
+
 
 function login() {
   const email = document.getElementById("email").value;
