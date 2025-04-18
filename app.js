@@ -670,8 +670,8 @@ function openNurseryCalendarModal() {
       <div>
         <h3>保育園スケジュール（${yearMonthStr}）</h3>
         <div style="margin-bottom: 10px;">
-          ${m > currentMonth ? '<button id="prevMonth">←今月</button>' : ''}
-          ${m === currentMonth ? '<button id="nextMonth">来月→</button>' : ''}
+          <button id="prevMonth">←今月</button>
+          <button id="nextMonth">来月→</button>
         </div>
         <table class="calendar-table">
           <thead>
@@ -685,20 +685,13 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
-    const prevBtn = document.getElementById("prevMonth");
-    const nextBtn = document.getElementById("nextMonth");
+    document.getElementById("prevMonth").onclick = () => {
+      renderNurseryCalendar(currentYear, currentMonth);
+    };
 
-    if (prevBtn) {
-      prevBtn.onclick = () => {
-        renderNurseryCalendar(currentYear, currentMonth);
-      };
-    }
-
-    if (nextBtn) {
-      nextBtn.onclick = () => {
-        renderNurseryCalendar(currentYear, currentMonth + 1);
-      };
-    }
+    document.getElementById("nextMonth").onclick = () => {
+      renderNurseryCalendar(currentYear, currentMonth + 1);
+    };
 
     const calendarBody = document.getElementById("calendarBody");
     calendarBody.innerHTML = "";
