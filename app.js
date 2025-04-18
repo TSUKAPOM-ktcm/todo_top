@@ -648,8 +648,8 @@ function openNurseryCalendarModal() {
 
   const now = new Date();
   let year = now.getFullYear();
-  let month = now.getMonth(); // 0〜11
-  let currentViewMonth = month;
+  let month = now.getMonth();
+  let currentMonth = month;
 
   renderNurseryCalendar(year, month);
 
@@ -664,8 +664,8 @@ function openNurseryCalendarModal() {
       <div>
         <h3>保育園スケジュール（${yearMonthStr}）</h3>
         <div style="margin-bottom: 10px;">
-          <button id="prevMonth" class="${m > currentViewMonth ? 'show' : ''}">←今月</button>
-          <button id="nextMonth" class="${m === currentViewMonth ? 'show' : ''}">来月→</button>
+          ${m > currentMonth ? '<button id="prevMonth">←今月</button>' : ''}
+          ${m === currentMonth ? '<button id="nextMonth">来月→</button>' : ''}
         </div>
         <table class="calendar-table">
           <thead>
@@ -679,19 +679,17 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
-    // 🔁 イベント付与（あとから）
     const prevBtn = document.getElementById("prevMonth");
     const nextBtn = document.getElementById("nextMonth");
 
     if (prevBtn) {
       prevBtn.onclick = () => {
-        renderNurseryCalendar(year, currentViewMonth); // ← 今月に戻る
+        renderNurseryCalendar(y, currentMonth);
       };
     }
-
     if (nextBtn) {
       nextBtn.onclick = () => {
-        renderNurseryCalendar(year, currentViewMonth + 1); // → 来月に進む
+        renderNurseryCalendar(y, currentMonth + 1);
       };
     }
 
@@ -720,31 +718,29 @@ function openNurseryCalendarModal() {
     const startDate = `${y}-${monthStr}-01`;
     const endDate = `${y}-${monthStr}-${String(totalDays).padStart(2, '0')}`;
 
-    db.collection("nursery")
-      .get()
-      .then(snapshot => {
-        snapshot.forEach(doc => {
-          const date = doc.id;
-          if (date >= startDate && date <= endDate) {
-            const cell = document.getElementById("day-" + date);
-            if (cell) {
-              const d = doc.data();
-              const label = (!d.start && !d.end)
-                ? "お休み"
-                : (d.start && d.end) ? `${d.start}〜${d.end}` : "";
-              const timeSpan = cell.querySelector(".nursery-time");
-              if (timeSpan) {
-                timeSpan.textContent = label;
-              }
-              if (label !== "") {
-                cell.style.cursor = "pointer";
-                cell.onclick = () => openNurseryEditModal(date);
-              }
+    db.collection("nursery").get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const date = doc.id;
+        if (date >= startDate && date <= endDate) {
+          const cell = document.getElementById("day-" + date);
+          if (cell) {
+            const d = doc.data();
+            const label = (!d.start && !d.end)
+              ? "お休み"
+              : (d.start && d.end) ? `${d.start}〜${d.end}` : "";
+            const timeSpan = cell.querySelector(".nursery-time");
+            if (timeSpan) {
+              timeSpan.textContent = label;
+            }
+            if (label !== "") {
+              cell.style.cursor = "pointer";
+              cell.onclick = () => openNurseryEditModal(date);
             }
           }
-        });
+        }
       });
+    });
   }
 }
-
 window.openNurseryCalendarModal = openNurseryCalendarModal;
+
