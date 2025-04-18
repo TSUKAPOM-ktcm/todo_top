@@ -641,6 +641,7 @@ function deleteTask(id) {
 }
 
 //保育園編集！
+// 📅 保育園スケジュール一覧モーダル（カレンダー）を開く
 function openNurseryCalendarModal() {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -666,7 +667,7 @@ function openNurseryCalendarModal() {
       <div>
         <h3>保育園スケジュール（${yearMonthStr}）</h3>
         <div style="margin-bottom: 10px;">
-          ${m !== currentMonth ? '<button id="prevMonth">←今月</button>' : ''}
+          ${m > currentMonth ? '<button id="prevMonth">←今月</button>' : ''}
           ${m === currentMonth ? '<button id="nextMonth">来月→</button>' : ''}
         </div>
         <table class="calendar-table">
@@ -686,17 +687,13 @@ function openNurseryCalendarModal() {
 
     if (prevBtn) {
       prevBtn.onclick = () => {
-        selectedYear = currentYear;
-        selectedMonth = currentMonth;
-        renderNurseryCalendar(selectedYear, selectedMonth);
+        renderNurseryCalendar(currentYear, currentMonth);
       };
     }
 
     if (nextBtn) {
       nextBtn.onclick = () => {
-        selectedYear = currentYear;
-        selectedMonth = currentMonth + 1;
-        renderNurseryCalendar(selectedYear, selectedMonth);
+        renderNurseryCalendar(currentYear, currentMonth + 1);
       };
     }
 
@@ -784,8 +781,8 @@ function openNurseryEditModalByDate(dateStr) {
   db.collection("nursery").doc(dateStr).get().then((doc) => {
     if (doc.exists) {
       const data = doc.data();
-      document.getElementById("editNurseryStart").value = data.start || "";
-      document.getElementById("editNurseryEnd").value = data.end || "";
+      document.getElementById("editNurseryStart").value = data.start?.padStart(5, '0') || "";
+      document.getElementById("editNurseryEnd").value = data.end?.padStart(5, '0') || "";
     }
   });
 
@@ -803,6 +800,7 @@ function openNurseryEditModalByDate(dateStr) {
       hideModal();
     });
   });
-} 
+}
+
 
 window.openNurseryCalendarModal = openNurseryCalendarModal;
