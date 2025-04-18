@@ -707,40 +707,110 @@ function saveNurserySchedule(e) {
   });
 }
 
-// 🔍 保育園スケジュール一覧モーダルを開く
+// 📅 保育園スケジュール一覧モーダル（カレンダー）を開く
 function openNurseryCalendarModal() {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
   modal.classList.remove("hidden");
   modal.style.display = "flex";
-  content.innerHTML = `<h3>保育園スケジュール一覧</h3><div id="nurseryScheduleList">読み込み中…</div>`;
 
-  db.collection("nursery").orderBy("date").get()
-    .then((snapshot) => {
-      const container = document.getElementById("nurseryScheduleList");
-      container.innerHTML = "";
-      if (snapshot.empty) {
-        container.innerHTML = "<p>スケジュールがありません</p>";
-        return;
+  const now = new Date();
+  let year = now.getFullYear();
+  let month = now.getMonth();
+
+  renderNurseryCalendar(year, month);
+
+  function renderNurseryCalendar(y, m) {
+    const firstDay = new Date(y, m, 1);
+    const lastDay = new Date(y, m + 1, 0);
+    const startWeekDay = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+    const yearMonthStr = `${y}年${m + 1}月`;
+
+    content.innerHTML = `
+      <div>
+        <h3>保育園スケジュール（${yearMonthStr}）</h3>
+        <div style="margin-bottom: 10px;">
+          <button id="prevMonth">←先月</button>
+          <button id="nextMonth">来月→</button>
+        </div>
+        <table class="calendar-table">
+          <thead>
+            <tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr>
+          </thead>
+          <tbody id="calendarBody"></tbody>
+        </table>
+        <div class="modal-buttons">
+          <button onclick="hideModal()">閉じる</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("prevMonth").onclick = () => {
+      if (month === 0) {
+        month = 11;
+        year--;
+      } else {
+        month--;
       }
+      renderNurseryCalendar(year, month);
+    };
 
-      snapshot.forEach(doc => {
-        const id = doc.id;
-        const data = doc.data();
-        const start = data.start || "お休み";
-        const end = data.end || "";
-        const div = document.createElement("div");
-        div.textContent = `${id}：${start} ～ ${end}`;
-        container.appendChild(div);
+    document.getElementById("nextMonth").onclick = () => {
+      if (month === 11) {
+        month = 0;
+        year++;
+      } else {
+        month++;
+      }
+      renderNurseryCalendar(year, month);
+    };
+
+    const calendarBody = document.getElementById("calendarBody");
+    calendarBody.innerHTML = "";
+
+    const weeks = [];
+    let currentDay = 1;
+
+    while (currentDay <= totalDays) {
+      const week = [];
+      for (let i = 0; i < 7; i++) {
+        if ((weeks.length === 0 && i < startWeekDay) || currentDay > totalDays) {
+          week.push("<td></td>");
+        } else {
+          const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
+          week.push(`<td id="day-${dateStr}"><strong>${currentDay}</strong><br><span class="nursery-time">読み込み中</span></td>`);
+          currentDay++;
+        }
+      }
+      weeks.push("<tr>" + week.join("") + "</tr>");
+    }
+    calendarBody.innerHTML = weeks.join("");
+
+    // Firestoreからデータ取得して反映
+    const monthStr = String(m + 1).padStart(2, '0');
+    const startDate = `${y}-${monthStr}-01`;
+    const endDate = `${y}-${monthStr}-${String(totalDays).padStart(2, '0')}`;
+
+    db.collection("nursery")
+      .where("start", ">=", null) // dummy filter to enable order
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          const date = doc.id;
+          if (date >= startDate && date <= endDate) {
+            const cell = document.getElementById("day-" + date);
+            if (cell) {
+              const d = doc.data();
+              const label = (!d.start || !d.end) ? "お休み" : `${d.start}〜${d.end}`;
+              cell.querySelector(".nursery-time").textContent = label;
+            }
+          }
+        });
       });
-    })
-    .catch(err => {
-      console.error("スケジュール一覧取得エラー:", err);
-      document.getElementById("nurseryScheduleList").textContent = "エラーが発生しました";
-    });
+  }
 }
 window.openNurseryCalendarModal = openNurseryCalendarModal;
-
 
 
 
