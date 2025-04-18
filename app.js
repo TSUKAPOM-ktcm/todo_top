@@ -640,6 +640,7 @@ function deleteTask(id) {
     });
 }
 
+//保育園編集！
 function openNurseryCalendarModal() {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -647,10 +648,12 @@ function openNurseryCalendarModal() {
   modal.style.display = "flex";
 
   const now = new Date();
-  let year = now.getFullYear();
-  let month = now.getMonth();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  let selectedYear = currentYear;
+  let selectedMonth = currentMonth;
 
-  renderNurseryCalendar(year, month);
+  renderNurseryCalendar(selectedYear, selectedMonth);
 
   function renderNurseryCalendar(y, m) {
     const firstDay = new Date(y, m, 1);
@@ -663,8 +666,8 @@ function openNurseryCalendarModal() {
       <div>
         <h3>保育園スケジュール（${yearMonthStr}）</h3>
         <div style="margin-bottom: 10px;">
-          <button id="prevMonth">←今月</button>
-          <button id="nextMonth">来月→</button>
+          ${m !== currentMonth ? '<button id="prevMonth">←今月</button>' : ''}
+          ${m === currentMonth ? '<button id="nextMonth">来月→</button>' : ''}
         </div>
         <table class="calendar-table">
           <thead>
@@ -678,13 +681,24 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
-    document.getElementById("prevMonth").onclick = () => {
-      renderNurseryCalendar(y, now.getMonth());
-    };
+    const prevBtn = document.getElementById("prevMonth");
+    const nextBtn = document.getElementById("nextMonth");
 
-    document.getElementById("nextMonth").onclick = () => {
-      renderNurseryCalendar(y, now.getMonth() + 1);
-    };
+    if (prevBtn) {
+      prevBtn.onclick = () => {
+        selectedYear = currentYear;
+        selectedMonth = currentMonth;
+        renderNurseryCalendar(selectedYear, selectedMonth);
+      };
+    }
+
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        selectedYear = currentYear;
+        selectedMonth = currentMonth + 1;
+        renderNurseryCalendar(selectedYear, selectedMonth);
+      };
+    }
 
     const calendarBody = document.getElementById("calendarBody");
     calendarBody.innerHTML = "";
@@ -727,7 +741,7 @@ function openNurseryCalendarModal() {
             }
             if (label !== "") {
               cell.style.cursor = "pointer";
-              cell.onclick = () => window.openNurseryEditModal(date);
+              cell.onclick = () => openNurseryEditModal(date);
             }
           }
         }
@@ -736,4 +750,3 @@ function openNurseryCalendarModal() {
   }
 }
 window.openNurseryCalendarModal = openNurseryCalendarModal;
-
