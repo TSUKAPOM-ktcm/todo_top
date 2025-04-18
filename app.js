@@ -261,13 +261,6 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
-
-function hideModal() {
-  document.getElementById("modal").classList.add("hidden");
-  document.getElementById("modal").style.display = "none";
-}
-
 function addTaskFromForm(e) {
   e.preventDefault();
   const name = document.getElementById("taskName").value;
@@ -382,7 +375,6 @@ function openEditTaskModal(task) {
 }
 window.openEditTaskModal = openEditTaskModal;
 
-
 function openEditEventModal(eventDiv) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -427,9 +419,9 @@ function openEditEventModal(eventDiv) {
     const newMinute = document.getElementById("editEventMinute").value;
     const newContent = document.getElementById("editEventContent").value;
     const newNote = document.getElementById("editEventNote").value;
-    const eventId = eventDiv.dataset.id; // ← 🔑
+    const eventId = eventDiv.dataset.id; // 🔑 Firestore の ID を使って更新！
 
-    // Firestoreに上書き保存！
+    // Firestore に上書き保存
     db.collection("events").doc(eventId).update({
       date: newDate,
       hour: newHour,
@@ -443,9 +435,40 @@ function openEditEventModal(eventDiv) {
       console.error("Firestore予定保存エラー（編集）:", error);
     });
 
+    // 表示の更新（重複登録を防ぐため remove → 再append）
+    eventDiv.dataset.date = newDate;
+    eventDiv.dataset.hour = newHour;
+    eventDiv.dataset.minute = newMinute;
+    eventDiv.dataset.content = newContent;
+    eventDiv.dataset.note = newNote;
+
+    const timeStr = newHour && newMinute ? `${newHour}:${newMinute}` : "";
+    eventDiv.innerHTML = `<strong>${newDate}</strong> ${timeStr} - ${newContent}`;
+    eventDiv.onclick = () => openEditEventModal(eventDiv);
+    eventDiv.remove();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const eventDate = new Date(newDate + "T00:00:00");
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    if (eventDate <= yesterday) {
+      hideModal(); return;
+    }
+
+    if (isSameWeek(eventDate, today)) {
+      document.getElementById("calendar-week").appendChild(eventDiv);
+    } else if (isSameMonth(eventDate, today)) {
+      document.getElementById("calendar-month").appendChild(eventDiv);
+    } else if (isNextMonthOrLater(eventDate, today)) {
+      document.getElementById("calendar-future").appendChild(eventDiv);
+    }
+
     hideModal();
   };
 }
+
 
 
 
@@ -548,84 +571,11 @@ function addEventFromForm(e) {
   hideModal();
 }
 
-function openEditEventModal(eventDiv) {
-  const modal = document.getElementById("modal");
-  const content = document.getElementById("modalContent");
-  modal.classList.remove("hidden");
-  modal.style.display = "flex";
-
-  content.innerHTML = `
-    <form id="editEventForm">
-      <h3>予定の編集</h3>
-      <label>日付<span class="required">*</span><br>
-        <input type="date" id="editEventDate" value="${eventDiv.dataset.date}" required></label>
-      <label>時間（時・分）<br>
-        <select id="editEventHour"></select>
-        <select id="editEventMinute">
-          <option value="">--</option>
-          <option>00</option><option>15</option><option>30</option><option>45</option>
-        </select></label>
-      <label>内容<span class="required">*</span><br>
-        <input id="editEventContent" value="${eventDiv.dataset.content}" required></label>
-      <label>メモ<br><textarea id="editEventNote">${eventDiv.dataset.note || ""}</textarea></label>
-      <div class="modal-buttons">
-        <button type="button" onclick="hideModal()">キャンセル</button>
-        <button type="submit">保存</button>
-      </div>
-    </form>`;
-
-  const hourSelect = document.getElementById("editEventHour");
-  for (let i = 0; i < 24; i++) {
-    const opt = document.createElement("option");
-    opt.value = String(i).padStart(2, "0");
-    opt.textContent = i;
-    if (eventDiv.dataset.hour === opt.value) opt.selected = true;
-    hourSelect.appendChild(opt);
-  }
-
-  document.getElementById("editEventMinute").value = eventDiv.dataset.minute || "";
-
-  document.getElementById("editEventForm").onsubmit = (e) => {
-    e.preventDefault();
-    const newDate = document.getElementById("editEventDate").value;
-    const newHour = document.getElementById("editEventHour").value;
-    const newMinute = document.getElementById("editEventMinute").value;
-    const newContent = document.getElementById("editEventContent").value;
-    const newNote = document.getElementById("editEventNote").value;
-
-    eventDiv.dataset.date = newDate;
-    eventDiv.dataset.hour = newHour;
-    eventDiv.dataset.minute = newMinute;
-    eventDiv.dataset.content = newContent;
-    eventDiv.dataset.note = newNote;
-
-    const timeStr = newHour && newMinute ? `${newHour}:${newMinute}` : "";
-    eventDiv.innerHTML = `<strong>${newDate}</strong> ${timeStr} - ${newContent}`;
-    eventDiv.onclick = () => openEditEventModal(eventDiv);
-
-    eventDiv.remove();
-    const dateObj = new Date(newDate + "T00:00:00");
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (dateObj <= yesterday) {
-      hideModal(); return;
-    }
-
-    if (isSameWeek(dateObj, today)) {
-      document.getElementById("calendar-week").appendChild(eventDiv);
-    } else if (isSameMonth(dateObj, today)) {
-      document.getElementById("calendar-month").appendChild(eventDiv);
-    } else if (isNextMonthOrLater(dateObj, today)) {
-      document.getElementById("calendar-future").appendChild(eventDiv);
-    }
-
-    hideModal();
-  };
+// モーダル非表示関数
+function hideModal() {
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
 }
-
 
 // 判定用補助関数
 function isSameWeek(date, reference) {
