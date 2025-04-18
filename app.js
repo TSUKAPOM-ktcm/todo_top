@@ -375,6 +375,64 @@ function openEditTaskModal(task) {
 }
 window.openEditTaskModal = openEditTaskModal;
 
+function addEventFromForm(e) {
+  e.preventDefault();
+  const date = document.getElementById("eventDate").value;
+  const hour = document.getElementById("eventHour").value;
+  const minute = document.getElementById("eventMinute").value;
+  const content = document.getElementById("eventContent").value;
+  const note = document.getElementById("eventNote").value;
+
+  if (!date || !content.trim()) return;
+
+  const eventDate = new Date(date + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  if (eventDate <= yesterday) {
+    hideModal(); // 昨日以前は無視
+    return;
+  }
+
+  const event = document.createElement("div");
+  event.className = "event-item";
+  event.dataset.date = date;
+  event.dataset.hour = hour;
+  event.dataset.minute = minute;
+  event.dataset.content = content;
+  event.dataset.note = note;
+
+  const time = hour && minute ? `${hour}:${minute}` : "";
+  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
+  event.onclick = () => openEditEventModal(event);
+
+  if (isSameWeek(eventDate, today)) {
+    document.getElementById("calendar-week").appendChild(event);
+  } else if (isSameMonth(eventDate, today)) {
+    document.getElementById("calendar-month").appendChild(event);
+  } else if (isNextMonthOrLater(eventDate, today)) {
+    document.getElementById("calendar-future").appendChild(event);
+  }
+
+    // Firestoreに保存
+  db.collection("events").add({
+    date,
+    hour,
+    minute,
+    content,
+    note,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    console.log("Firestoreに予定を保存しました");
+  }).catch((error) => {
+    console.error("Firestore予定保存エラー:", error);
+  });
+
+  hideModal();
+}
+
 function openEditEventModal(eventDiv) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -508,74 +566,18 @@ function addMemoFromForm(e) {
   hideModal();
 }
 
-function hideMemoModal() {
-  document.getElementById("memoViewModal").classList.add("hidden");
-  document.getElementById("memoViewModal").style.display = "none";
-}
-
-function addEventFromForm(e) {
-  e.preventDefault();
-  const date = document.getElementById("eventDate").value;
-  const hour = document.getElementById("eventHour").value;
-  const minute = document.getElementById("eventMinute").value;
-  const content = document.getElementById("eventContent").value;
-  const note = document.getElementById("eventNote").value;
-
-  if (!date || !content.trim()) return;
-
-  const eventDate = new Date(date + "T00:00:00");
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-
-  if (eventDate <= yesterday) {
-    hideModal(); // 昨日以前は無視
-    return;
-  }
-
-  const event = document.createElement("div");
-  event.className = "event-item";
-  event.dataset.date = date;
-  event.dataset.hour = hour;
-  event.dataset.minute = minute;
-  event.dataset.content = content;
-  event.dataset.note = note;
-
-  const time = hour && minute ? `${hour}:${minute}` : "";
-  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
-  event.onclick = () => openEditEventModal(event);
-
-  if (isSameWeek(eventDate, today)) {
-    document.getElementById("calendar-week").appendChild(event);
-  } else if (isSameMonth(eventDate, today)) {
-    document.getElementById("calendar-month").appendChild(event);
-  } else if (isNextMonthOrLater(eventDate, today)) {
-    document.getElementById("calendar-future").appendChild(event);
-  }
-
-    // Firestoreに保存
-  db.collection("events").add({
-    date,
-    hour,
-    minute,
-    content,
-    note,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    console.log("Firestoreに予定を保存しました");
-  }).catch((error) => {
-    console.error("Firestore予定保存エラー:", error);
-  });
-
-  hideModal();
-}
 
 // モーダル非表示関数
 function hideModal() {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
 }
+
+function hideMemoModal() {
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
+}
+
 
 // 判定用補助関数
 function isSameWeek(date, reference) {
