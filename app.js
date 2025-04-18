@@ -1,8 +1,7 @@
+// Firestoreの db は HTML 側で初期化されている前提です
 const db = window.db;
 
-// Firestoreの db は HTML 側で初期化されている前提です
-
-// ログイン処理
+// 🔐 ログイン処理
 function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -24,9 +23,7 @@ function login() {
       alert("ログインに失敗しました");
     });
 }
-
-window.login = login; 
-
+window.login = login;
 
 // 🔧 モーダル処理　type別に表示　task,regular
 function showModal(type) {
@@ -115,17 +112,15 @@ function showModal(type) {
     });
   }
 }
-
 window.showModal = showModal;
 
-//ページ読み込み時のモーダル非表示化処理
-  document.addEventListener("DOMContentLoaded", () => {
+// ページ読み込み時のモーダル初期化とFirestoreの同期設定
+window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
   document.getElementById("memoViewModal").classList.add("hidden");
   document.getElementById("memoViewModal").style.display = "none";
 
-// 🔄 Firestoreリアルタイム同期（tasks）
   db.collection("tasks").onSnapshot((snapshot) => {
     const taskContainers = document.querySelectorAll("[id^='tasks-']");
     taskContainers.forEach(container => container.innerHTML = "");
@@ -153,8 +148,7 @@ window.showModal = showModal;
     });
   });
 
-  // 🔄 Firestoreリアルタイム同期（events）
- db.collection("events").onSnapshot((snapshot) => {
+  db.collection("events").onSnapshot((snapshot) => {
     document.getElementById("calendar-week").innerHTML = "";
     document.getElementById("calendar-month").innerHTML = "";
     document.getElementById("calendar-future").innerHTML = "";
@@ -165,10 +159,8 @@ window.showModal = showModal;
     snapshot.forEach(doc => {
       const data = doc.data();
       const eventDate = new Date(data.date + "T00:00:00");
-
       if (eventDate < today || data.deleted) return;
 
-      // 既存の同一IDのイベントがあれば削除してから再表示（重複防止）
       const existing = document.querySelector(`[data-id='${doc.id}']`);
       if (existing) existing.remove();
 
@@ -192,9 +184,9 @@ window.showModal = showModal;
       } else if (isNextMonthOrLater(eventDate, today)) {
         document.getElementById("calendar-future").appendChild(event);
       }
+    });
+  });
 
-
-  // 🔄 Firestoreリアルタイム同期（memos）
   db.collection("memos").onSnapshot((snapshot) => {
     document.getElementById("memos").innerHTML = "";
 
