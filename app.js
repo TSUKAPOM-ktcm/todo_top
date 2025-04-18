@@ -653,6 +653,14 @@ function openNurseryEditModal(dateStr) {
   modal.classList.remove("hidden");
   modal.style.display = "flex";
 
+  if (!dateStr) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    dateStr = `${yyyy}-${mm}-${dd}`;
+  }
+
   content.innerHTML = `
     <form id="editNurseryForm">
       <h3>${dateStr} の保育園時間を編集</h3>
@@ -791,11 +799,14 @@ function openNurseryCalendarModal() {
             const cell = document.getElementById("day-" + date);
             if (cell) {
               const d = doc.data();
-              if (!d.start && !d.end) return; // 🐻 どちらもなければ表示もクリックもスキップ
-              const label = (!d.start || !d.end) ? "お休み" : `${d.start}〜${d.end}`;
+              const label = (!d.start && !d.end)
+                ? "お休み"
+                : (d.start && d.end) ? `${d.start}〜${d.end}` : "";
               const timeSpan = cell.querySelector(".nursery-time");
               if (timeSpan) {
                 timeSpan.textContent = label;
+              }
+              if (label !== "") {
                 cell.style.cursor = "pointer";
                 cell.onclick = () => openNurseryEditModal(date);
               }
