@@ -646,23 +646,16 @@ function deleteTask(id) {
     });
 }
 
-// 🔧 保育園時間を編集するモーダルを開く
-function openNurseryEditModal() {
+// 🔧 保育園時間を編集するモーダルを開く（任意の日付）
+function openNurseryEditModal(dateStr) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
   modal.classList.remove("hidden");
   modal.style.display = "flex";
 
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const dateStr = `${yyyy}-${mm}-${dd}`; // 🔑 FirestoreのIDと一致
-
-  // HTMLを挿入
   content.innerHTML = `
     <form id="editNurseryForm">
-      <h3>今日の保育園時間を編集</h3>
+      <h3>${dateStr} の保育園時間を編集</h3>
       <label>日付：<input type="date" id="editNurseryDate" value="${dateStr}" required></label><br>
       <label>開始時間：<input type="time" id="editNurseryStart"></label><br>
       <label>終了時間：<input type="time" id="editNurseryEnd"></label><br>
@@ -673,7 +666,6 @@ function openNurseryEditModal() {
     </form>
   `;
 
-  // 既存データを読み込んで入力欄にセット
   db.collection("nursery").doc(dateStr).get().then((doc) => {
     if (doc.exists) {
       const data = doc.data();
@@ -682,7 +674,6 @@ function openNurseryEditModal() {
     }
   });
 
-  // 保存イベント
   document.getElementById("editNurseryForm").addEventListener("submit", saveNurserySchedule);
 }
 window.openNurseryEditModal = openNurseryEditModal;
@@ -700,7 +691,7 @@ function saveNurserySchedule(e) {
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
     console.log("保育園スケジュールを更新しました");
-    renderTodayNursery(); // 🐣 メイン表示も更新！
+    renderTodayNursery();
     hideModal();
   }).catch((err) => {
     console.error("スケジュール更新失敗:", err);
@@ -779,7 +770,7 @@ function openNurseryCalendarModal() {
           week.push("<td></td>");
         } else {
           const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
-          week.push(`<td id="day-${dateStr}"><strong>${currentDay}</strong><br><span class="nursery-time"></span></td>`);
+          week.push(`<td id="day-${dateStr}" data-date="${dateStr}"><strong>${currentDay}</strong><br><span class="nursery-time"></span></td>`);
           currentDay++;
         }
       }
@@ -787,33 +778,31 @@ function openNurseryCalendarModal() {
     }
     calendarBody.innerHTML = weeks.join("");
 
-    // Firestoreからデータ取得して反映
     const monthStr = String(m + 1).padStart(2, '0');
     const startDate = `${y}-${monthStr}-01`;
     const endDate = `${y}-${monthStr}-${String(totalDays).padStart(2, '0')}`;
 
-db.collection("nursery")
-  .get()
-  .then(snapshot => {
-    snapshot.forEach(doc => {
-      const date = doc.id;
-      if (date >= startDate && date <= endDate) {
-        const cell = document.getElementById("day-" + date);
-        if (cell) {
-          const d = doc.data();
-          const label = (!d.start || !d.end) ? "お休み" : `${d.start}〜${d.end}`;
-          cell.querySelector(".nursery-time").textContent = label;
-        }
-      }
-    });
-  });
-
+    db.collection("nursery")
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          const date = doc.id;
+          if (date >= startDate && date <= endDate) {
+            const cell = document.getElementById("day-" + date);
+            if (cell) {
+              const d = doc.data();
+              if (!d.start && !d.end) return; // 🐻 どちらもなければ表示もクリックもスキップ
+              const label = (!d.start || !d.end) ? "お休み" : `${d.start}〜${d.end}`;
+              const timeSpan = cell.querySelector(".nursery-time");
+              if (timeSpan) {
+                timeSpan.textContent = label;
+                cell.style.cursor = "pointer";
+                cell.onclick = () => openNurseryEditModal(date);
+              }
+            }
+          }
+        });
+      });
   }
 }
 window.openNurseryCalendarModal = openNurseryCalendarModal;
-
-
-
-
-
-
