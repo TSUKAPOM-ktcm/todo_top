@@ -792,22 +792,22 @@ function openNurseryCalendarModal() {
     const startDate = `${y}-${monthStr}-01`;
     const endDate = `${y}-${monthStr}-${String(totalDays).padStart(2, '0')}`;
 
-    db.collection("nursery")
-      .where("start", ">=", null) // dummy filter to enable order
-      .get()
-      .then(snapshot => {
-        snapshot.forEach(doc => {
-          const date = doc.id;
-          if (date >= startDate && date <= endDate) {
-            const cell = document.getElementById("day-" + date);
-            if (cell) {
-              const d = doc.data();
-              const label = (!d.start || !d.end) ? "お休み" : `${d.start}〜${d.end}`;
-              cell.querySelector(".nursery-time").textContent = label;
-            }
-          }
-        });
-      });
+db.collection("nursery")
+  .get()
+  .then(snapshot => {
+    snapshot.forEach(doc => {
+      const date = doc.id;
+      if (date >= startDate && date <= endDate) {
+        const cell = document.getElementById("day-" + date);
+        if (cell) {
+          const d = doc.data();
+          const label = (!d.start || !d.end) ? "お休み" : `${d.start}〜${d.end}`;
+          cell.querySelector(".nursery-time").textContent = label;
+        }
+      }
+    });
+  });
+
   }
 }
 window.openNurseryCalendarModal = openNurseryCalendarModal;
