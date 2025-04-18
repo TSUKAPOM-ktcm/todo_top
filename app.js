@@ -707,6 +707,41 @@ function saveNurserySchedule(e) {
   });
 }
 
+// 🔍 保育園スケジュール一覧モーダルを開く
+function openNurseryCalendarModal() {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+  content.innerHTML = `<h3>保育園スケジュール一覧</h3><div id="nurseryScheduleList">読み込み中…</div>`;
+
+  db.collection("nursery").orderBy("date").get()
+    .then((snapshot) => {
+      const container = document.getElementById("nurseryScheduleList");
+      container.innerHTML = "";
+      if (snapshot.empty) {
+        container.innerHTML = "<p>スケジュールがありません</p>";
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const id = doc.id;
+        const data = doc.data();
+        const start = data.start || "お休み";
+        const end = data.end || "";
+        const div = document.createElement("div");
+        div.textContent = `${id}：${start} ～ ${end}`;
+        container.appendChild(div);
+      });
+    })
+    .catch(err => {
+      console.error("スケジュール一覧取得エラー:", err);
+      document.getElementById("nurseryScheduleList").textContent = "エラーが発生しました";
+    });
+}
+window.openNurseryCalendarModal = openNurseryCalendarModal;
+
+
 
 
 
