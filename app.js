@@ -642,6 +642,31 @@ function deleteTask(id) {
 
 //保育園編集！
 // 📅 保育園スケジュール一覧モーダル（カレンダー）を開く
+function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  db.collection("users")
+    .where("email", "==", email)
+    .where("password", "==", password)
+    .get()
+    .then((querySnapshot) => {
+      if (!querySnapshot.empty) {
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("mainScreen").classList.remove("hidden");
+        renderTodayNursery();
+      } else {
+        alert("IDかパスワードが違います");
+      }
+    })
+    .catch((error) => {
+      console.error("ログイン時のエラー:", error);
+      alert("ログインに失敗しました");
+    });
+}
+window.login = login;
+
+// 📅 保育園スケジュール一覧モーダル（カレンダー）を開く
 function openNurseryCalendarModal() {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -685,13 +710,15 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
-    document.getElementById("prevMonth").onclick = () => {
-      renderNurseryCalendar(currentYear, currentMonth);
-    };
+    setTimeout(() => {
+      document.getElementById("prevMonth").onclick = () => {
+        renderNurseryCalendar(currentYear, currentMonth);
+      };
 
-    document.getElementById("nextMonth").onclick = () => {
-      renderNurseryCalendar(currentYear, currentMonth + 1);
-    };
+      document.getElementById("nextMonth").onclick = () => {
+        renderNurseryCalendar(currentYear, currentMonth + 1);
+      };
+    }, 0);
 
     const calendarBody = document.getElementById("calendarBody");
     calendarBody.innerHTML = "";
@@ -734,7 +761,7 @@ function openNurseryCalendarModal() {
             }
             if (label !== "") {
               cell.style.cursor = "pointer";
-              cell.onclick = () => openNurseryEditModalByDate(date);
+              cell.onclick = () => window.openNurseryEditModalByDate(date);
             }
           }
         }
@@ -796,4 +823,3 @@ function openNurseryEditModalByDate(dateStr) {
   });
 }
 window.openNurseryEditModalByDate = openNurseryEditModalByDate;
-
