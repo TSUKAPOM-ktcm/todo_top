@@ -137,7 +137,58 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+else if (type === "regular") {
+    modalContent.innerHTML = `
+      <form id="regularForm">
+        <h3>定期タスクを追加</h3>
+        <p>どのタスクを追加しますか？</p>
+        <label><input type="checkbox" name="frequency" value="毎日"> 毎日</label><br>
+        <label><input type="checkbox" name="frequency" value="毎週"> 毎週</label><br>
+        <label><input type="checkbox" name="frequency" value="毎月"> 毎月</label><br>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
+    `;
 
+    document.getElementById("regularForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const selected = Array.from(document.querySelectorAll("input[name='frequency']:checked"))
+        .map(cb => cb.value);
+
+      if (selected.length === 0) {
+        alert("最低1つ選んでください！");
+        return;
+      }
+
+      try {
+        const snapshot = await db.collection("templates")
+          .where("frequency", "in", selected)
+          .get();
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, doc.id);
+
+          // Firestoreのtasksにも追加
+          db.collection("tasks").add({
+            name: data.name,
+            status: data.status,
+            frequency: data.frequency,
+            assignee: data.assignee,
+            dueDate: data.dueDate || null,
+            note: data.note || "",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+
+        hideModal();
+      } catch (error) {
+        console.error("定期タスク取得エラー:", error);
+        alert("取得に失敗しました");
+      }
+    });
 
   // 🔄 Firestoreリアルタイム同期（memos）
   db.collection("memos").onSnapshot((snapshot) => {
