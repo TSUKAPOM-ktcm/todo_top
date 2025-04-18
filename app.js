@@ -2,6 +2,7 @@ const db = window.db;
 
 // Firestoreの db は HTML 側で初期化されている前提です
 
+// ログイン処理
 function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -24,8 +25,10 @@ function login() {
     });
 }
 
-window.login = login; // 🔧 これでグローバル化！HTMLから使えるよ！
+window.login = login; 
 
+
+// 🔧 モーダル処理　type別に表示　task,regular
 function showModal(type) {
   const modal = document.getElementById("modal");
   const modalContent = document.getElementById("modalContent");
@@ -57,18 +60,72 @@ function showModal(type) {
         </div>
       </form>`;
     document.getElementById("taskForm").addEventListener("submit", addTaskFromForm);
+
+  } else if (type === "regular") {
+    modalContent.innerHTML = `
+      <form id="regularForm">
+        <h3>定期タスクを追加</h3>
+        <p>どのタスクを追加しますか？</p>
+        <label><input type="checkbox" name="frequency" value="毎日"> 毎日</label><br>
+        <label><input type="checkbox" name="frequency" value="毎週"> 毎週</label><br>
+        <label><input type="checkbox" name="frequency" value="毎月"> 毎月</label><br>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
+    `;
+
+    document.getElementById("regularForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const selected = Array.from(document.querySelectorAll("input[name='frequency']:checked"))
+        .map(cb => cb.value);
+
+      if (selected.length === 0) {
+        alert("最低1つ選んでください！");
+        return;
+      }
+
+      try {
+        const snapshot = await db.collection("templates")
+          .where("frequency", "in", selected)
+          .get();
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, doc.id);
+
+          db.collection("tasks").add({
+            name: data.name,
+            status: data.status,
+            frequency: data.frequency,
+            assignee: data.assignee,
+            dueDate: data.dueDate || null,
+            note: data.note || "",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+
+        hideModal();
+
+      } catch (error) {
+        console.error("定期タスク取得エラー:", error);
+        alert("取得に失敗しました");
+      }
+    });
   }
 }
+
 window.showModal = showModal;
 
-
-document.addEventListener("DOMContentLoaded", () => {
+//ページ読み込み時のモーダル非表示化処理
+  document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal").classList.add("hidden");
   document.getElementById("modal").style.display = "none";
   document.getElementById("memoViewModal").classList.add("hidden");
   document.getElementById("memoViewModal").style.display = "none";
 
-    // 🔄 Firestoreリアルタイム同期（tasks）
+// 🔄 Firestoreリアルタイム同期（tasks）
   db.collection("tasks").onSnapshot((snapshot) => {
     const taskContainers = document.querySelectorAll("[id^='tasks-']");
     taskContainers.forEach(container => container.innerHTML = "");
@@ -135,60 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (isNextMonthOrLater(eventDate, today)) {
         document.getElementById("calendar-future").appendChild(event);
       }
-    });
-  });
-else if (type === "regular") {
-    modalContent.innerHTML = `
-      <form id="regularForm">
-        <h3>定期タスクを追加</h3>
-        <p>どのタスクを追加しますか？</p>
-        <label><input type="checkbox" name="frequency" value="毎日"> 毎日</label><br>
-        <label><input type="checkbox" name="frequency" value="毎週"> 毎週</label><br>
-        <label><input type="checkbox" name="frequency" value="毎月"> 毎月</label><br>
-        <div class="modal-buttons">
-          <button type="button" onclick="hideModal()">キャンセル</button>
-          <button type="submit">OK</button>
-        </div>
-      </form>
-    `;
 
-    document.getElementById("regularForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const selected = Array.from(document.querySelectorAll("input[name='frequency']:checked"))
-        .map(cb => cb.value);
-
-      if (selected.length === 0) {
-        alert("最低1つ選んでください！");
-        return;
-      }
-
-      try {
-        const snapshot = await db.collection("templates")
-          .where("frequency", "in", selected)
-          .get();
-
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, doc.id);
-
-          // Firestoreのtasksにも追加
-          db.collection("tasks").add({
-            name: data.name,
-            status: data.status,
-            frequency: data.frequency,
-            assignee: data.assignee,
-            dueDate: data.dueDate || null,
-            note: data.note || "",
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        });
-
-        hideModal();
-      } catch (error) {
-        console.error("定期タスク取得エラー:", error);
-        alert("取得に失敗しました");
-      }
-    });
 
   // 🔄 Firestoreリアルタイム同期（memos）
   db.collection("memos").onSnapshot((snapshot) => {
