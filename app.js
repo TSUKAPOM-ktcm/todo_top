@@ -670,8 +670,8 @@ function openNurseryCalendarModal() {
       <div>
         <h3>保育園スケジュール（${yearMonthStr}）</h3>
         <div style="margin-bottom: 10px; text-align: center;">
-          ${m > currentMonth ? '<button id="prevMonth">←今月</button>' : ''}
-          ${m === currentMonth ? '<button id="nextMonth">来月→</button>' : ''}
+          <button id="prevMonth" style="display: ${m > currentMonth ? 'inline-block' : 'none'}">←今月</button>
+          <button id="nextMonth" style="display: ${m === currentMonth ? 'inline-block' : 'none'}">来月→</button>
         </div>
         <table class="calendar-table">
           <thead>
@@ -685,16 +685,18 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
-    // ボタンイベントを登録（setTimeoutを使わずに確実に実行）
-    const prevBtn = document.getElementById("prevMonth");
-    if (prevBtn) {
-      prevBtn.onclick = () => renderNurseryCalendar(currentYear, currentMonth);
-    }
+    setTimeout(() => {
+      const prevBtn = document.getElementById("prevMonth");
+      const nextBtn = document.getElementById("nextMonth");
 
-    const nextBtn = document.getElementById("nextMonth");
-    if (nextBtn) {
-      nextBtn.onclick = () => renderNurseryCalendar(currentYear, currentMonth + 1);
-    }
+      if (prevBtn) {
+        prevBtn.onclick = () => renderNurseryCalendar(currentYear, currentMonth);
+      }
+
+      if (nextBtn) {
+        nextBtn.onclick = () => renderNurseryCalendar(currentYear, currentMonth + 1);
+      }
+    }, 0);
 
     const calendarBody = document.getElementById("calendarBody");
     calendarBody.innerHTML = "";
