@@ -26,6 +26,7 @@ function login() {
 }
 window.login = login;
 
+//保育園スケジュールをfirestoreから読み取り
 function renderTodayNursery() {
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -36,7 +37,7 @@ function renderTodayNursery() {
   const startEl = document.getElementById("nurseryStart");
   const endEl = document.getElementById("nurseryEnd");
 
-  db.collection("nursery").doc(dateStr).get()
+  db.collection("nursery_schedule").doc(dateStr).get()
     .then((doc) => {
       if (doc.exists) {
         const data = doc.data();
