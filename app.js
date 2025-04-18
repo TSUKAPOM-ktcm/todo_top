@@ -14,6 +14,7 @@ function login() {
       if (!querySnapshot.empty) {
         document.getElementById("loginScreen").classList.add("hidden");
         document.getElementById("mainScreen").classList.remove("hidden");
+        renderTodayNursery(); // 🔸ログイン後に今日の保育園時間を表示
       } else {
         alert("IDかパスワードが違います");
       }
@@ -24,6 +25,39 @@ function login() {
     });
 }
 window.login = login;
+
+function renderTodayNursery() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const dateStr = `${yyyy}-${mm}-${dd}`; // 🔑 FirestoreのIDと一致させる
+
+  const startEl = document.getElementById("nurseryStart");
+  const endEl = document.getElementById("nurseryEnd");
+
+  db.collection("nursery").doc(dateStr).get()
+    .then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        if (!data.start || !data.end) {
+          startEl.textContent = "お休み";
+          endEl.textContent = "";
+        } else {
+          startEl.textContent = data.start;
+          endEl.textContent = data.end;
+        }
+      } else {
+        startEl.textContent = "データなし";
+        endEl.textContent = "";
+      }
+    })
+    .catch((error) => {
+      console.error("保育園情報の取得エラー:", error);
+      startEl.textContent = "エラー";
+      endEl.textContent = "";
+    });
+}
 
 // 🔧 モーダル処理　type別に表示　task,regular
 function showModal(type) {
