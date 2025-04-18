@@ -32,32 +32,26 @@ function renderTodayNursery() {
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
-  const dateStr = `${yyyy}-${mm}-${dd}`; // 🔑 FirestoreのIDと一致させる
+  const dateStr = `${yyyy}-${mm}-${dd}`;
 
   const startEl = document.getElementById("nurseryStart");
   const endEl = document.getElementById("nurseryEnd");
 
-  db.collection("nursery").doc(dateStr).get()
-    .then((doc) => {
-      if (doc.exists) {
-        const data = doc.data();
-        if (!data.start || !data.end) {
-          startEl.textContent = "お休み";
-          endEl.textContent = "";
-        } else {
-          startEl.textContent = data.start;
-          endEl.textContent = data.end;
-        }
-      } else {
-        startEl.textContent = "データなし";
+  db.collection("nursery").doc(dateStr).get().then((doc) => {
+    if (doc.exists) {
+      const data = doc.data();
+      if (data.start == null || data.end == null) {
+        startEl.textContent = "お休み";
         endEl.textContent = "";
+      } else {
+        startEl.textContent = data.start;
+        endEl.textContent = data.end;
       }
-    })
-    .catch((error) => {
-      console.error("保育園情報の取得エラー:", error);
-      startEl.textContent = "エラー";
-      endEl.textContent = "";
-    });
+    } else {
+      startEl.textContent = "--:--";
+      endEl.textContent = "--:--";
+    }
+  });
 }
 
 // 🔧 モーダル処理　type別に表示　task,regular
@@ -647,23 +641,21 @@ function deleteTask(id) {
 }
 
 // 🔧 保育園時間を編集するモーダルを開く（任意の日付）
-function openNurseryEditModal(dateStr) {
+function openNurseryEditModal() {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
   modal.classList.remove("hidden");
   modal.style.display = "flex";
 
-  if (!dateStr) {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    dateStr = `${yyyy}-${mm}-${dd}`;
-  }
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const dateStr = `${yyyy}-${mm}-${dd}`;
 
   content.innerHTML = `
     <form id="editNurseryForm">
-      <h3>${dateStr} の保育園時間を編集</h3>
+      <h3>今日の保育園時間を編集</h3>
       <label>日付：<input type="date" id="editNurseryDate" value="${dateStr}" required></label><br>
       <label>開始時間：<input type="time" id="editNurseryStart"></label><br>
       <label>終了時間：<input type="time" id="editNurseryEnd"></label><br>
@@ -684,7 +676,6 @@ function openNurseryEditModal(dateStr) {
 
   document.getElementById("editNurseryForm").addEventListener("submit", saveNurserySchedule);
 }
-window.openNurseryEditModal = openNurseryEditModal;
 
 // ✅ 編集内容をFirestoreに保存して、画面に反映
 function saveNurserySchedule(e) {
@@ -698,13 +689,14 @@ function saveNurserySchedule(e) {
     end: end || null,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then(() => {
-    console.log("保育園スケジュールを更新しました");
-    renderTodayNursery();
+    console.log("🍼 保育園スケジュールを保存しました");
+    renderTodayNursery();  // 🔁 表示も更新
     hideModal();
   }).catch((err) => {
-    console.error("スケジュール更新失敗:", err);
+    console.error("❌ 保存失敗", err);
   });
 }
+
 
 // 📅 保育園スケジュール一覧モーダル（カレンダー）を開く
 function openNurseryCalendarModal() {
