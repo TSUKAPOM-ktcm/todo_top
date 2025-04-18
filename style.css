@@ -230,7 +230,7 @@ header {
     flex-direction: column;
   }
 
-  /* 🧸 保育園エリア */
+/* 🌸 保育園・カレンダーのスタイル */
 .nursery-section {
   background-color: #fff5f8;
   border: 2px dashed #ffb6c1;
@@ -242,22 +242,27 @@ header {
   box-shadow: 2px 2px 8px rgba(255, 182, 193, 0.3);
 }
 
-.nursery-time-display {
+.nursery-section h3 {
   font-size: 1.4em;
-  margin: 10px 0;
+  color: #d63384;
+  margin-bottom: 10px;
 }
 
-.bubble-time {
+#nurseryToday {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+#nurseryStart, #nurseryEnd {
   background-color: #ffe3ec;
-  padding: 6px 16px;
+  padding: 6px 12px;
   border-radius: 50px;
-  display: inline-block;
-  margin: 0 5px;
   font-weight: bold;
   color: #d63384;
+  margin: 0 4px;
 }
 
-.nursery-buttons button {
+.nursery-section button {
   margin: 5px;
   padding: 8px 16px;
   background-color: #f8d7e6;
@@ -269,11 +274,11 @@ header {
   transition: background-color 0.3s ease;
 }
 
-.nursery-buttons button:hover {
+.nursery-section button:hover {
   background-color: #f5b8cf;
 }
 
-/* 📅 カレンダー全体 */
+/* 📅 カレンダー表示 */
 .calendar-table {
   width: 100%;
   border-collapse: collapse;
@@ -292,6 +297,7 @@ header {
   border: 1px solid #ffc0cb;
   vertical-align: top;
   height: 60px;
+  box-sizing: border-box;
 }
 
 .calendar-table th {
@@ -317,6 +323,23 @@ header {
   color: #b03060;
   white-space: nowrap;
 }
+
+#prevMonth, #nextMonth {
+  margin: 0 5px;
+  padding: 5px 12px;
+  font-weight: bold;
+  background-color: #ffe4ec;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #c2185b;
+  transition: background-color 0.3s ease;
+}
+
+#prevMonth:hover, #nextMonth:hover {
+  background-color: #f8bcd0;
+}
+
 
 /* 📅 月切替ボタン */
 #prevMonth,
