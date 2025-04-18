@@ -741,7 +741,7 @@ function openNurseryCalendarModal() {
             }
             if (label !== "") {
               cell.style.cursor = "pointer";
-              cell.onclick = () => openNurseryEditModal(date);
+              cell.onclick = () => openNurseryEditModalByDate(date);
             }
           }
         }
@@ -749,4 +749,60 @@ function openNurseryCalendarModal() {
     });
   }
 }
+window.openNurseryCalendarModal = openNurseryCalendarModal;
+
+// 🔧 編集用モーダルを開く関数（今日の分）
+function openNurseryEditModal() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+  openNurseryEditModalByDate(dateStr);
+}
+window.openNurseryEditModal = openNurseryEditModal;
+
+// 🔧 編集用モーダルを開く関数（任意の日付）
+function openNurseryEditModalByDate(dateStr) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  content.innerHTML = `
+    <form id="editNurseryForm">
+      <h3>保育園時間の編集（${dateStr}）</h3>
+      <label>開始時間<input type="time" id="editNurseryStart"></label>
+      <label>終了時間<input type="time" id="editNurseryEnd"></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  `;
+
+  db.collection("nursery").doc(dateStr).get().then((doc) => {
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById("editNurseryStart").value = data.start || "";
+      document.getElementById("editNurseryEnd").value = data.end || "";
+    }
+  });
+
+  document.getElementById("editNurseryForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const start = document.getElementById("editNurseryStart").value;
+    const end = document.getElementById("editNurseryEnd").value;
+
+    db.collection("nursery").doc(dateStr).set({
+      start: start || null,
+      end: end || null,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      renderTodayNursery();
+      hideModal();
+    });
+  });
+} 
+
 window.openNurseryCalendarModal = openNurseryCalendarModal;
