@@ -51,17 +51,18 @@
     </header>
 
 <div class="nursery-section">
-  <h3 class="section-title">📅 今日の保育園 🌼</h3>
-  <div class="nursery-time-display">
-    <span id="nurseryStart" class="bubble-time">--:--</span>
+  <h3>📅 今日の保育園 🌼</h3>
+  <div id="nurseryToday">
+    <span id="nurseryStart">--:--</span>
     <span class="tilde">～</span>
-    <span id="nurseryEnd" class="bubble-time">--:--</span>
+    <span id="nurseryEnd">--:--</span>
   </div>
-  <div class="nursery-buttons">
+  <div>
     <button onclick="openNurseryEditModal()">編集</button>
     <button onclick="openNurseryCalendarModal()">一覧を見る</button>
   </div>
 </div>
+
 
     <div id="nurseryCalendarModal" class="modal hidden">
   <div class="modal-content">
