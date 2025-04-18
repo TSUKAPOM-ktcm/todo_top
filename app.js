@@ -642,31 +642,6 @@ function deleteTask(id) {
 
 //保育園編集！
 // 📅 保育園スケジュール一覧モーダル（カレンダー）を開く
-function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  db.collection("users")
-    .where("email", "==", email)
-    .where("password", "==", password)
-    .get()
-    .then((querySnapshot) => {
-      if (!querySnapshot.empty) {
-        document.getElementById("loginScreen").classList.add("hidden");
-        document.getElementById("mainScreen").classList.remove("hidden");
-        renderTodayNursery();
-      } else {
-        alert("IDかパスワードが違います");
-      }
-    })
-    .catch((error) => {
-      console.error("ログイン時のエラー:", error);
-      alert("ログインに失敗しました");
-    });
-}
-window.login = login;
-
-// 📅 保育園スケジュール一覧モーダル（カレンダー）を開く
 function openNurseryCalendarModal() {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -694,9 +669,9 @@ function openNurseryCalendarModal() {
     content.innerHTML = `
       <div>
         <h3>保育園スケジュール（${yearMonthStr}）</h3>
-        <div style="margin-bottom: 10px;">
-          <button id="prevMonth">←今月</button>
-          <button id="nextMonth">来月→</button>
+        <div style="margin-bottom: 10px; text-align: center;">
+          ${m > currentMonth ? '<button id="prevMonth">←今月</button>' : ''}
+          ${m === currentMonth ? '<button id="nextMonth">来月→</button>' : ''}
         </div>
         <table class="calendar-table">
           <thead>
@@ -710,15 +685,16 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
-    setTimeout(() => {
-      document.getElementById("prevMonth").onclick = () => {
-        renderNurseryCalendar(currentYear, currentMonth);
-      };
+    // ボタンイベントを登録（setTimeoutを使わずに確実に実行）
+    const prevBtn = document.getElementById("prevMonth");
+    if (prevBtn) {
+      prevBtn.onclick = () => renderNurseryCalendar(currentYear, currentMonth);
+    }
 
-      document.getElementById("nextMonth").onclick = () => {
-        renderNurseryCalendar(currentYear, currentMonth + 1);
-      };
-    }, 0);
+    const nextBtn = document.getElementById("nextMonth");
+    if (nextBtn) {
+      nextBtn.onclick = () => renderNurseryCalendar(currentYear, currentMonth + 1);
+    }
 
     const calendarBody = document.getElementById("calendarBody");
     calendarBody.innerHTML = "";
