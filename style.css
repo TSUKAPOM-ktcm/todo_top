@@ -230,6 +230,114 @@ header {
     flex-direction: column;
   }
 
+  /* 🧸 保育園エリア */
+.nursery-section {
+  background-color: #fff5f8;
+  border: 2px dashed #ffb6c1;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 2px 2px 8px rgba(255, 182, 193, 0.3);
+}
+
+.nursery-time-display {
+  font-size: 1.4em;
+  margin: 10px 0;
+}
+
+.bubble-time {
+  background-color: #ffe3ec;
+  padding: 6px 16px;
+  border-radius: 50px;
+  display: inline-block;
+  margin: 0 5px;
+  font-weight: bold;
+  color: #d63384;
+}
+
+.nursery-buttons button {
+  margin: 5px;
+  padding: 8px 16px;
+  background-color: #f8d7e6;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #7d1e5f;
+  transition: background-color 0.3s ease;
+}
+
+.nursery-buttons button:hover {
+  background-color: #f5b8cf;
+}
+
+/* 📅 カレンダー全体 */
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 0.9em;
+  background-color: #fff0f5;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.calendar-table th,
+.calendar-table td {
+  width: 14.28%;
+  text-align: center;
+  padding: 8px 4px;
+  border: 1px solid #ffc0cb;
+  vertical-align: top;
+  height: 60px;
+}
+
+.calendar-table th {
+  background-color: #ffdeeb;
+  color: #d63384;
+  font-weight: bold;
+}
+
+.calendar-table td {
+  background-color: #fff;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-table td:hover {
+  background-color: #fff6f9;
+}
+
+.nursery-time {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.75em;
+  color: #b03060;
+  white-space: nowrap;
+}
+
+/* 📅 月切替ボタン */
+#prevMonth,
+#nextMonth {
+  margin: 0 5px;
+  padding: 5px 12px;
+  font-weight: bold;
+  background-color: #ffe4ec;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #c2185b;
+  transition: background-color 0.3s ease;
+}
+
+#prevMonth:hover,
+#nextMonth:hover {
+  background-color: #f8bcd0;
+}
+
+
   .task-box, .calendar-box, .memo-box {
     min-height: auto;
   }
