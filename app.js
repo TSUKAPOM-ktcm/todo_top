@@ -622,20 +622,6 @@ function openEditEventModal(eventDiv) {
       document.getElementById("calendar-future").appendChild(eventDiv);
     }
 
-    // Firestoreに保存（編集＝再追加）
-    db.collection("events").add({
-      date: newDate,
-      hour: newHour,
-      minute: newMinute,
-      content: newContent,
-      note: newNote,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      console.log("Firestoreに予定（編集）を保存しました");
-    }).catch((error) => {
-      console.error("Firestore予定保存エラー（編集）:", error);
-    });
-
     hideModal();
   };
 }
