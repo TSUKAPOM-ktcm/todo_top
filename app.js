@@ -111,6 +111,51 @@ function showModal(type) {
       }
     });
   }
+// 伝言メモ追加
+  else if (type === "memo") {
+    modalContent.innerHTML = `
+      <form id="memoForm">
+        <h3>伝言メモ追加</h3>
+        <label>メモ<span class="required">*</span><br><textarea id="memoText" required></textarea></label>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>`;
+    document.getElementById("memoForm").addEventListener("submit", addMemoFromForm);
+  }
+
+  // 予定を追加
+  else if (type === "event") {
+    modalContent.innerHTML = `
+      <form id="eventForm">
+        <h3>予定を追加</h3>
+        <label>日付<span class="required">*</span><br><input type="date" id="eventDate" required></label>
+        <label>時間（時・分）<br>
+          <select id="eventHour"><option value="">--</option></select>
+          <select id="eventMinute">
+            <option value="">--</option><option>00</option><option>15</option><option>30</option><option>45</option>
+          </select>
+        </label>
+        <label>内容<span class="required">*</span><br><input id="eventContent" required></label>
+        <label>メモ<br><textarea id="eventNote"></textarea></label>
+        <div class="modal-buttons">
+          <button type="button" onclick="hideModal()">キャンセル</button>
+          <button type="submit">OK</button>
+        </div>
+      </form>
+    `;
+
+    const hourSel = document.getElementById("eventHour");
+    for (let i = 0; i < 24; i++) {
+      const op = document.createElement("option");
+      op.value = String(i).padStart(2, "0");
+      op.textContent = i;
+      hourSel.appendChild(op);
+    }
+
+    document.getElementById("eventForm").addEventListener("submit", addEventFromForm);
+  }
 }
 window.showModal = showModal;
 
