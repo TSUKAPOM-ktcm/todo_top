@@ -644,4 +644,109 @@ function deleteTask(id) {
     .catch((err) => {
       console.error("❌ タスク削除に失敗", err);
     });
+}」」function openNurseryEditModal() {
+  const modal = document.getElementById("modal");
+  const modalContent = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+
+  modalContent.innerHTML = `
+    <form id="editNurseryForm">
+      <h3>今日の保育園時間</h3>
+      <label>開始時刻（例: 08:30）<br><input type="time" id="nurseryStartInput"></label>
+      <label>終了時刻（例: 17:00）<br><input type="time" id="nurseryEndInput"></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  `;
+
+  // 既存のデータを取得してフォームに表示（あれば）
+  db.collection("nursery").doc(dateStr).get().then((doc) => {
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById("nurseryStartInput").value = data.start || "";
+      document.getElementById("nurseryEndInput").value = data.end || "";
+    }
+  });
+
+  // 保存処理
+  document.getElementById("editNurseryForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const start = document.getElementById("nurseryStartInput").value;
+    const end = document.getElementById("nurseryEndInput").value;
+
+    db.collection("nursery").doc(dateStr).set({
+      start: start || null,
+      end: end || null,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      renderTodayNursery(); // 画面の表示も更新
+      hideModal();
+    }).catch((err) => {
+      console.error("保育園時間の保存失敗:", err);
+      alert("保存に失敗しました");
+    });
+  });
+
+
+  function openNurseryEditModal() {
+  const modal = document.getElementById("modal");
+  const modalContent = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+
+  modalContent.innerHTML = `
+    <form id="editNurseryForm">
+      <h3>今日の保育園時間</h3>
+      <label>開始時刻（例: 08:30）<br><input type="time" id="nurseryStartInput"></label>
+      <label>終了時刻（例: 17:00）<br><input type="time" id="nurseryEndInput"></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  `;
+
+  // 既存のデータを取得してフォームに表示（あれば）
+  db.collection("nursery").doc(dateStr).get().then((doc) => {
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById("nurseryStartInput").value = data.start || "";
+      document.getElementById("nurseryEndInput").value = data.end || "";
+    }
+  });
+
+  // 保存処理
+  document.getElementById("editNurseryForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const start = document.getElementById("nurseryStartInput").value;
+    const end = document.getElementById("nurseryEndInput").value;
+
+    db.collection("nursery").doc(dateStr).set({
+      start: start || null,
+      end: end || null,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      renderTodayNursery(); // 画面の表示も更新
+      hideModal();
+    }).catch((err) => {
+      console.error("保育園時間の保存失敗:", err);
+      alert("保存に失敗しました");
+    });
+  });
 }
+
