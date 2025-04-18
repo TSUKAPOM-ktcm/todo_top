@@ -657,6 +657,9 @@ function openNurseryCalendarModal() {
   renderNurseryCalendar(selectedYear, selectedMonth);
 
   function renderNurseryCalendar(y, m) {
+    selectedYear = y;
+    selectedMonth = m;
+
     const firstDay = new Date(y, m, 1);
     const lastDay = new Date(y, m + 1, 0);
     const startWeekDay = firstDay.getDay();
@@ -748,7 +751,6 @@ function openNurseryCalendarModal() {
 }
 window.openNurseryCalendarModal = openNurseryCalendarModal;
 
-// 🔧 編集用モーダルを開く関数（今日の分）
 function openNurseryEditModal() {
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -759,7 +761,6 @@ function openNurseryEditModal() {
 }
 window.openNurseryEditModal = openNurseryEditModal;
 
-// 🔧 編集用モーダルを開く関数（任意の日付）
 function openNurseryEditModalByDate(dateStr) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -801,6 +802,5 @@ function openNurseryEditModalByDate(dateStr) {
     });
   });
 }
+window.openNurseryEditModalByDate = openNurseryEditModalByDate;
 
-
-window.openNurseryCalendarModal = openNurseryCalendarModal;
