@@ -648,7 +648,8 @@ function openNurseryCalendarModal() {
 
   const now = new Date();
   let year = now.getFullYear();
-  let month = now.getMonth();
+  let month = now.getMonth(); // 0〜11
+  let currentViewMonth = month;
 
   renderNurseryCalendar(year, month);
 
@@ -661,10 +662,10 @@ function openNurseryCalendarModal() {
 
     content.innerHTML = `
       <div>
-        <h3>保育園スケジュール（<span id="calendarMonthLabel">${yearMonthStr}</span>）</h3>
+        <h3>保育園スケジュール（${yearMonthStr}）</h3>
         <div style="margin-bottom: 10px;">
-          <button id="prevMonth">←今月</button>
-          <button id="nextMonth">来月→</button>
+          <button id="prevMonth" class="${m > currentViewMonth ? 'show' : ''}">←今月</button>
+          <button id="nextMonth" class="${m === currentViewMonth ? 'show' : ''}">来月→</button>
         </div>
         <table class="calendar-table">
           <thead>
@@ -678,43 +679,21 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
-    // 🔄 ボタン表示制御（今月・来月のみ）
+    // 🔁 イベント付与（あとから）
     const prevBtn = document.getElementById("prevMonth");
     const nextBtn = document.getElementById("nextMonth");
-    const today = new Date();
-    const thisYear = today.getFullYear();
-    const thisMonth = today.getMonth();
 
-    if (y === thisYear && m === thisMonth) {
-      prevBtn.classList.remove("show");
-      nextBtn.classList.add("show");
-    } else if (y === thisYear && m === thisMonth + 1) {
-      prevBtn.classList.add("show");
-      nextBtn.classList.remove("show");
-    } else {
-      prevBtn.classList.remove("show");
-      nextBtn.classList.remove("show");
+    if (prevBtn) {
+      prevBtn.onclick = () => {
+        renderNurseryCalendar(year, currentViewMonth); // ← 今月に戻る
+      };
     }
 
-    prevBtn.onclick = () => {
-      if (month === 0) {
-        month = 11;
-        year--;
-      } else {
-        month--;
-      }
-      renderNurseryCalendar(year, month);
-    };
-
-    nextBtn.onclick = () => {
-      if (month === 11) {
-        month = 0;
-        year++;
-      } else {
-        month++;
-      }
-      renderNurseryCalendar(year, month);
-    };
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        renderNurseryCalendar(year, currentViewMonth + 1); // → 来月に進む
+      };
+    }
 
     const calendarBody = document.getElementById("calendarBody");
     calendarBody.innerHTML = "";
@@ -752,7 +731,7 @@ function openNurseryCalendarModal() {
               const d = doc.data();
               const label = (!d.start && !d.end)
                 ? "お休み"
-                : (d.start && d.end) ? `${d.start}〜\n${d.end}` : "";
+                : (d.start && d.end) ? `${d.start}〜${d.end}` : "";
               const timeSpan = cell.querySelector(".nursery-time");
               if (timeSpan) {
                 timeSpan.textContent = label;
@@ -767,5 +746,6 @@ function openNurseryCalendarModal() {
       });
   }
 }
+
 
 window.openNurseryCalendarModal = openNurseryCalendarModal;
