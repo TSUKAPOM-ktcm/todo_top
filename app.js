@@ -779,7 +779,7 @@ function openNurseryCalendarModal() {
           week.push("<td></td>");
         } else {
           const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
-          week.push(`<td id="day-${dateStr}"><strong>${currentDay}</strong><br><span class="nursery-time">読み込み中</span></td>`);
+          week.push(`<td id="day-${dateStr}"><strong>${currentDay}</strong><br><span class="nursery-time"></span></td>`);
           currentDay++;
         }
       }
