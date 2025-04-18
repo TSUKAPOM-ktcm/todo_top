@@ -649,7 +649,6 @@ function openNurseryCalendarModal() {
   const now = new Date();
   let year = now.getFullYear();
   let month = now.getMonth();
-  let currentMonth = month;
 
   renderNurseryCalendar(year, month);
 
@@ -664,8 +663,8 @@ function openNurseryCalendarModal() {
       <div>
         <h3>保育園スケジュール（${yearMonthStr}）</h3>
         <div style="margin-bottom: 10px;">
-          ${m > currentMonth ? '<button id="prevMonth">←今月</button>' : ''}
-          ${m === currentMonth ? '<button id="nextMonth">来月→</button>' : ''}
+          <button id="prevMonth">←今月</button>
+          <button id="nextMonth">来月→</button>
         </div>
         <table class="calendar-table">
           <thead>
@@ -679,19 +678,13 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
-    const prevBtn = document.getElementById("prevMonth");
-    const nextBtn = document.getElementById("nextMonth");
+    document.getElementById("prevMonth").onclick = () => {
+      renderNurseryCalendar(y, now.getMonth());
+    };
 
-    if (prevBtn) {
-      prevBtn.onclick = () => {
-        renderNurseryCalendar(y, currentMonth);
-      };
-    }
-    if (nextBtn) {
-      nextBtn.onclick = () => {
-        renderNurseryCalendar(y, currentMonth + 1);
-      };
-    }
+    document.getElementById("nextMonth").onclick = () => {
+      renderNurseryCalendar(y, now.getMonth() + 1);
+    };
 
     const calendarBody = document.getElementById("calendarBody");
     calendarBody.innerHTML = "";
@@ -734,7 +727,7 @@ function openNurseryCalendarModal() {
             }
             if (label !== "") {
               cell.style.cursor = "pointer";
-              cell.onclick = () => openNurseryEditModal(date);
+              cell.onclick = () => window.openNurseryEditModal(date);
             }
           }
         }
