@@ -240,42 +240,54 @@ header {
   max-width: 600px;
   text-align: center;
   box-shadow: 2px 2px 8px rgba(255, 182, 193, 0.3);
+  font-family: 'Rounded Mplus 1c', 'Noto Sans JP', sans-serif;
 }
 
 .nursery-section h3 {
-  font-size: 1.4em;
-  color: #d63384;
-  margin-bottom: 10px;
+  font-size: 1.5em;
+  color: #c2185b;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 #nurseryToday {
-  font-size: 1.2em;
-  margin-bottom: 10px;
+  font-size: 1.3em;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
 }
 
 #nurseryStart, #nurseryEnd {
   background-color: #ffe3ec;
-  padding: 6px 12px;
-  border-radius: 50px;
+  padding: 6px 14px;
+  border-radius: 40px;
   font-weight: bold;
   color: #d63384;
-  margin: 0 4px;
+  font-size: 1.1em;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
 }
 
 .nursery-section button {
-  margin: 5px;
-  padding: 8px 16px;
+  margin: 6px;
+  padding: 10px 20px;
   background-color: #f8d7e6;
   border: none;
-  border-radius: 12px;
+  border-radius: 20px;
   cursor: pointer;
   font-weight: bold;
   color: #7d1e5f;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  font-size: 0.95em;
 }
 
 .nursery-section button:hover {
   background-color: #f5b8cf;
+  transform: translateY(-1px);
 }
 
 /* 📅 カレンダー表示 */
@@ -285,8 +297,9 @@ header {
   margin-top: 10px;
   font-size: 0.9em;
   background-color: #fff0f5;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
+  table-layout: fixed;
 }
 
 .calendar-table th,
@@ -296,20 +309,23 @@ header {
   padding: 8px 4px;
   border: 1px solid #ffc0cb;
   vertical-align: top;
-  height: 60px;
+  height: 75px;
   box-sizing: border-box;
+  font-family: 'Rounded Mplus 1c', 'Noto Sans JP', sans-serif;
 }
 
 .calendar-table th {
   background-color: #ffdeeb;
   color: #d63384;
   font-weight: bold;
+  font-size: 0.95em;
 }
 
 .calendar-table td {
   background-color: #fff;
   position: relative;
   transition: background-color 0.2s ease;
+  font-size: 0.9em;
 }
 
 .calendar-table td:hover {
@@ -325,43 +341,23 @@ header {
 }
 
 #prevMonth, #nextMonth {
-  margin: 0 5px;
-  padding: 5px 12px;
+  margin: 0 8px;
+  padding: 8px 20px;
   font-weight: bold;
   background-color: #ffe4ec;
   border: none;
-  border-radius: 10px;
+  border-radius: 20px;
   cursor: pointer;
   color: #c2185b;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s;
+  font-size: 0.95em;
 }
 
 #prevMonth:hover, #nextMonth:hover {
   background-color: #f8bcd0;
+  transform: scale(1.05);
 }
 
 
-/* 📅 月切替ボタン */
-#prevMonth,
-#nextMonth {
-  margin: 0 5px;
-  padding: 5px 12px;
-  font-weight: bold;
-  background-color: #ffe4ec;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  color: #c2185b;
-  transition: background-color 0.3s ease;
-}
 
-#prevMonth:hover,
-#nextMonth:hover {
-  background-color: #f8bcd0;
-}
-
-
-  .task-box, .calendar-box, .memo-box {
-    min-height: auto;
-  }
 }
