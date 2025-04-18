@@ -230,7 +230,7 @@ header {
   justify-content: center;
   align-items: center;
   gap: 6px;
-  flex-direction: column; /* 👈 ここを追加して縦並びにする */
+  flex-direction: row;
 }
 
 #nurseryStart, #nurseryEnd {
