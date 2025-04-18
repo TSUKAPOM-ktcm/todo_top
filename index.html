@@ -50,7 +50,7 @@
       </div>
     </header>
 
-<div class="nursery-section cute-box">
+<div class="nursery-section">
   <h3 class="section-title">📅 今日の保育園 🌼</h3>
   <div class="nursery-time-display">
     <span id="nurseryStart" class="bubble-time">--:--</span>
@@ -62,6 +62,22 @@
     <button onclick="openNurseryCalendarModal()">一覧を見る</button>
   </div>
 </div>
+
+    <div id="nurseryCalendarModal" class="modal hidden">
+  <div class="modal-content">
+    <h3>保育園スケジュール（<span id="calendarMonthLabel"></span>）</h3>
+    <div style="text-align:center; margin: 10px 0;">
+      <button id="prevMonth" onclick="changeMonth(-1)">←先月</button>
+      <button id="nextMonth" onclick="changeMonth(1)">来月→</button>
+    </div>
+    <table class="calendar-table" id="nurseryCalendarTable"></table>
+    <div style="text-align:center;">
+      <button onclick="hideModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+
 
 
     <div class="container">
