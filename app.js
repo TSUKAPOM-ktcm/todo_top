@@ -747,5 +747,4 @@ function openNurseryCalendarModal() {
   }
 }
 
-
 window.openNurseryCalendarModal = openNurseryCalendarModal;
