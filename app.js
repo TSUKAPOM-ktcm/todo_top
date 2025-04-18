@@ -26,7 +26,7 @@ function login() {
 }
 window.login = login;
 
-//保育園スケジュールをfirestoreから読み取り
+// 🔸今日の保育園時間を表示する
 function renderTodayNursery() {
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -37,7 +37,7 @@ function renderTodayNursery() {
   const startEl = document.getElementById("nurseryStart");
   const endEl = document.getElementById("nurseryEnd");
 
-  db.collection("nursery_schedule").doc(dateStr).get()
+  db.collection("nursery").doc(dateStr).get()
     .then((doc) => {
       if (doc.exists) {
         const data = doc.data();
@@ -687,7 +687,6 @@ function openNurseryEditModal() {
 }
 window.openNurseryEditModal = openNurseryEditModal;
 
-
 // ✅ 編集内容をFirestoreに保存して、画面に反映
 function saveNurserySchedule(e) {
   e.preventDefault();
@@ -707,6 +706,7 @@ function saveNurserySchedule(e) {
     console.error("スケジュール更新失敗:", err);
   });
 }
+
 
 
 
