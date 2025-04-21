@@ -641,6 +641,112 @@ function deleteTask(id) {
 }
 
 //保育園編集！
+// 🔧 「一覧を見る」ボタンで保育園スケジュールカレンダーモーダルを表示
+function openNurseryCalendarModal() {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  let selectedYear = currentYear;
+  let selectedMonth = currentMonth;
+
+  renderNurseryCalendar(selectedYear, selectedMonth);
+
+  function renderNurseryCalendar(y, m) {
+    selectedYear = y;
+    selectedMonth = m;
+
+    const firstDay = new Date(y, m, 1);
+    const lastDay = new Date(y, m + 1, 0);
+    const startWeekDay = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+    const yearMonthStr = `${y}年${m + 1}月`;
+
+    content.innerHTML = `
+      <div>
+        <h3>保育園スケジュール（${yearMonthStr}）</h3>
+        <div style="margin-bottom: 10px; text-align: center;">
+          <button id="prevMonth" style="display: ${m > currentMonth ? 'inline-block' : 'none'}">←今月</button>
+          <button id="nextMonth" style="display: ${m === currentMonth ? 'inline-block' : 'none'}">来月→</button>
+        </div>
+        <table class="calendar-table">
+          <thead>
+            <tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr>
+          </thead>
+          <tbody id="calendarBody"></tbody>
+        </table>
+        <div class="modal-buttons">
+          <button onclick="hideModal()">閉じる</button>
+        </div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      const prevBtn = document.getElementById("prevMonth");
+      const nextBtn = document.getElementById("nextMonth");
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => renderNurseryCalendar(currentYear, currentMonth));
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => renderNurseryCalendar(currentYear, currentMonth + 1));
+      }
+    }, 0);
+
+    const calendarBody = document.getElementById("calendarBody");
+    calendarBody.innerHTML = "";
+
+    const weeks = [];
+    let currentDay = 1;
+
+    while (currentDay <= totalDays) {
+      const week = [];
+      for (let i = 0; i < 7; i++) {
+        if ((weeks.length === 0 && i < startWeekDay) || currentDay > totalDays) {
+          week.push("<td></td>");
+        } else {
+          const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
+          week.push(`<td id="day-${dateStr}" data-date="${dateStr}"><strong>${currentDay}</strong><br><span class="nursery-time"></span></td>`);
+          currentDay++;
+        }
+      }
+      weeks.push("<tr>" + week.join("") + "</tr>");
+    }
+    calendarBody.innerHTML = weeks.join("");
+
+    const monthStr = String(m + 1).padStart(2, '0');
+    const startDate = `${y}-${monthStr}-01`;
+    const endDate = `${y}-${monthStr}-${String(totalDays).padStart(2, '0')}`;
+
+    db.collection("nursery").get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const date = doc.id;
+        if (date >= startDate && date <= endDate) {
+          const cell = document.getElementById("day-" + date);
+          if (cell) {
+            const d = doc.data();
+            const label = (!d.start && !d.end)
+              ? "お休み"
+              : (d.start && d.end) ? `${d.start}〜${d.end}` : "";
+            const timeSpan = cell.querySelector(".nursery-time");
+            if (timeSpan) {
+              timeSpan.textContent = label;
+            }
+            if (label !== "") {
+              cell.style.cursor = "pointer";
+              cell.onclick = () => window.openNurseryEditModalByDate(date);
+            }
+          }
+        }
+      });
+    });
+  }
+}
+
 // 🔧 今日の日付の保育園時間を編集するモーダルを開く
 function openNurseryEditModal() {
   const today = new Date();
