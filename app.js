@@ -685,16 +685,21 @@ function openNurseryCalendarModal() {
       </div>
     `;
 
+    // 🔁 ボタンの動作設定を描画後に行う
     setTimeout(() => {
       const prevBtn = document.getElementById("prevMonth");
       const nextBtn = document.getElementById("nextMonth");
 
       if (prevBtn) {
-        prevBtn.onclick = () => renderNurseryCalendar(currentYear, currentMonth);
+        prevBtn.addEventListener("click", () => {
+          renderNurseryCalendar(currentYear, currentMonth);
+        });
       }
 
       if (nextBtn) {
-        nextBtn.onclick = () => renderNurseryCalendar(currentYear, currentMonth + 1);
+        nextBtn.addEventListener("click", () => {
+          renderNurseryCalendar(currentYear, currentMonth + 1);
+        });
       }
     }, 0);
 
@@ -748,4 +753,3 @@ function openNurseryCalendarModal() {
   }
 }
 window.openNurseryCalendarModal = openNurseryCalendarModal;
-
