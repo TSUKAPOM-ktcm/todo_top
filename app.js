@@ -121,7 +121,13 @@ function updateTaskStatusToCompleted(taskId, updateData) {
   return db.collection("tasks").doc(taskId).update(updateData);
 }
 
-
+// 💖 タスクアイテムにかわいい色をつける（毎日→グリーン、毎週→ブルー、毎月→パープル）
+function getTaskColorClass(frequency) {
+  if (frequency.includes("毎日")) return "task-daily";
+  if (frequency.includes("毎週")) return "task-weekly";
+  if (frequency.includes("毎月")) return "task-monthly";
+  return "";
+}
 // 🔧 モーダル処理　type別に表示　task,regular
 function showModal(type) {
   const modal = document.getElementById("modal");
@@ -382,8 +388,9 @@ function addTaskFromForm(e) {
   });
 }
 
-function createTaskElement(name, status, frequency, assignee, dueDate, note, id) {
+function createTaskElement(name, status, frequency, assignee, dueDate, note, id, isOverdue = false) {
   const task = document.createElement("div");
+   const colorClass = getTaskColorClass(frequency);
   task.className = "task-item";
   task.dataset.id = id;
   task.dataset.name = name;
