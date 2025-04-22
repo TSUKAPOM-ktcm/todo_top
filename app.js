@@ -479,11 +479,12 @@ function openEditTaskModal(task) {
     const newNote = document.getElementById("editNote").value;
     const id = task.dataset.id;
 
-    db.collection("tasks").doc(id).update({
-      status: newStatus,
-      assignee: newAssignee,
-      dueDate: newDueDate || null,
-      note: newNote || ""
+updateTaskStatusToCompleted(id, {
+  status: newStatus,
+  assignee: newAssignee,
+  dueDate: newDueDate || null,
+  note: newNote || ""
+});
     }).then(() => {
       hideModal();
     }).catch((error) => {
