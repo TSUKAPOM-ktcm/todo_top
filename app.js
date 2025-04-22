@@ -6,7 +6,10 @@ function updateTaskStatusToCompleted(taskId, updateData) {
   if (updateData.status === "完了") {
     updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
   }
-  return db.collection("tasks").doc(taskId).update(updateData);
+  return db.collection("tasks").doc(taskId).update(updateData)
+    .then(() => {
+      renderTodayCompletedTasksCount(); // ← 🧸✨ここを追加！
+    });
 }
 
 // 🔐 ログイン処理
