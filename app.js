@@ -482,19 +482,19 @@ function openEditTaskModal(task) {
     const newNote = document.getElementById("editNote").value;
     const id = task.dataset.id;
 
-updateTaskStatusToCompleted(id, {
-  status: newStatus,
-  assignee: newAssignee,
-  dueDate: newDueDate || null,
-  note: newNote || ""
-})
-.then(() => {
-  hideModal();
-})
-.catch((error) => {
-  console.error("更新エラー:", error);
-});
-    }; 
+ updateTaskStatusToCompleted(id, {
+    status: newStatus,
+    assignee: newAssignee,
+    dueDate: newDueDate || null,
+    note: newNote || ""
+  }).then(() => {
+    // ✅ ここにリアルタイム更新したい処理を書く！
+    renderTodayCompletedTasksCount(); // ← これで即反映される！
+    hideModal();
+  }).catch((error) => {
+    console.error("更新エラー:", error);
+  });
+};
     
   // 🗑削除ボタン処理
   document.getElementById("deleteTaskBtn").addEventListener("click", () => {
