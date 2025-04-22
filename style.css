@@ -330,6 +330,27 @@ header {
   transform: scale(1.05);
 }
 
+.completed-task-summary {
+  background-color: #fff5f8;
+  border: 2px dashed #ffb6c1;
+  border-radius: 20px;
+  padding: 10px;
+  margin: 20px auto;
+  max-width: 300px;
+  text-align: center;
+  font-family: 'Rounded Mplus 1c', 'Noto Sans JP', sans-serif;
+}
+
+.clickable-count {
+  background-color: #ffe3ec;
+  padding: 4px 10px;
+  border-radius: 30px;
+  color: #d63384;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
 
 @media (max-width: 768px) {
   header {
