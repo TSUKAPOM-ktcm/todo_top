@@ -210,6 +210,7 @@ window.addEventListener("DOMContentLoaded", () => {
       const id = doc.id;
 
       if (data.status === "完了") return;
+      if (data.delete === true) return; // ← 表示しない
 
       const due = data.dueDate ? new Date(data.dueDate + "T00:00:00") : null;
       const isOverdue = due && due <= yesterday;
