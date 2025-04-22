@@ -1,6 +1,14 @@
 　// Firestoreの db は HTML 側で初期化されている前提です　
 const db = window.db;
 
+// 🔧 完了に更新されたとき completedAt をセット
+function updateTaskStatusToCompleted(taskId, updateData) {
+  if (updateData.status === "完了") {
+    updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
+  }
+  return db.collection("tasks").doc(taskId).update(updateData);
+}
+
 // 🔐 ログイン処理
 function login() {
   const email = document.getElementById("email").value;
