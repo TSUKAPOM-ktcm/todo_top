@@ -1,4 +1,4 @@
-　// Firestoreの db は HTML 側で初期化されている前提です
+　// Firestoreの db は HTML 側で初期化されている前提です　
 const db = window.db;
 
 // 🔐 ログイン処理
