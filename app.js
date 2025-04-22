@@ -405,7 +405,6 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note, id,
   const task = document.createElement("div");
    const colorClass = getTaskColorClass(frequency);
   task.className = "task-item " + colorClass; // ← 色も反映！
-  task.className = "task-item";
   task.dataset.id = id;
   task.dataset.name = name;
   task.dataset.status = status;
