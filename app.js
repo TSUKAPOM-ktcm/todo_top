@@ -54,6 +54,73 @@ function renderTodayNursery() {
   });
 }
 
+// 🔸 担当者別・今日の完了タスク数を表示
+function renderTodayCompletedTasksCount() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+
+  const counts = {
+    つみき: [],
+    ぬみき: []
+  };
+
+  db.collection("tasks")
+    .where("status", "==", "完了")
+    .where("completedAt", ">=", today)
+    .where("completedAt", "<=", endOfToday)
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.assignee === "つみき" || data.assignee === "ぬみき") {
+          counts[data.assignee].push({ name: data.name, time: formatTime(data.completedAt?.toDate()) });
+        }
+      });
+
+      // 表示を更新
+      document.getElementById("done-tsumiki-count").textContent = counts.つみき.length;
+      document.getElementById("done-numiki-count").textContent = counts.ぬみき.length;
+
+      document.getElementById("done-tsumiki-count").onclick = () => showDoneTasksModal("つみき", counts.つみき);
+      document.getElementById("done-numiki-count").onclick = () => showDoneTasksModal("ぬみき", counts.ぬみき);
+    });
+}
+
+function showDoneTasksModal(assignee, list) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  let html = `<h3>${assignee}さんの完了タスク</h3><ul>`;
+  if (list.length === 0) {
+    html += "<li>なし</li>";
+  } else {
+    list.forEach(task => {
+      html += `<li>${task.name}（${task.time}）</li>`;
+    });
+  }
+  html += `</ul><div class="modal-buttons"><button onclick="hideModal()">閉じる</button></div>`;
+  content.innerHTML = html;
+}
+
+function formatTime(date) {
+  if (!date) return "--:--";
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+// 🔧 完了に更新されたとき completedAt をセット
+function updateTaskStatusToCompleted(taskId, updateData) {
+  if (updateData.status === "完了") {
+    updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
+  }
+  return db.collection("tasks").doc(taskId).update(updateData);
+}
+
+
 // 🔧 モーダル処理　type別に表示　task,regular
 function showModal(type) {
   const modal = document.getElementById("modal");
