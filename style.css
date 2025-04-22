@@ -351,6 +351,16 @@ header {
   margin-left: 5px;
 }
 
+.task-daily {
+  background-color: #d4f8d4; /* マカロン風グリーン */
+}
+.task-weekly {
+  background-color: #d4ecff; /* パステルブルー */
+}
+.task-monthly {
+  background-color: #ead4ff; /* パステルパープル */
+}
+
 
 @media (max-width: 768px) {
   header {
