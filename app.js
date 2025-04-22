@@ -373,6 +373,7 @@ function openEditTaskModal(task) {
       <div class="modal-buttons">
         <button type="button" onclick="hideModal()">キャンセル</button>
         <button type="submit">保存</button>
+        <button type="button" id="deleteTaskBtn">削除</button>
       </div>
     </form>
   `;
@@ -382,6 +383,7 @@ function openEditTaskModal(task) {
   document.getElementById("editDueDate").value = task.dataset.dueDate || "";
   document.getElementById("editNote").value = task.dataset.note || "";
 
+  // 保存処理
   document.getElementById("editTaskForm").onsubmit = (e) => {
     e.preventDefault();
     const newStatus = document.getElementById("editStatus").value;
@@ -399,10 +401,24 @@ function openEditTaskModal(task) {
       hideModal();
     }).catch((error) => {
       console.error("更新エラー:", error);
-    });// 保存処理などここに入る
+    });
   };
+
+  // 🗑削除ボタン処理
+  document.getElementById("deleteTaskBtn").addEventListener("click", () => {
+    const id = task.dataset.id;
+    db.collection("tasks").doc(id).update({
+      delete: true
+    }).then(() => {
+      task.remove(); // 表示から削除
+      hideModal();
+    }).catch((error) => {
+      console.error("削除エラー:", error);
+    });
+  });
 }
 window.openEditTaskModal = openEditTaskModal;
+
 
 function addEventFromForm(e) {
   e.preventDefault();
