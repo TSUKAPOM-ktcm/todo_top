@@ -484,14 +484,14 @@ updateTaskStatusToCompleted(id, {
   assignee: newAssignee,
   dueDate: newDueDate || null,
   note: newNote || ""
+})
+.then(() => {
+  hideModal();
+})
+.catch((error) => {
+  console.error("更新エラー:", error);
 });
-    }).then(() => {
-      hideModal();
-    }).catch((error) => {
-      console.error("更新エラー:", error);
-    });
-  };
-
+    
   // 🗑削除ボタン処理
   document.getElementById("deleteTaskBtn").addEventListener("click", () => {
     const id = task.dataset.id;
