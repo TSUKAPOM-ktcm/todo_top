@@ -401,6 +401,7 @@ function addTaskFromForm(e) {
 function createTaskElement(name, status, frequency, assignee, dueDate, note, id, isOverdue = false) {
   const task = document.createElement("div");
    const colorClass = getTaskColorClass(frequency);
+  task.className = "task-item " + colorClass; // ← 色も反映！
   task.className = "task-item";
   task.dataset.id = id;
   task.dataset.name = name;
@@ -415,7 +416,7 @@ function createTaskElement(name, status, frequency, assignee, dueDate, note, id,
   const due = dueDate ? new Date(dueDate + "T00:00:00") : null;
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  const isOverdue = due && due <= yesterday && status !== "完了";
+  isOverdue = due && due <= yesterday && status !== "完了";
 
   // 表示内容の条件分岐（過去日なら詳細表示、それ以外はタスク名のみ）
   task.innerHTML = isOverdue
