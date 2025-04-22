@@ -331,24 +331,33 @@ header {
 }
 
 .completed-task-summary {
-  background-color: #fff5f8;
-  border: 2px dashed #ffb6c1;
+  background: #ffe7f1;
+  border: 2px solid #ffbad2;
   border-radius: 20px;
-  padding: 10px;
-  margin: 20px auto;
+  padding: 16px;
+  font-family: 'Rounded Mplus 1c', sans-serif;
+  box-shadow: 2px 2px 6px rgba(255, 182, 193, 0.3);
+  flex: 1;
+  min-width: 220px;
   max-width: 300px;
-  text-align: center;
-  font-family: 'Rounded Mplus 1c', 'Noto Sans JP', sans-serif;
+}
+
+/* ぷっくりな文字スタイル */
+.completed-task-summary p {
+  font-weight: bold;
+  font-size: 16px;
+  color: #d64f83;
+  text-shadow: 1px 1px #fff, -1px -1px #fff;
+  margin: 6px 0;
 }
 
 .clickable-count {
-  background-color: #ffe3ec;
-  padding: 4px 10px;
-  border-radius: 30px;
-  color: #d63384;
   cursor: pointer;
   font-weight: bold;
-  margin-left: 5px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background-color: #fff4f8;
+  border: 2px solid #ffc0cb;
 }
 
 .task-daily {
