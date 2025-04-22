@@ -33,8 +33,11 @@ function login() {
       alert("ログインに失敗しました");
     });
 }
-window.login = login;
-window.updateTaskStatusToCompleted = updateTaskStatusToCompleted;
+window.addEventListener("DOMContentLoaded", () => {
+  window.login = login;
+  window.updateTaskStatusToCompleted = updateTaskStatusToCompleted;
+});
+
 
 // 🔸今日の保育園時間を表示する
 function renderTodayNursery() {
