@@ -330,36 +330,42 @@ header {
   transform: scale(1.05);
 }
 
-/* ラッパーを横並びにする */
+/* 🌼 保育園と完了タスクを横並びに */
 .nursery-completed-wrapper {
   display: flex;
-  gap: 16px;
-  justify-content: center;
-  align-items: flex-start;
   flex-wrap: wrap;
+  gap: 20px;
   margin-bottom: 20px;
 }
 
-/* 今日やったタスクのスタイルをぷっくり＆かわいく */
-.completed-task-summary {
-  background: #ffe6f0;
-  padding: 16px;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px rgba(255, 192, 203, 0.4);
-  min-width: 180px;
+.nursery-section, .completed-task-summary {
+  flex: 1;
+  min-width: 250px;
 }
 
-/* 数字をぷっくりバッジ風に */
-.pill {
-  display: inline-block;
-  background: #fff0f5;
-  color: #d6336c;
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 999px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-left: 6px;
+/* 🌸 ぷっくり＆かわいいスタイル */
+.completed-task-summary {
+  background: #fff0f7;
+  border-radius: 20px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-family: "Hiragino Maru Gothic Pro", "Rounded Mplus 1c", sans-serif;
 }
+
+.completed-task-summary .clickable-count {
+  font-weight: bold;
+  font-size: 1.5em;
+  color: #d672b6;
+  background: #ffe4f2;
+  padding: 5px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.completed-task-summary .clickable-count:hover {
+  transform: scale(1.1);
+}
+
 
 .task-daily {
   background-color: #d4f8d4; /* マカロン風グリーン */
