@@ -282,33 +282,58 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("memoViewModal").classList.add("hidden");
   document.getElementById("memoViewModal").style.display = "none";
 
-  db.collection("tasks").onSnapshot((snapshot) => {
-    const taskContainers = document.querySelectorAll("[id^='tasks-']");
-    taskContainers.forEach(container => container.innerHTML = "");
-    document.getElementById("tasks-overdue").innerHTML = "";
+db.collection("tasks").onSnapshot((snapshot) => {
+  const taskContainers = document.querySelectorAll("[id^='tasks-']");
+  taskContainers.forEach(container => container.innerHTML = "");
+  document.getElementById("tasks-overdue").innerHTML = "";
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const id = doc.id;
+  // 🔽 一度すべてのデータを配列に集める
+  const tasks = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const id = doc.id;
 
-      if (data.delete === true) return; // ← 表示しない
-      if (data.status === "完了") return;
+    if (data.delete === true || data.status === "完了") return;
 
-      const due = data.dueDate ? new Date(data.dueDate + "T00:00:00") : null;
-      const isOverdue = due && due <= yesterday;
-
-      if (isOverdue) {
-        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id, true);
-      } else {
-        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
-      }
-    });
+    tasks.push({ ...data, id });
   });
+
+  // 🔽 頻度順にソート
+  const frequencyOrder = {
+    "毎日（平日）": 1,
+    "毎日（休日）": 1,
+    "毎日": 1,
+    "毎週": 2,
+    "隔週": 3,
+    "毎月": 4,
+    "都度": 5
+  };
+
+  tasks.sort((a, b) => {
+    const orderA = frequencyOrder[a.frequency] ?? 99;
+    const orderB = frequencyOrder[b.frequency] ?? 99;
+    return orderA - orderB;
+  });
+
+  // 🔽 並び替えた順で表示
+  tasks.forEach(data => {
+    const id = data.id;
+    const due = data.dueDate ? new Date(data.dueDate + "T00:00:00") : null;
+    const isOverdue = due && due <= yesterday;
+
+    if (isOverdue) {
+      createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id, true);
+    } else {
+      createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
+    }
+  });
+});
+
 
   db.collection("events").onSnapshot((snapshot) => {
     document.getElementById("calendar-week").innerHTML = "";
