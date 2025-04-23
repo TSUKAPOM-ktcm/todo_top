@@ -101,7 +101,6 @@ function renderTodayCompletedTasksCount() {
       document.getElementById("done-tsumiki-count").onclick = () => showDoneTasksModal("つみき", counts.つみき);
       document.getElementById("done-numiki-count").onclick = () => showDoneTasksModal("ぬみき", counts.ぬみき);
     });
-}
 
 ffunction showDoneTasksModal(assignee, list) {
   const modal = document.getElementById("modal");
