@@ -404,6 +404,18 @@ header {
   background-color: #ead4ff; /* パステルパープル */
 }
 
+.cute-bubble {
+  background-color: #fffaf3;
+  border: 2px solid #f4c2c2;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  font-family: "Zen Maru Gothic", cursive;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
 /* ✨ モーダル内のスクロール対応 */
 .modal-content ul {
   max-height: 300px;
