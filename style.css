@@ -372,15 +372,18 @@ header {
 
 /* 今日やったタスク */
 .completed-task-summary {
-  background: #fff0f5;
+  padding: 12px;
+  background-color: #ffe5ec;
   border-radius: 20px;
-  padding: 20px;
-  flex: 1;
-  min-width: 280px;
-  box-shadow: 0 0 10px rgba(255, 192, 203, 0.5);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   font-weight: bold;
 }
 
+.cute-bubble {
+  font-family: "Rounded Mplus 1c", "ヒラギノ丸ゴ ProN", sans-serif;
+  font-size: 1.1rem;
+  color: #b45588;
+}
 /* カウント数字をぷっくりかわいく */
 .clickable-count {
   background: pink;
