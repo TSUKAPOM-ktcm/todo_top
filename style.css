@@ -331,36 +331,37 @@ header {
 }
 
 /* 🌸 保育園と完了数を横並びにするエリア */
-.nursery-completed-wrapper {
+.nursery-complete-wrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin: 16px 0;
   align-items: flex-start;
   justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 /* 📅 今日の保育園ボックス */
 .nursery-section {
-  flex: 1 1 280px;
-  background: #fff9f9;
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  flex: 1;
+  min-width: 280px;
 }
 
 /* ✅ 今日の完了タスクボックス */
 .completed-task-summary {
-  flex: 1 1 240px;
-  background: #fefcff;
-  border-radius: 20px;
+  flex: 1;
+  min-width: 200px;
+  background-color: #fff2f9;
+  border: 2px dashed #ffaadd;
+  border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  font-family: "Zen Maru Gothic", sans-serif;
+  box-shadow: 2px 2px 8px rgba(255, 182, 193, 0.3);
+  font-family: "Hiragino Maru Gothic ProN", "Rounded Mplus 1c", sans-serif;
+}
+
+.completed-task-summary p {
+  margin: 8px 0;
+  font-weight: bold;
   font-size: 16px;
-  line-height: 1.6;
-  text-align: left;
-  word-break: break-word;
 }
 
 /* 📌 見出しテキスト */
@@ -372,25 +373,22 @@ header {
 }
 
 /* 💖 数字のぷっくりバッジ */
-.completed-task-summary .clickable-count {
+.clickable-count {
   display: inline-block;
-  background-color: #ffe5ec;
-  padding: 6px 14px;
-  margin-left: 6px;
-  border-radius: 999px;
-  font-size: 22px;
+  background-color: #ffccdd;
+  color: #70003b;
+  padding: 4px 10px;
+  border-radius: 9999px;
   font-weight: bold;
-  color: #b03060;
+  font-size: 18px;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6),
+              inset 0 -2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  transition: all 0.2s ease;
-  font-family: "Zen Maru Gothic", sans-serif;
+  transition: transform 0.2s ease;
 }
 
 /* 💕 ホバーした時にさらにふんわり */
-.completed-task-summary .clickable-count:hover {
-  background-color: #ffc9d7;
-  transform: scale(1.1);
+ transform: scale(1.1);
 }
 
 
