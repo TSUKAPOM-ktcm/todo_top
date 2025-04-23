@@ -345,7 +345,6 @@ header {
   justify-content: space-between;
   align-items: flex-start; 
   gap: 20px;
-  align-items: flex-start;
   flex-wrap: wrap;
   margin: 20px 0;
 }
