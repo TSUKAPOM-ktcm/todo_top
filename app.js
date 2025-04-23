@@ -121,6 +121,8 @@ ffunction showDoneTasksModal(assignee, list) {
   content.innerHTML = html;
 }
 
+window.showDoneTasksModal = showDoneTasksModal;
+
 function formatTime(date) {
   if (!date) return "--:--";
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -936,4 +938,3 @@ function openNurseryEditModalByDate(dateStr) {
   });
 }
 window.openNurseryEditModalByDate = openNurseryEditModalByDate;
-window.showDoneTasksModal = showDoneTasksModal;
