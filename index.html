@@ -53,27 +53,30 @@
 
 <!-- 🌸 保育園＋今日の完了タスクを並べるラッパー -->
 <div class="nursery-completed-wrapper">
+
   <!-- 🌸 今日の保育園エリア -->
   <div class="nursery-section">
     <h3 class="section-title">📅 今日の保育園 🌼</h3>
-      <div id="nurseryToday">
-        <span id="nurseryStart" class="bubble-time">--:--</span>
-        <span class="tilde">～</span>
-        <span id="nurseryEnd" class="bubble-time">--:--</span>
-        </div>
-  <div class="nursery-buttons">
-    <button onclick="openNurseryEditModal()">編集</button>
-    <button onclick="openNurseryCalendarModal()">一覧を見る</button>
+    <div id="nurseryToday">
+      <span id="nurseryStart" class="bubble-time">--:--</span>
+      <span class="tilde">～</span>
+      <span id="nurseryEnd" class="bubble-time">--:--</span>
+    </div>
+    <div class="nursery-buttons">
+      <button onclick="openNurseryEditModal()">編集</button>
+      <button onclick="openNurseryCalendarModal()">一覧を見る</button>
+    </div>
   </div>
-</div>
 
   <!-- 🌸 担当者ごとの完了数表示エリア -->
   <div class="completed-task-summary cute-bubble">
-  <p>今日やったタスク：</p>
-  <p>つみき 🐰：<span id="done-tsumiki-count" class="clickable-count">0</span></p>
-  <p>ぬみき 🦁：<span id="done-numiki-count" class="clickable-count">0</span></p>
-</div>
+    <p>今日やったタスク：</p>
+    <p>つみき 🐰：<span id="done-tsumiki-count" class="clickable-count">0</span></p>
+    <p>ぬみき 🦁：<span id="done-numiki-count" class="clickable-count">0</span></p>
   </div>
+
+</div> <!-- ← ここで wrapper を閉じる！ -->
+
 
 <!-- 📅 保育園カレンダー モーダル -->
 <div id="nurseryCalendarModal" class="modal hidden">
