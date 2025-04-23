@@ -102,7 +102,7 @@ function renderTodayCompletedTasksCount() {
       document.getElementById("done-numiki-count").onclick = () => showDoneTasksModal("ぬみき", counts.ぬみき);
     });
 
-ffunction showDoneTasksModal(assignee, list) {
+function showDoneTasksModal(assignee, list) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
   modal.classList.remove("hidden");
