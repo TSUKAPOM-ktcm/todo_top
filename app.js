@@ -936,3 +936,4 @@ function openNurseryEditModalByDate(dateStr) {
   });
 }
 window.openNurseryEditModalByDate = openNurseryEditModalByDate;
+window.showDoneTasksModal = showDoneTasksModal;
