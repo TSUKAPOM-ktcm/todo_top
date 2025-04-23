@@ -126,13 +126,6 @@ function formatTime(date) {
   if (!date) return "--:--";
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
-// 🔧 完了に更新されたとき completedAt をセット
-function updateTaskStatusToCompleted(taskId, updateData) {
-  if (updateData.status === "完了") {
-    updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
-  }
-  return db.collection("tasks").doc(taskId).update(updateData);
-}
 
 // 💖 タスクアイテムにかわいい色をつける（毎日→グリーン、毎週→ブルー、毎月→パープル）
 function getTaskColorClass(frequency) {
