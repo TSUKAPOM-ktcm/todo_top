@@ -330,15 +330,17 @@ header {
   transform: scale(1.05);
 }
 
-/* 🔧 保育園 + 完了数を横並びに */
+/* 🌸 保育園と完了数を横並びにするエリア */
 .nursery-completed-wrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   margin: 16px 0;
   align-items: flex-start;
+  justify-content: space-between;
 }
 
+/* 📅 今日の保育園ボックス */
 .nursery-section {
   flex: 1 1 280px;
   background: #fff9f9;
@@ -347,6 +349,7 @@ header {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* ✅ 今日の完了タスクボックス */
 .completed-task-summary {
   flex: 1 1 240px;
   background: #fefcff;
@@ -360,6 +363,7 @@ header {
   word-break: break-word;
 }
 
+/* 📌 見出しテキスト */
 .completed-task-summary p {
   margin: 0.5em 0;
   font-weight: bold;
@@ -367,21 +371,26 @@ header {
   color: #4d3c41;
 }
 
+/* 💖 数字のぷっくりバッジ */
 .completed-task-summary .clickable-count {
+  display: inline-block;
   background-color: #ffe5ec;
-  padding: 4px 10px;
+  padding: 6px 14px;
   margin-left: 6px;
   border-radius: 999px;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   color: #b03060;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: background-color 0.2s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  font-family: "Zen Maru Gothic", sans-serif;
 }
 
+/* 💕 ホバーした時にさらにふんわり */
 .completed-task-summary .clickable-count:hover {
   background-color: #ffc9d7;
+  transform: scale(1.1);
 }
 
 
