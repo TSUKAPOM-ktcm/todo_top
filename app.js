@@ -103,13 +103,13 @@ function renderTodayCompletedTasksCount() {
     });
 }
 
-function showDoneTasksModal(assignee, list) {
+ffunction showDoneTasksModal(assignee, list) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
   modal.classList.remove("hidden");
   modal.style.display = "flex";
 
-  let html = `<h3>${assignee}さんの完了タスク</h3><ul>`;
+  let html = `<div style="max-height:400px; overflow-y:auto;"><h3>${assignee}さんの完了タスク</h3><ul>`;
   if (list.length === 0) {
     html += "<li>なし</li>";
   } else {
@@ -117,7 +117,7 @@ function showDoneTasksModal(assignee, list) {
       html += `<li>${task.name}（${task.time}）</li>`;
     });
   }
-  html += `</ul><div class="modal-buttons"><button onclick="hideModal()">閉じる</button></div>`;
+  html += `</ul></div><div class="modal-buttons"><button onclick="hideModal()">閉じる</button></div>`;
   content.innerHTML = html;
 }
 
@@ -125,7 +125,6 @@ function formatTime(date) {
   if (!date) return "--:--";
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
-
 // 🔧 完了に更新されたとき completedAt をセット
 function updateTaskStatusToCompleted(taskId, updateData) {
   if (updateData.status === "完了") {
