@@ -340,43 +340,37 @@ header {
 }
 
 /* 🌸 保育園と完了数を横並びにするエリア */
-.nursery-complete-wrapper {
+.nursery-wrapper {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-/* 📅 今日の保育園ボックス */
-.nursery-section {
-  background: #fff0f5;
-  border-radius: 20px;
-  padding: 20px;
-  flex: 1;
-  min-width: 280px;
-  box-shadow: 0 0 10px rgba(255, 192, 203, 0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin: 20px 0;
 }
 
 /* 保育園の時間表示 */
-#nurseryToday {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
+.nursery-section,
+.completed-task-summary {
+  background: #fffaf4;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  flex: 1;
+  min-width: 240px;
 }
 
 /* 今日やったタスク */
-.completed-task-summary {
-  padding: 12px;
-  background-color: #ffe5ec;
-  border-radius: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+.completed-task-summary .done-item {
   font-weight: bold;
+  font-size: 1.2em;
+  margin: 8px 0;
+  color: #444;
+  background: #f3f8ff;
+  padding: 6px 10px;
+  border-radius: 12px;
+  box-shadow: inset 1px 1px 3px #ccc;
+  font-family: 'Rounded Mplus 1c', 'Hiragino Maru Gothic Pro', sans-serif;
 }
 
 .cute-bubble {
@@ -386,14 +380,13 @@ header {
 }
 /* カウント数字をぷっくりかわいく */
 .clickable-count {
-  background: pink;
-  padding: 5px 12px;
-  border-radius: 20px;
+  cursor: pointer;
+  color: #ff69b4;
   font-weight: bold;
-  display: inline-block;
-  margin-left: 10px;
-  box-shadow: 2px 2px 5px rgba(200, 100, 150, 0.3);
-  font-size: 1.2em;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background-color: #fff0f5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 /* 💕 ホバーした時にさらにふんわり */
