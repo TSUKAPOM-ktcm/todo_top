@@ -159,7 +159,7 @@ function showModal(type) {
           </select></label>
         <label>頻度<span class="required">*</span><br>
           <select id="frequency">
-            <option>毎日（平日）</option><option>毎日（休日）</option><option>毎週</option><option>隔週</option><option>毎月</option><option>都度</option>
+            <option>毎日</option><option>毎週</option><option>隔週</option><option>毎月</option><option>都度</option>
           </select></label>
         <label>担当者<span class="required">*</span><br>
           <select id="assignee">
@@ -305,8 +305,6 @@ db.collection("tasks").onSnapshot((snapshot) => {
 
   // 🔽 頻度順にソート
   const frequencyOrder = {
-    "毎日（平日）": 1,
-    "毎日（休日）": 1,
     "毎日": 1,
     "毎週": 2,
     "隔週": 3,
