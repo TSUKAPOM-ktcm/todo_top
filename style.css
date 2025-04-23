@@ -343,6 +343,7 @@ header {
 .nursery-wrapper {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start; 
   gap: 20px;
   align-items: flex-start;
   flex-wrap: wrap;
