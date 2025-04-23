@@ -330,6 +330,15 @@ header {
   transform: scale(1.05);
 }
 
+.nursery-summary-container {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
 /* 🌸 保育園と完了数を横並びにするエリア */
 .nursery-complete-wrapper {
   display: flex;
@@ -342,11 +351,23 @@ header {
 
 /* 📅 今日の保育園ボックス */
 .nursery-section {
+  background: #fff0f5;
+  border-radius: 20px;
+  padding: 20px;
+  flex: 1;
+  min-width: 280px;
+  box-shadow: 0 0 10px rgba(255, 192, 203, 0.5);
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 保育園の時間表示 */
+#nurseryToday {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
 }
 
 /* ✅ 今日の完了タスクボックス */
