@@ -370,35 +370,27 @@ header {
   justify-content: center;
 }
 
-/* ✅ 今日の完了タスクボックス */
+/* 今日やったタスク */
 .completed-task-summary {
-  flex: 1;
-  min-width: 180px;
-  background-color: #ffe0f0;
+  background: #fff0f5;
   border-radius: 20px;
-  padding: 15px;
-  box-shadow: 0 4px 10px rgba(255, 182, 193, 0.4);
-  font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive;
-}
-
-.completed-task-summary p {
+  padding: 20px;
+  flex: 1;
+  min-width: 280px;
+  box-shadow: 0 0 10px rgba(255, 192, 203, 0.5);
   font-weight: bold;
-  margin: 8px 0;
-  font-size: 1rem;
 }
 
-/* 💖 数字のぷっくりバッジ */
+/* カウント数字をぷっくりかわいく */
 .clickable-count {
-  display: inline-block;
-  padding: 6px 12px;
-  background: linear-gradient(135deg, #ff9acb, #ffcde1);
-  border-radius: 9999px;
-  font-size: 1.2rem;
-  color: white;
+  background: pink;
+  padding: 5px 12px;
+  border-radius: 20px;
   font-weight: bold;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  display: inline-block;
+  margin-left: 10px;
+  box-shadow: 2px 2px 5px rgba(200, 100, 150, 0.3);
+  font-size: 1.2em;
 }
 
 /* 💕 ホバーした時にさらにふんわり */
