@@ -26,7 +26,7 @@ function login() {
         document.getElementById("loginScreen").classList.add("hidden");
         document.getElementById("mainScreen").classList.remove("hidden");
         renderTodayNursery(); // 🔸ログイン後に今日の保育園時間を表示
-        renderTodayCompletedTasksCount(); // 🔸ログイン後に今日のタスク完了数を表示
+        letedTasksCount(); // 🔸ログイン後に今日のタスク完了数を表示
       } else {
         alert("IDかパスワードが違います");
       }
@@ -101,6 +101,7 @@ function renderTodayCompletedTasksCount() {
       document.getElementById("done-tsumiki-count").onclick = () => showDoneTasksModal("つみき", counts.つみき);
       document.getElementById("done-numiki-count").onclick = () => showDoneTasksModal("ぬみき", counts.ぬみき);
     });
+}
 
 function showDoneTasksModal(assignee, list) {
   const modal = document.getElementById("modal");
