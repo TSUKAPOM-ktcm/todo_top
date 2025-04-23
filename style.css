@@ -388,6 +388,7 @@ header {
 }
 
 /* 💕 ホバーした時にさらにふんわり */
+.clickable-count:hover {
  transform: scale(1.1);
 }
 
