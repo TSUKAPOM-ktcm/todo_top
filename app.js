@@ -252,13 +252,6 @@ function showDoneTasksModal(assignee, list) {
 window.showDoneTasksModal = showDoneTasksModal;
 
 
-// 💖 タスクアイテムにかわいい色をつける（毎日→グリーン、毎週→ブルー、毎月→パープル）
-function getTaskColorClass(frequency) {
-  if (frequency.includes("毎日")) return "task-daily";
-  if (frequency.includes("毎週")) return "task-weekly";
-  if (frequency.includes("毎月")) return "task-monthly";
-  return "";
-}
 // 🔧 モーダル処理　type別に表示　task,regular
 function showModal(type) {
   const modal = document.getElementById("modal");
