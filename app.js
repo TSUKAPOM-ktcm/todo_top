@@ -83,7 +83,7 @@ function renderTodayNursery() {
     if (doc.exists) {
       const data = doc.data();
       if (data.start == null || data.end == null) {
-        startEl.textContent = "お休み";
+        startEl.textContent = "休";
         endEl.textContent = "";
       } else {
         startEl.textContent = data.start;
@@ -971,7 +971,7 @@ function openNurseryCalendarModal() {
           if (cell) {
             const d = doc.data();
             const label = (!d.start && !d.end)
-              ? "お休み"
+              ? "休"
               : (d.start && d.end) ? `${d.start}〜${d.end}` : "";
             const timeSpan = cell.querySelector(".nursery-time");
             if (timeSpan) {
