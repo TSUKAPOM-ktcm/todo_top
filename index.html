@@ -45,6 +45,7 @@
       <div class="top-buttons">
         <button onclick="showModal('regular')">定期タスクを追加</button>
         <button onclick="showModal('task')">タスクを追加</button>
+        <button onclick="showOkaimonoModal()">メモを追加</button>
         <button onclick="showModal('memo')">伝言メモ追加</button>
         <button onclick="showModal('event')">予定を追加</button>
       </div>
@@ -67,14 +68,11 @@
         </div>
       </div>
 
-      <!-- 2: お買い物メモ -->
-      <div class="okaimono-section">
-        <h3>🛍 お買い物メモ</h3>
-        <div class="okaimono-buttons">
-          <button onclick="showOkaimonoModal()">メモを追加</button>
-        </div>
-        <div id="okaimonoList" class="okaimono-box"></div>
-      </div>
+<!-- 2: お買い物メモ -->
+<div class="okaimono-section">
+  <h3>🛍 お買い物メモ</h3>
+  <div id="okaimonoList" class="okaimono-box"></div>
+</div>
 
       <!-- 3: 今日やったタスク -->
       <div class="completed-task-summary">
