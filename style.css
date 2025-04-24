@@ -92,6 +92,13 @@ header {
   color: #4d2c2c;
 }
 
+.top-buttons {
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+gap: 0.5rem;
+}
+
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -129,13 +136,80 @@ header {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.memo-item {
+.memo-item, .okaimono-item{
   background: #fff0f7;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
   border-radius: 1rem;
   cursor: pointer;
   white-space: pre-wrap;
+}
+
+.okaimono-section h3 {
+  text-align: center;
+  font-size: 1.4rem;
+  color: #d63384;
+  font-family: "M PLUS Rounded 1c", cursive;
+}
+
+.okaimono-buttons {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.event-item {
+  background: #e6faff;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff0f7;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #804040;
+  margin-bottom: 1rem;
+  font-family: "M PLUS Rounded 1c", cursive;
+}
+
+.modal-content label {
+  display: block;
+  margin: 0.7rem 0 0.2rem;
+  font-weight: bold;
+  color: #804040;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.calendar-area {
+  margin-bottom: 2rem;
 }
 
 .event-item {
