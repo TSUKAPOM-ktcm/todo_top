@@ -39,6 +39,7 @@ function initializeAfterLogin() {
   renderTodayNursery();
   renderTodayCompletedTasksCount();
   renderOkaimonoList();
+  renderWeeklyGraph();
   // ログイン後のみリアルタイム同期を開始
   db.collection("tasks").onSnapshot(renderTasksFromSnapshot);
   db.collection("events").onSnapshot(renderEventsFromSnapshot);
@@ -1085,4 +1086,84 @@ function renderWeeklyCompletedTasksChart() {
     });
   });
 }
+
+function renderWeeklyGraph() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+
+  const counts = {};
+
+  db.collection("tasks")
+    .where("status", "==", "完了")
+    .where("completedAt", ">=", weekStart)
+    .where("completedAt", "<=", weekEnd)
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const dateStr = data.completedAt?.toDate().toISOString().split("T")[0];
+        const assignee = data.assignee || "未設定";
+        if (!counts[dateStr]) counts[dateStr] = { "つみき": 0, "ぬみき": 0 };
+        if (assignee === "つみき" || assignee === "ぬみき") {
+          counts[dateStr][assignee]++;
+        }
+      });
+
+      drawWeeklyBarGraph(counts);
+    });
+}
+
+function drawWeeklyBarGraph(counts) {
+  const labels = [];
+  const tsumikiData = [];
+  const numikiData = [];
+
+  const start = new Date();
+  start.setDate(start.getDate() - start.getDay());
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const dateStr = d.toISOString().split("T")[0];
+    labels.push(`${d.getMonth()+1}/${d.getDate()}`);
+    tsumikiData.push(counts[dateStr]?.つみき || 0);
+    numikiData.push(counts[dateStr]?.ぬみき || 0);
+  }
+
+  const ctx = document.getElementById("weeklyGraph").getContext("2d");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "つみき",
+          data: tsumikiData,
+          backgroundColor: "#f8b4d9"
+        },
+        {
+          label: "ぬみき",
+          data: numikiData,
+          backgroundColor: "#a5d8ff"
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      },
+      plugins: {
+        legend: { position: "bottom" }
+      }
+    }
+  });
+}
+
 window.openNurseryEditModalByDate = openNurseryEditModalByDate;
