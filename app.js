@@ -83,7 +83,7 @@ function renderTodayNursery() {
     if (doc.exists) {
       const data = doc.data();
       if (data.start == null || data.end == null) {
-        startEl.textContent = "休";
+        startEl.textContent = "お休み";
         endEl.textContent = "";
       } else {
         startEl.textContent = data.start;
