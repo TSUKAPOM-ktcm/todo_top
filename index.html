@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="apple-touch-icon" href="icon.png">
 <!-- Firebase SDKの読み込み --> 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 
   <!-- Firebase初期化 -->
@@ -38,7 +38,7 @@
     <button id="loginBtn">ログイン</button>
   </div>
 
-  <!-- メイン画面 -->
+ <!-- メイン画面 -->
   <div id="mainScreen" class="main-screen hidden">
     <header>
       <span class="title">こたちゃんすくすく計画🐻</span>
@@ -50,57 +50,6 @@
       </div>
     </header>
 
-
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>こたちゃんすくすく計画</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="apple-touch-icon" href="icon.png">
-<!-- Firebase SDKの読み込み -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
-<!-- Firebase初期化 -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCoPHxST4Dra0Ucs5bRWgKRvxlTGt7x_r4",
-      authDomain: "kotachan-sukusuku.firebaseapp.com",
-      projectId: "kotachan-sukusuku",
-      storageBucket: "kotachan-sukusuku.firebasestorage.app",
-      messagingSenderId: "407032223624",
-      appId: "1:407032223624:web:443b371b85c5905c69cc3d"
-    };
-    firebase.initializeApp(firebaseConfig);
-    window.db = firebase.firestore();
-  </script>
-
-<!-- メインのアプリJS -->
-  <script src="app.js" defer></script>
-</head>
-<body>
-  <!-- ログイン画面 -->
-  <div id="loginScreen" class="login-screen">
-    <h1 class="app-title">こたちゃん<br>すくすく計画</h1>
-    <img src="bear.png" alt="くま" class="bear-icon" />
-    <input type="email" id="email" placeholder="メールアドレス" />
-    <input type="password" id="password" placeholder="パスワード" />
-    <button id="loginBtn">ログイン</button>
-  </div>
-
-  <!-- メイン画面 -->
-  <div id="mainScreen" class="main-screen hidden">
-    <header>
-      <span class="title">こたちゃんすくすく計画🐻</span>
-      <div class="top-buttons">
-        <button onclick="showModal('regular')">定期タスクを追加</button>
-        <button onclick="showModal('task')">タスクを追加</button>
-        <button onclick="showModal('memo')">伝言メモ追加</button>
-        <button onclick="showModal('event')">予定を追加</button>
-      </div>
-    </header>
 
     <!-- 🌟 上部４エリア横並び -->
     <div class="nursery-wrapper">
