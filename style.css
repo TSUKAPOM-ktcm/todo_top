@@ -1,32 +1,32 @@
 /* 👗 ページ全体の基本スタイル設定 */
 body {
-  margin: 0; /* ページの余白をなくす */
-  font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic Pro", "Yu Gothic UI", sans-serif; /* 丸みのあるかわいいフォント */
-  background: #fff8f2; /* 優しいピンクの背景色 */
-  color: #4d2c2c; /* 茶系の落ち着いた文字色 */
-  overflow-x: hidden; /* 横スクロールを防止 */
+  margin: 0;
+  font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic Pro", "Yu Gothic UI", sans-serif;
+  background: #fff8f2;
+  color: #4d2c2c;
+  overflow-x: hidden;
 }
 
 .hidden {
-  display: none !important; /* 完全に非表示にする */
+  display: none !important;
 }
 
 button {
-  padding: 0.7rem 1.5rem; /* 余白をとって押しやすく */
-  background: #ffb6c1; /* ピンク色ボタン */
+  padding: 0.7rem 1.5rem;
+  background: #ffb6c1;
   border: none;
-  border-radius: 1.5rem; /* 丸っこく */
+  border-radius: 1.5rem;
   color: white;
   font-size: 1rem;
   cursor: pointer;
   margin: 0.3rem;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* ボタンに影 */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 input, select, textarea {
   font-family: inherit;
   font-size: 1rem;
-  border-radius: 1rem; /* 入力欄も丸っこく */
+  border-radius: 1rem;
   padding: 0.5rem;
   border: 2px solid #ffddee;
   background: white;
@@ -35,11 +35,11 @@ input, select, textarea {
 }
 
 textarea {
-  resize: vertical; /* 縦方向のみリサイズ可 */
+  resize: vertical;
 }
 
 .required {
-  color: red; /* 必須マークは赤 */
+  color: red;
   margin-left: 0.3rem;
 }
 
@@ -51,12 +51,12 @@ h3, h4 {
 .login-screen {
   text-align: center;
   padding: 4rem 1rem;
-  background: url('background-stars.png') no-repeat center top / cover; /* 星背景 */
+  background: url('background-stars.png') no-repeat center top / cover;
 }
 
 .app-title {
   font-size: 2.7rem;
-  color: #804040; /* タイトル文字色 */
+  color: #804040;
   font-weight: bold;
   line-height: 1.3;
 }
@@ -77,9 +77,9 @@ input[type="email"], input[type="password"] {
 }
 
 header {
-  background: #ffe0ec; /* ヘッダー背景 */
+  background: #ffe0ec;
   padding: 1rem;
-  border-bottom: 2px dashed #ffbad2; /* 下線を点線で */
+  border-bottom: 2px dashed #ffbad2;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -121,7 +121,7 @@ header {
 }
 
 .task-item {
-  background: #d4f8d4; /* マカロングリーン */
+  background: #d4f8d4;
   border-radius: 1rem;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
@@ -172,6 +172,7 @@ header {
   font-size: 1.3rem;
   color: #804040;
   margin-bottom: 1rem;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .modal-content label {
@@ -194,19 +195,22 @@ header {
 
 .calendar-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   background: #fff;
   box-shadow: 0 0 6px rgba(0,0,0,0.1);
   border-radius: 1rem;
   overflow: hidden;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .calendar-table th {
   background: #ffddee;
-  color: #804060;
+  color: #d63384;
   padding: 0.6rem;
   font-weight: bold;
   text-align: center;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .calendar-table td {
@@ -217,6 +221,7 @@ header {
   height: 4.5rem;
   font-size: 0.9rem;
   background: #fffdfd;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .calendar-table td strong {
@@ -228,14 +233,15 @@ header {
 
 .calendar-table td .nursery-time {
   font-size: 0.75rem;
-  background: #fff0f7;
-  padding: 2px 4px;
-  border-radius: 0.5rem;
+  background: #ffe6ee;
+  padding: 2px 6px;
+  border-radius: 1rem;
   display: inline-block;
   color: #6a1b9a;
+  font-weight: bold;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
-/* 🌸 上部エリア（保育園など） */
 .nursery-wrapper {
   display: flex;
   justify-content: space-between;
@@ -263,6 +269,7 @@ header {
   color: #d63384;
   margin-bottom: 1rem;
   text-align: center;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 #nurseryToday {
@@ -283,6 +290,7 @@ header {
   font-size: 1.5rem;
   font-weight: bold;
   padding: 0 0.5rem;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .tilde {
@@ -298,11 +306,5 @@ header {
 @media (max-width: 768px) {
   .nursery-wrapper {
     flex-direction: column;
-  }
-}
-
-@media (max-width: 768px) {
-  .nursery-wrapper {
-    flex-direction: column; /* モバイル対応 */
   }
 }
