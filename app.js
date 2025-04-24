@@ -396,7 +396,7 @@ function showModal(type) {
 window.showModal = showModal;
 
 
-db.collection("tasks").onSnapshot((snapshot) => {
+function renderTasksFromSnapshot(snapshot) {
   const taskContainers = document.querySelectorAll("[id^='tasks-']");
   taskContainers.forEach(container => container.innerHTML = "");
   document.getElementById("tasks-overdue").innerHTML = "";
@@ -406,7 +406,6 @@ db.collection("tasks").onSnapshot((snapshot) => {
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
 
-  // 🔽 一度すべてのデータを配列に集める
   const tasks = [];
   snapshot.forEach(doc => {
     const data = doc.data();
@@ -417,7 +416,6 @@ db.collection("tasks").onSnapshot((snapshot) => {
     tasks.push({ ...data, id });
   });
 
-  // 🔽 頻度順にソート
   const frequencyOrder = {
     "毎日": 1,
     "毎週": 2,
@@ -432,88 +430,93 @@ db.collection("tasks").onSnapshot((snapshot) => {
     return orderA - orderB;
   });
 
-  // 🔽 並び替えた順で表示
   tasks.forEach(data => {
     const id = data.id;
     const due = data.dueDate ? new Date(data.dueDate + "T00:00:00") : null;
-    const isOverdue = due && due <= yesterday;
+    const isOverdue = due && due <= yesterday && data.status !== "完了";
 
-    if (isOverdue) {
-      createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id, true);
-    } else {
-      createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
+    createTaskElement(
+      data.name,
+      data.status,
+      data.frequency,
+      data.assignee,
+      data.dueDate,
+      data.note,
+      id,
+      isOverdue
+    );
+  });
+}
+
+
+
+  function renderEventsFromSnapshot(snapshot) {
+  document.getElementById("calendar-week").innerHTML = "";
+  document.getElementById("calendar-month").innerHTML = "";
+  document.getElementById("calendar-future").innerHTML = "";
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const eventDate = new Date(data.date + "T00:00:00");
+    if (eventDate < today || data.deleted) return;
+
+    const existing = document.querySelector(`[data-id='${doc.id}']`);
+    if (existing) existing.remove();
+
+    const event = document.createElement("div");
+    event.className = "event-item";
+    event.dataset.id = doc.id;
+    event.dataset.date = data.date;
+    event.dataset.hour = data.hour;
+    event.dataset.minute = data.minute;
+    event.dataset.content = data.content;
+    event.dataset.note = data.note;
+
+    const time = data.hour && data.minute ? `${data.hour}:${data.minute}` : "";
+    event.innerHTML = `<strong>${data.date}</strong> ${time} - ${data.content}`;
+    event.onclick = () => openEditEventModal(event);
+
+    if (isSameWeek(eventDate, today)) {
+      document.getElementById("calendar-week").appendChild(event);
+    } else if (isSameMonth(eventDate, today)) {
+      document.getElementById("calendar-month").appendChild(event);
+    } else if (isNextMonthOrLater(eventDate, today)) {
+      document.getElementById("calendar-future").appendChild(event);
     }
   });
-});
+}
 
+function renderMemosFromSnapshot(snapshot) {
+  document.getElementById("memos").innerHTML = "";
 
-  db.collection("events").onSnapshot((snapshot) => {
-    document.getElementById("calendar-week").innerHTML = "";
-    document.getElementById("calendar-month").innerHTML = "";
-    document.getElementById("calendar-future").innerHTML = "";
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const id = doc.id;
+    if (data.deleted) return;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const memo = document.createElement("div");
+    memo.className = "memo-item";
+    memo.dataset.full = data.text;
+    memo.textContent = data.text.length > 100 ? data.text.slice(0, 100) + "…" : data.text;
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const eventDate = new Date(data.date + "T00:00:00");
-      if (eventDate < today || data.deleted) return;
-
-      const existing = document.querySelector(`[data-id='${doc.id}']`);
-      if (existing) existing.remove();
-
-      const event = document.createElement("div");
-      event.className = "event-item";
-      event.dataset.id = doc.id;
-      event.dataset.date = data.date;
-      event.dataset.hour = data.hour;
-      event.dataset.minute = data.minute;
-      event.dataset.content = data.content;
-      event.dataset.note = data.note;
-
-      const time = data.hour && data.minute ? `${data.hour}:${data.minute}` : "";
-      event.innerHTML = `<strong>${data.date}</strong> ${time} - ${data.content}`;
-      event.onclick = () => openEditEventModal(event);
-
-      if (isSameWeek(eventDate, today)) {
-        document.getElementById("calendar-week").appendChild(event);
-      } else if (isSameMonth(eventDate, today)) {
-        document.getElementById("calendar-month").appendChild(event);
-      } else if (isNextMonthOrLater(eventDate, today)) {
-        document.getElementById("calendar-future").appendChild(event);
-      }
-    });
-  });
-
-  db.collection("memos").onSnapshot((snapshot) => {
-    document.getElementById("memos").innerHTML = "";
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const id = doc.id;
-      if (data.deleted) return;
-
-      const memo = document.createElement("div");
-      memo.className = "memo-item";
-      memo.dataset.full = data.text;
-      memo.textContent = data.text.length > 100 ? data.text.slice(0, 100) + "…" : data.text;
-
-      memo.onclick = () => {
-        document.getElementById("fullMemoText").textContent = data.text;
-        document.getElementById("memoViewModal").classList.remove("hidden");
-        document.getElementById("memoViewModal").style.display = "flex";
-        document.getElementById("deleteMemoBtn").onclick = () => {
-          db.collection("memos").doc(id).update({ deleted: true });
-          memo.remove();
-          hideMemoModal();
-        };
+    memo.onclick = () => {
+      document.getElementById("fullMemoText").textContent = data.text;
+      document.getElementById("memoViewModal").classList.remove("hidden");
+      document.getElementById("memoViewModal").style.display = "flex";
+      document.getElementById("deleteMemoBtn").onclick = () => {
+        db.collection("memos").doc(id).update({ deleted: true });
+        memo.remove();
+        hideMemoModal();
       };
+    };
 
-      document.getElementById("memos").appendChild(memo);
-    });
+    document.getElementById("memos").appendChild(memo);
   });
-});
+}
+
 
 function addTaskFromForm(e) {
   e.preventDefault();
