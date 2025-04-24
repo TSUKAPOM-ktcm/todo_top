@@ -238,11 +238,11 @@ header .top-buttons {
 
 .calendar-table td {
   text-align: center;
-  padding: 0.6rem;
+  padding: 0.3rem;
   border: 1px solid #ffeef2;
   vertical-align: top;
-  height: 4.5rem;
-  font-size: 0.9rem;
+  height: 4rem;
+  font-size: 0.75rem;
   background: #fffdfd;
   font-family: "M PLUS Rounded 1c", cursive;
 }
@@ -251,17 +251,16 @@ header .top-buttons {
   display: block;
   font-weight: bold;
   color: #d63384;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 
 .calendar-table td .nursery-time {
-  font-size: 0.75rem;
-  background: #ffe6ee;
-  padding: 2px 6px;
-  border-radius: 1rem;
-  display: inline-block;
+  font-size: 0.6rem;
+  padding: 0;
+  border-radius: 0;
+  display: block;
   color: #6a1b9a;
-  font-weight: bold;
+  font-weight: normal;
   font-family: "M PLUS Rounded 1c", cursive;
 }
 
