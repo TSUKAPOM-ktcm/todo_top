@@ -51,29 +51,151 @@
     </header>
 
 
-<!-- 🌸 保育園＋今日の完了タスクを並べるラッパー -->
-<!-- 🌸 今日の保育園エリア -->
-<div class="nursery-wrapper">
-  <div class="nursery-section">
-    <h3 class="section-title">📅 今日の保育園 🌼</h3>
-    <div id="nurseryToday">
-      <span id="nurseryStart" class="bubble-time">--:--</span>
-      <span class="tilde">～</span>
-      <span id="nurseryEnd" class="bubble-time">--:--</span>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>こたちゃんすくすく計画</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="apple-touch-icon" href="icon.png">
+<!-- Firebase SDKの読み込み -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<!-- Firebase初期化 -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCoPHxST4Dra0Ucs5bRWgKRvxlTGt7x_r4",
+      authDomain: "kotachan-sukusuku.firebaseapp.com",
+      projectId: "kotachan-sukusuku",
+      storageBucket: "kotachan-sukusuku.firebasestorage.app",
+      messagingSenderId: "407032223624",
+      appId: "1:407032223624:web:443b371b85c5905c69cc3d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    window.db = firebase.firestore();
+  </script>
+
+<!-- メインのアプリJS -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- ログイン画面 -->
+  <div id="loginScreen" class="login-screen">
+    <h1 class="app-title">こたちゃん<br>すくすく計画</h1>
+    <img src="bear.png" alt="くま" class="bear-icon" />
+    <input type="email" id="email" placeholder="メールアドレス" />
+    <input type="password" id="password" placeholder="パスワード" />
+    <button id="loginBtn">ログイン</button>
+  </div>
+
+  <!-- メイン画面 -->
+  <div id="mainScreen" class="main-screen hidden">
+    <header>
+      <span class="title">こたちゃんすくすく計画🐻</span>
+      <div class="top-buttons">
+        <button onclick="showModal('regular')">定期タスクを追加</button>
+        <button onclick="showModal('task')">タスクを追加</button>
+        <button onclick="showModal('memo')">伝言メモ追加</button>
+        <button onclick="showModal('event')">予定を追加</button>
+      </div>
+    </header>
+
+    <!-- 🌟 上部４エリア横並び -->
+    <div class="nursery-wrapper">
+      <!-- 1: 今日の保育園 -->
+      <div class="nursery-section">
+        <h3 class="section-title">📅 今日の保育園 🌼</h3>
+        <div id="nurseryToday">
+          <span id="nurseryStart" class="bubble-time">--:--</span>
+          <span class="tilde">～</span>
+          <span id="nurseryEnd" class="bubble-time">--:--</span>
+        </div>
+        <div class="nursery-buttons">
+          <button onclick="openNurseryEditModal()">編集</button>
+          <button onclick="openNurseryCalendarModal()">一覧を見る</button>
+        </div>
+      </div>
+
+      <!-- 2: お買い物メモ -->
+      <div class="okaimono-section">
+        <h3>🛍 お買い物メモ</h3>
+        <div class="okaimono-buttons">
+          <button onclick="showOkaimonoModal()">メモを追加</button>
+        </div>
+        <div id="okaimonoList" class="okaimono-box"></div>
+      </div>
+
+      <!-- 3: 今日やったタスク -->
+      <div class="completed-task-summary">
+        <h3 class="section-title">🎯 今日やったタスク</h3>
+        <p class="done-item">つみき 🧸：<span id="done-tsumiki-count" class="clickable-count">0</span></p>
+        <p class="done-item">ぬみき 🐻：<span id="done-numiki-count" class="clickable-count">0</span></p>
+      </div>
+
+      <!-- 4: 今週やったタスク（棒グラフ） -->
+      <div class="weekly-graph-section">
+        <h3>📊 今週やったタスク</h3>
+        <canvas id="weeklyTaskChart" width="300" height="200"></canvas>
+      </div>
     </div>
-    <div class="nursery-buttons">
-      <button onclick="openNurseryEditModal()">編集</button>
-      <button onclick="openNurseryCalendarModal()">一覧を見る</button>
+
+    <!-- 以下、既存のレイアウト -->
+    <div class="container">
+      <div class="tasks-column">
+        <h3>期日が過ぎているタスク</h3>
+        <div id="tasks-overdue" class="task-box"></div>
+
+        <h3>未完了の担当者別タスク</h3>
+        <h4>なし（未対応）</h4>
+        <div id="tasks-なし-未対応" class="task-box"></div>
+        <h4>つみき（未対応）</h4>
+        <div id="tasks-つみき-未対応" class="task-box"></div>
+        <h4>ぬみき（未対応）</h4>
+        <div id="tasks-ぬみき-未対応" class="task-box"></div>
+        <h4>つみき（対応中）</h4>
+        <div id="tasks-つみき-対応中" class="task-box"></div>
+        <h4>ぬみき（対応中）</h4>
+        <div id="tasks-ぬみき-対応中" class="task-box"></div>
+      </div>
+
+      <div class="right-column">
+        <div class="calendar-area">
+          <h3>今週の予定</h3>
+          <div id="calendar-week" class="calendar-box"></div>
+
+          <h3>今月の予定</h3>
+          <div id="calendar-month" class="calendar-box"></div>
+
+          <h3>来月以降の予定</h3>
+          <div id="calendar-future" class="calendar-box"></div>
+        </div>
+
+        <div class="memo-area">
+          <h3>伝言メモ</h3>
+          <div id="memos" class="memo-box"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- 🎀 担当者ごとの完了数表示（nurseryの右に並べる） -->
-  <div class="completed-task-summary">
-    <h3 class="section-title">🎯 今日やったタスク</h3>
-    <p class="done-item">つみき 🧸：<span id="done-tsumiki-count" class="clickable-count">0</span></p>
-    <p class="done-item">ぬみき 🐻：<span id="done-numiki-count" class="clickable-count">0</span></p>
+  <div id="modal" class="modal hidden">
+    <div class="modal-content" id="modalContent"></div>
   </div>
-</div>
+
+  <div id="memoViewModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>メモの内容</h3>
+      <p id="fullMemoText"></p>
+      <div class="modal-buttons">
+        <button id="deleteMemoBtn">削除</button>
+        <button onclick="hideMemoModal()">キャンセル</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
 
 
 <!-- 📅 保育園カレンダー モーダル -->
