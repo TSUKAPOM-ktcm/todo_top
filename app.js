@@ -1030,6 +1030,45 @@ function openNurseryEditModalByDate(dateStr) {
     }
   });
 
+function renderWeeklyCompletedTasksChart() {
+  const today = new Date();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  const dailyCounts = {};
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().split('T')[0];
+    dailyCounts[key] = { つみき: 0, ぬみき: 0 };
+  }
+
+  db.collection("tasks")
+    .where("status", "==", "完了")
+    .where("completedAt", ">=", startOfWeek)
+    .where("completedAt", "<=", endOfWeek)
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const dateKey = data.completedAt.toDate().toISOString().split("T")[0];
+        const assignee = data.assignee;
+        if (dailyCounts[dateKey] && (assignee === "つみき" || assignee === "ぬみき")) {
+          dailyCounts[dateKey][assignee]++;
+        }
+      });
+
+      drawBarChart(dailyCounts);
+    });
+}
+
+  
   // 保存ボタンが押されたときの処理
   document.getElementById("editNurseryForm").addEventListener("submit", (e) => {
     e.preventDefault();
