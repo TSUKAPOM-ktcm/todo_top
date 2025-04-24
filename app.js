@@ -68,6 +68,107 @@ function renderTodayNursery() {
   });
 }
 
+// 🔧 お買い物メモモーダルの表示
+function showOkaimonoModal(existingId = null, existingText = "") {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  content.innerHTML = `
+    <form id="okaimonoForm">
+      <h3>お買い物メモ</h3>
+      <label>内容<br><textarea id="okaimonoText" required>${existingText}</textarea></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+      </div>
+    </form>
+  `;
+
+  document.getElementById("okaimonoForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = document.getElementById("okaimonoText").value.trim();
+    if (!text) return;
+
+    if (existingId) {
+      db.collection("okaimono").doc(existingId).update({
+        text,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } else {
+      db.collection("okaimono").add({
+        text,
+        complete: false,
+        delete: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    hideModal();
+  });
+}
+
+window.showOkaimonoModal = showOkaimonoModal;
+
+// 🔧 お買い物メモの一覧を表示
+function renderOkaimonoList() {
+  const container = document.getElementById("okaimonoList");
+  if (!container) return;
+  container.innerHTML = "";
+
+  db.collection("okaimono").where("delete", "!=", true).onSnapshot((snapshot) => {
+    container.innerHTML = "";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const div = document.createElement("div");
+      div.className = "okaimono-item" + (data.complete ? " complete" : "");
+      div.textContent = data.text;
+      div.onclick = () => showOkaimonoEditModal(doc.id, data);
+      container.appendChild(div);
+    });
+  });
+}
+
+// 🔧 お買い物メモ 編集用モーダル
+function showOkaimonoEditModal(id, data) {
+  const modal = document.getElementById("modal");
+  const content = document.getElementById("modalContent");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
+  content.innerHTML = `
+    <form id="okaimonoEditForm">
+      <h3>お買い物メモの編集</h3>
+      <label>内容<br><textarea id="editOkaimonoText">${data.text}</textarea></label>
+      <div class="modal-buttons">
+        <button type="button" onclick="hideModal()">キャンセル</button>
+        <button type="submit">保存</button>
+        <button type="button" id="deleteOkaimonoBtn">削除</button>
+        <button type="button" id="completeOkaimonoBtn">完了</button>
+      </div>
+    </form>
+  `;
+
+  document.getElementById("okaimonoEditForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = document.getElementById("editOkaimonoText").value.trim();
+    if (!text) return;
+    db.collection("okaimono").doc(id).update({ text });
+    hideModal();
+  });
+
+  document.getElementById("deleteOkaimonoBtn").onclick = () => {
+    db.collection("okaimono").doc(id).update({ delete: true });
+    hideModal();
+  };
+
+  document.getElementById("completeOkaimonoBtn").onclick = () => {
+    db.collection("okaimono").doc(id).update({ complete: true });
+    hideModal();
+  };
+}
+window.showOkaimonoEditModal = showOkaimonoEditModal;
+
 // 🔸 担当者別・今日の完了タスク数を表示
 function renderTodayCompletedTasksCount() {
   const today = new Date();
