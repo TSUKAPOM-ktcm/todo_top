@@ -427,7 +427,7 @@ function renderTasksFromSnapshot(snapshot) {
   tasks.sort((a, b) => {
     const orderA = frequencyOrder[a.frequency] ?? 99;
     const orderB = frequencyOrder[b.frequency] ?? 99;
-    if (freqA !== freqB) return freqA - freqB;
+    if (orderA !== orderB) return orderA - orderB;
 // 毎日タスクの場合、サブ順で比較
   if (a.frequency === "毎日" && b.frequency === "毎日") {
     const subA = getDailySubOrder(a.name);
