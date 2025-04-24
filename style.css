@@ -344,7 +344,7 @@ header .top-buttons {
   .okaimono-section,
   .completed-task-summary,
   .weekly-graph-section {
-    margin: 0 auto 16px auto;
+    margin: 0 12px 16px 12px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
