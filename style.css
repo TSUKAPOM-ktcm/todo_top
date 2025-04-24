@@ -1,10 +1,10 @@
 /* 👗 ページ全体の基本スタイル設定 */
 body {
   margin: 0;
+  font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic Pro", "Yu Gothic UI", sans-serif;
   background: #fff8f2;
   color: #4d2c2c;
   overflow-x: hidden;
-  font-family: 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif;
 }
 
 .hidden {
@@ -46,7 +46,6 @@ textarea {
 h3, h4 {
   font-weight: bold;
   margin-bottom: 0.5rem;
-  font-family: 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif;
 }
 
 .login-screen {
@@ -60,7 +59,6 @@ h3, h4 {
   color: #804040;
   font-weight: bold;
   line-height: 1.3;
-  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .bear-icon {
@@ -92,14 +90,13 @@ header {
   font-size: 1.7rem;
   font-weight: bold;
   color: #4d2c2c;
-  font-family: "M PLUS Rounded 1c", cursive;
 }
 
-.top-buttons {
+header .top-buttons {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .container {
@@ -120,7 +117,6 @@ header {
 .tasks-column h3, .right-column h3 {
   color: #ff77aa;
   font-size: 1.1rem;
-  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .task-box, .memo-box, .calendar-box {
@@ -140,29 +136,13 @@ header {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.memo-item, .okaimono-item {
+.memo-item {
   background: #fff0f7;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
   border-radius: 1rem;
   cursor: pointer;
   white-space: pre-wrap;
-  font-family: "M PLUS Rounded 1c", cursive;
-  font-size: 0.95rem;
-  color: #a05278;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-}
-
-.okaimono-section h3 {
-  text-align: center;
-  font-size: 1.4rem;
-  color: #d63384;
-  font-family: "M PLUS Rounded 1c", cursive;
-}
-
-.okaimono-buttons {
-  text-align: center;
-  margin-bottom: 0.5rem;
 }
 
 .event-item {
@@ -219,15 +199,6 @@ header {
 .calendar-area {
   margin-bottom: 2rem;
 }
-
-.event-item {
-  background: #e6faff;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 1rem;
-  cursor: pointer;
-}
-
 
 .calendar-table {
   width: 100%;
@@ -320,7 +291,6 @@ header {
   padding: 0.5rem 1rem;
   margin-bottom: 1rem;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .bubble-time {
@@ -343,15 +313,17 @@ header {
 @media (max-width: 768px) {
   .nursery-wrapper {
     flex-direction: column;
-    padding: 0; /* 追加：スマホ時は横余白を消す */
-    margin: 0;  /* 追加：上下の余白も整える */
+    padding: 0;
+    margin: 0;
   }
-
   .nursery-section,
   .okaimono-section,
   .completed-task-summary,
   .weekly-graph-section {
-    margin: 0 8px 16px 8px; /* 左右をぎゅっと詰めて、下だけ余白 */
-    width: auto; /* 幅を100%に近く */
+    margin: 0 8px 16px 8px;
+    width: auto;
+  }
+  header .top-buttons {
+    justify-content: center;
   }
 }
