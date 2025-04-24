@@ -343,6 +343,16 @@ header {
   flex-wrap: wrap;
 }
 
+.done-item {
+  font-weight: bold;
+  background-color: #ffe4f2;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 1.2em;
+  display: inline-block;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 /* 🌸 保育園と完了数を横並びにするエリア */
 .nursery-wrapper {
   display: flex;
