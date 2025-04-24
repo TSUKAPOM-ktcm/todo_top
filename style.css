@@ -21,10 +21,6 @@ button {
   cursor: pointer;
   margin: 0.3rem;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* ボタンに影 */
-  transition: transform 0.2s ease-in-out; /* ホバーアニメーション */
-}
-button:hover {
-  transform: scale(1.05); /* 少し大きくなる */
 }
 
 input, select, textarea {
@@ -196,11 +192,54 @@ header {
   margin-bottom: 2rem;
 }
 
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.calendar-table th {
+  background: #ffddee;
+  color: #804060;
+  padding: 0.6rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.calendar-table td {
+  text-align: center;
+  padding: 0.6rem;
+  border: 1px solid #ffeef2;
+  vertical-align: top;
+  height: 4.5rem;
+  font-size: 0.9rem;
+  background: #fffdfd;
+}
+
+.calendar-table td strong {
+  display: block;
+  font-weight: bold;
+  color: #d63384;
+  margin-bottom: 0.3rem;
+}
+
+.calendar-table td .nursery-time {
+  font-size: 0.75rem;
+  background: #fff0f7;
+  padding: 2px 4px;
+  border-radius: 0.5rem;
+  display: inline-block;
+  color: #6a1b9a;
+}
+
 /* 🌸 上部エリア（保育園など） */
 .nursery-wrapper {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; 
+  align-items: flex-start;
   gap: 20px;
   flex-wrap: wrap;
   margin: 20px 0;
@@ -210,19 +249,12 @@ header {
 .completed-task-summary,
 .okaimono-section,
 .weekly-graph-section {
-  background: #fffaf4; /* やさしい背景色 */
+  background: #fffaf4;
   padding: 16px;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   flex: 1;
   min-width: 240px;
-  transition: all 0.3s ease;
-}
-
-.nursery-section:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  background: #fff2ea; /* ホバー時の色 */
 }
 
 .section-title {
@@ -244,7 +276,7 @@ header {
   border-radius: 12px;
   padding: 0.5rem 1rem;
   margin-bottom: 1rem;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* 内側のぷっくり感 */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .bubble-time {
@@ -261,6 +293,12 @@ header {
 
 .nursery-buttons {
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .nursery-wrapper {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 768px) {
