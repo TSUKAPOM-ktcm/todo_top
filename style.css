@@ -60,7 +60,6 @@ h3, h4 {
   background: url('background-stars.png') no-repeat center top / cover; /* 星の背景画像 */
 }
 
-
 .app-title {
   font-size: 2.7rem; /* 大きなタイトル */
   color: #804040; /* 濃い赤茶 */
@@ -188,11 +187,6 @@ header {
   color: #804040;
 }
 
-.modal-content input[type="checkbox"] {
-  width: auto;
-  margin-right: 0.5rem;
-}
-
 .modal-buttons {
   display: flex;
   justify-content: center;
@@ -202,155 +196,6 @@ header {
 
 .calendar-area {
   margin-bottom: 2rem;
-}
-
-/* 🌸 保育園・カレンダーのスタイル */
-.nursery-section {
-  background-color: #fff5f8;
-  border: 2px dashed #ffb6c1;
-  border-radius: 20px;
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 600px;
-  text-align: center;
-  box-shadow: 2px 2px 8px rgba(255, 182, 193, 0.3);
-  font-family: 'Rounded Mplus 1c', 'Noto Sans JP', sans-serif;
-}
-
-.nursery-section h3 {
-  font-size: 1.5em;
-  color: #c2185b;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-#nurseryToday {
-  font-size: 1.3em;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  flex-direction: row;
-}
-
-#nurseryStart, #nurseryEnd {
-  background-color: #ffe3ec;
-  padding: 6px 14px;
-  border-radius: 40px;
-  font-weight: bold;
-  color: #d63384;
-  font-size: 1.1em;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-}
-
-.nursery-section button {
-  margin: 6px;
-  padding: 10px 20px;
-  background-color: #f8d7e6;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: bold;
-  color: #7d1e5f;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-  font-size: 0.95em;
-}
-
-.nursery-section button:hover {
-  background-color: #f5b8cf;
-  transform: translateY(-1px);
-}
-
-/* 📅 カレンダー表示 */
-.calendar-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 0.9em;
-  background-color: #fff0f5;
-  border-radius: 16px;
-  overflow: hidden;
-  table-layout: fixed;
-}
-
-.calendar-table th,
-.calendar-table td {
-  width: 14.28%;
-  text-align: center;
-  padding: 8px 4px;
-  border: 1px solid #ffc0cb;
-  vertical-align: top;
-  height: 75px;
-  box-sizing: border-box;
-  font-family: 'Rounded Mplus 1c', 'Noto Sans JP', sans-serif;
-}
-
-.calendar-table th {
-  background-color: #ffdeeb;
-  color: #d63384;
-  font-weight: bold;
-  font-size: 0.95em;
-}
-
-.calendar-table td {
-  background-color: #fff;
-  position: relative;
-  transition: background-color 0.2s ease;
-  font-size: 0.9em;
-}
-
-.calendar-table td:hover {
-  background-color: #fff6f9;
-}
-
-.nursery-time {
-  display: block;
-  margin-top: 4px;
-  font-size: 0.75em;
-  color: #b03060;
-  white-space: normal; /* 👈 1行に収めないようにする */
-  line-height: 1.2;
-}
-
-#prevMonth, #nextMonth {
-  margin: 0 8px;
-  padding: 8px 20px;
-  font-weight: bold;
-  background-color: #ffe4ec;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  color: #c2185b;
-  transition: background-color 0.3s ease, transform 0.2s;
-  font-size: 0.95em;
-}
-
-#prevMonth:hover, #nextMonth:hover {
-  background-color: #f8bcd0;
-  transform: scale(1.05);
-}
-
-.nursery-summary-container {
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin: 20px 0;
-  flex-wrap: wrap;
-}
-
-.done-item {
-  font-weight: bold;
-  background-color: #ffe4f2;
-  padding: 5px 10px;
-  border-radius: 20px;
-  font-size: 1.2em;
-  display: inline-block;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* 🌸 保育園と完了数を横並びにするエリア */
@@ -363,9 +208,10 @@ header {
   margin: 20px 0;
 }
 
-/* 保育園の時間表示 */
 .nursery-section,
-.completed-task-summary {
+.completed-task-summary,
+.okaimono-section,
+.weekly-graph-section {
   background: #fffaf4;
   padding: 16px;
   border-radius: 16px;
@@ -374,8 +220,15 @@ header {
   min-width: 240px;
 }
 
-/* 今日やったタスク */
-.completed-task-summary .done-item {
+.section-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #c2185b;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.done-item {
   font-weight: bold;
   font-size: 1.2em;
   margin: 8px 0;
@@ -387,12 +240,31 @@ header {
   font-family: 'Rounded Mplus 1c', 'Hiragino Maru Gothic Pro', sans-serif;
 }
 
-.cute-bubble {
-  font-family: "Rounded Mplus 1c", "ヒラギノ丸ゴ ProN", sans-serif;
-  font-size: 1.1rem;
-  color: #b45588;
+.okaimono-box {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  min-height: 60px;
 }
-/* カウント数字をぷっくりかわいく */
+
+.okaimono-item {
+  background: #ffeef2;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  white-space: pre-wrap;
+  font-weight: bold;
+  color: #b03060;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.okaimono-item.complete {
+  text-decoration: line-through;
+  color: #999;
+}
+
 .clickable-count {
   cursor: pointer;
   color: #ff69b4;
@@ -403,75 +275,12 @@ header {
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* 💕 ホバーした時にさらにふんわり */
 .clickable-count:hover {
- transform: scale(1.1);
+  transform: scale(1.1);
 }
-
-
-
-.task-daily {
-  background-color: #d4f8d4; /* マカロン風グリーン */
-}
-.task-weekly {
-  background-color: #d4ecff; /* パステルブルー */
-}
-.task-monthly {
-  background-color: #ead4ff; /* パステルパープル */
-}
-
-.cute-bubble {
-  background-color: #fffaf3;
-  border: 2px solid #f4c2c2;
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  font-family: "Zen Maru Gothic", cursive;
-  font-weight: bold;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-/* ✨ モーダル内のスクロール対応 */
-.modal-content ul {
-  max-height: 300px;
-  overflow-y: auto;
-  padding-right: 10px;
-}
-
-.modal-content ul li {
-  margin-bottom: 8px;
-  padding-left: 10px;
-  list-style-type: disc;
-}
-
 
 @media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.8rem;
-    text-align: center;
-  }
-
-  .title {
-    font-size: 1.4rem;
-    word-break: keep-all;
-    white-space: nowrap;
-  }
-
-  .top-buttons {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  .top-buttons button {
-    width: 90%;
-    margin: 0 auto;
-  }
-
-  .container {
+  .nursery-wrapper {
     flex-direction: column;
   }
+}
