@@ -1,101 +1,99 @@
 /* 👗 ページ全体の基本スタイル設定 */
 body {
   margin: 0; /* ページの余白をなくす */
-  font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic Pro", "Yu Gothic UI", sans-serif; /* 丸みのある可愛いフォント */
-  background: #fff8f2; /* ほんのりピンク系の背景色 */
-  color: #4d2c2c; /* 落ち着いた茶色の文字色 */
-  overflow-x: hidden; /* 横スクロールを無効にする */
+  font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic Pro", "Yu Gothic UI", sans-serif; /* 丸みのあるかわいいフォント */
+  background: #fff8f2; /* 優しいピンクの背景色 */
+  color: #4d2c2c; /* 茶系の落ち着いた文字色 */
+  overflow-x: hidden; /* 横スクロールを防止 */
 }
 
-/* 🫧 要素を非表示にするための共通クラス */
 .hidden {
-  display: none !important;
+  display: none !important; /* 完全に非表示にする */
 }
 
-/* 💕 ボタンの共通デザイン（丸み＆シャドウ付き） */
 button {
-  padding: 0.7rem 1.5rem; /* 内側の余白 */
-  background: #ffb6c1; /* ピンクの背景 */
+  padding: 0.7rem 1.5rem; /* 余白をとって押しやすく */
+  background: #ffb6c1; /* ピンク色ボタン */
   border: none;
-  border-radius: 1.5rem; /* 丸い角 */
+  border-radius: 1.5rem; /* 丸っこく */
   color: white;
   font-size: 1rem;
   cursor: pointer;
   margin: 0.3rem;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* ふんわり影 */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* ボタンに影 */
+  transition: transform 0.2s ease-in-out; /* ホバーアニメーション */
+}
+button:hover {
+  transform: scale(1.05); /* 少し大きくなる */
 }
 
-/* 📝 入力系の共通スタイル */
 input, select, textarea {
   font-family: inherit;
   font-size: 1rem;
-  border-radius: 1rem;
+  border-radius: 1rem; /* 入力欄も丸っこく */
   padding: 0.5rem;
-  border: 2px solid #ffddee; /* 薄いピンクのボーダー */
+  border: 2px solid #ffddee;
   background: white;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* 📝 テキストエリアは縦に伸ばせるように */
 textarea {
-  resize: vertical;
+  resize: vertical; /* 縦方向のみリサイズ可 */
 }
 
-/* ※マークを赤く */
 .required {
-  color: red;
+  color: red; /* 必須マークは赤 */
   margin-left: 0.3rem;
 }
 
-/* タイトル類の余白と太さ調整 */
 h3, h4 {
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
 .login-screen {
-  text-align: center; /* 中央寄せ */
-  padding: 4rem 1rem; /* 上下に余白たっぷり */
-  background: url('background-stars.png') no-repeat center top / cover; /* 星の背景画像 */
+  text-align: center;
+  padding: 4rem 1rem;
+  background: url('background-stars.png') no-repeat center top / cover; /* 星背景 */
 }
 
 .app-title {
-  font-size: 2.7rem; /* 大きなタイトル */
-  color: #804040; /* 濃い赤茶 */
+  font-size: 2.7rem;
+  color: #804040; /* タイトル文字色 */
   font-weight: bold;
   line-height: 1.3;
 }
 
 .bear-icon {
-  width: 120px; /* クマのアイコンサイズ */
-  margin: 1rem 0; /* 上下に余白 */
+  width: 120px;
+  margin: 1rem 0;
 }
 
 input[type="email"], input[type="password"] {
   display: block;
-  margin: 0.5rem auto; /* 中央寄せ */
-  max-width: 300px; /* 幅制限 */
+  margin: 0.5rem auto;
+  max-width: 300px;
 }
 
 .main-screen {
-  padding: 1rem; /* 全体余白 */
+  padding: 1rem;
 }
 
 header {
-  background: #ffe0ec; /* ピンク背景 */
+  background: #ffe0ec; /* ヘッダー背景 */
   padding: 1rem;
-  border-bottom: 2px dashed #ffbad2; /* 下にピンクの破線 */
+  border-bottom: 2px dashed #ffbad2; /* 下線を点線で */
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap; /* モバイル対応 */
+  flex-wrap: wrap;
   align-items: center;
 }
 
 .title {
   font-size: 1.7rem;
   font-weight: bold;
-  color: #4d2c2c; /* ダークブラウン */
+  color: #4d2c2c;
 }
 
 .container {
@@ -106,15 +104,15 @@ header {
 }
 
 .tasks-column, .right-column {
-  flex: 1 1 300px; /* 幅のベースは300px */
-  background: #fff5fa; /* 薄ピンク背景 */
+  flex: 1 1 300px;
+  background: #fff5fa;
   border: 2px dashed #ffd2e1;
   border-radius: 1rem;
   padding: 1rem;
 }
 
 .tasks-column h3, .right-column h3 {
-  color: #ff77aa; /* ピンクのタイトル文字 */
+  color: #ff77aa;
   font-size: 1.1rem;
 }
 
@@ -123,7 +121,7 @@ header {
   border-radius: 1rem;
   padding: 0.5rem;
   margin-bottom: 1rem;
-  min-height: 60px; /* ボックスの高さ */
+  min-height: 60px;
 }
 
 .task-item {
@@ -155,7 +153,7 @@ header {
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.3); /* 半透明の背景 */
+  background: rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,8 +167,8 @@ header {
   width: 90%;
   max-width: 500px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  max-height: 80vh; /* 高さ制限を追加！ */
-  overflow-y: auto; /* 内容が多いときにスクロール */
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .modal-content h3 {
@@ -198,7 +196,7 @@ header {
   margin-bottom: 2rem;
 }
 
-/* 🌸 保育園と完了数を横並びにするエリア */
+/* 🌸 上部エリア（保育園など） */
 .nursery-wrapper {
   display: flex;
   justify-content: space-between;
@@ -212,75 +210,61 @@ header {
 .completed-task-summary,
 .okaimono-section,
 .weekly-graph-section {
-  background: #fffaf4;
+  background: #fffaf4; /* やさしい背景色 */
   padding: 16px;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   flex: 1;
   min-width: 240px;
+  transition: all 0.3s ease;
+}
+
+.nursery-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: #fff2ea; /* ホバー時の色 */
 }
 
 .section-title {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: bold;
-  color: #c2185b;
+  color: #d63384;
   margin-bottom: 1rem;
   text-align: center;
 }
 
-.done-item {
+#nurseryToday {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
   font-weight: bold;
-  font-size: 1.2em;
-  margin: 8px 0;
-  color: #444;
-  background: #f3f8ff;
-  padding: 6px 10px;
+  color: #6a1b9a;
+  background: #fce4ec;
   border-radius: 12px;
-  box-shadow: inset 1px 1px 3px #ccc;
-  font-family: 'Rounded Mplus 1c', 'Hiragino Maru Gothic Pro', sans-serif;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* 内側のぷっくり感 */
 }
 
-.okaimono-box {
-  background: #ffffff;
-  border-radius: 1rem;
-  padding: 0.5rem;
-  margin-top: 1rem;
-  min-height: 60px;
-}
-
-.okaimono-item {
-  background: #ffeef2;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 1rem;
-  cursor: pointer;
-  white-space: pre-wrap;
+.bubble-time {
+  font-size: 1.5rem;
   font-weight: bold;
-  color: #b03060;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  padding: 0 0.5rem;
 }
 
-.okaimono-item.complete {
-  text-decoration: line-through;
-  color: #999;
+.tilde {
+  font-size: 1.3rem;
+  padding: 0 0.5rem;
+  color: #a4608f;
 }
 
-.clickable-count {
-  cursor: pointer;
-  color: #ff69b4;
-  font-weight: bold;
-  padding: 4px 8px;
-  border-radius: 10px;
-  background-color: #fff0f5;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-.clickable-count:hover {
-  transform: scale(1.1);
+.nursery-buttons {
+  text-align: center;
 }
 
 @media (max-width: 768px) {
   .nursery-wrapper {
-    flex-direction: column;
+    flex-direction: column; /* モバイル対応 */
   }
 }
