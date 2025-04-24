@@ -1,17 +1,6 @@
 　// Firestoreの db は HTML 側で初期化されている前提です　
 const db = window.db;
 
-// 🔧 完了に更新されたとき completedAt をセット
-function updateTaskStatusToCompleted(taskId, updateData) {
-  if (updateData.status === "完了") {
-    updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
-  }
-  return db.collection("tasks").doc(taskId).update(updateData)
-    .then(() => {
-      renderTodayCompletedTasksCount(); // ← 🧸✨ここを追加！
-    });
-}
-
 // 🔐 ログイン処理
 function login() {
   const email = document.getElementById("email").value;
@@ -36,10 +25,28 @@ function login() {
       alert("ログインに失敗しました");
     });
 }
+// ページ読み込み時に初期状態を設定
 window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("mainScreen").classList.add("hidden");
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
   document.getElementById("loginBtn").addEventListener("click", login);
 });
 
+// 🔧 ログイン後の初期化処理（描画やリアルタイム監視）
+function initializeAfterLogin() {
+  renderTodayNursery();
+  renderTodayCompletedTasksCount();
+  renderOkaimonoList();
+
+  // ログイン後のみリアルタイム同期を開始
+  db.collection("tasks").onSnapshot(renderTasksFromSnapshot);
+  db.collection("events").onSnapshot(renderEventsFromSnapshot);
+  db.collection("memos").onSnapshot(renderMemosFromSnapshot);
+}
+  
 // 🔸今日の保育園時間を表示する
 function renderTodayNursery() {
   const today = new Date();
@@ -322,6 +329,18 @@ function showModal(type) {
       }
     });
   }
+
+  // 🔧 タスクが完了に更新されたとき completedAt をセット
+function updateTaskStatusToCompleted(taskId, updateData) {
+  if (updateData.status === "完了") {
+    updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
+  }
+  return db.collection("tasks").doc(taskId).update(updateData)
+    .then(() => {
+      renderTodayCompletedTasksCount(); // ← 🧸✨ここを追加！
+    });
+}
+  
 // 伝言メモ追加
   else if (type === "memo") {
     modalContent.innerHTML = `
@@ -370,12 +389,6 @@ function showModal(type) {
 }
 window.showModal = showModal;
 
-// ページ読み込み時のモーダル初期化とFirestoreの同期設定
-window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("modal").classList.add("hidden");
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("memoViewModal").classList.add("hidden");
-  document.getElementById("memoViewModal").style.display = "none";
 
 db.collection("tasks").onSnapshot((snapshot) => {
   const taskContainers = document.querySelectorAll("[id^='tasks-']");
