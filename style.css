@@ -90,13 +90,17 @@ header {
   font-size: 1.7rem;
   font-weight: bold;
   color: #4d2c2c;
+  white-space: nowrap; /* ← これを追加！ */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 header .top-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 0.5rem;
+  justify-content: center;
 }
 
 .container {
@@ -311,19 +315,38 @@ header .top-buttons {
 }
 
 @media (max-width: 768px) {
-  .nursery-wrapper {
-    flex-direction: column;
+  header .top-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  header .top-buttons button {
+    flex: 1 1 auto;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  body {
     padding: 0;
     margin: 0;
   }
+
+  .main-screen {
+    padding: 0.5rem;
+  }
+
+  .nursery-wrapper {
+    margin: 0;
+  }
+
   .nursery-section,
   .okaimono-section,
   .completed-task-summary,
   .weekly-graph-section {
-    margin: 0 8px 16px 8px;
-    width: auto;
-  }
-  header .top-buttons {
-    justify-content: center;
+    margin: 0 auto 16px auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
