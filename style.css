@@ -285,6 +285,34 @@ header .top-buttons {
   min-width: 240px;
 }
 
+.okaimono-box {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  min-height: 60px;
+}
+
+.okaimono-item {
+  background: #fff0f7;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 1rem;
+  font-family: "M PLUS Rounded 1c", cursive;
+  font-size: 0.95rem;
+  color: #804040;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  white-space: pre-wrap;
+  cursor: pointer;
+}
+
+.okaimono-item.complete {
+  text-decoration: line-through;
+  color: #aaa;
+  background: #f7f7f7;
+}
+
 .section-title {
   font-size: 1.4rem;
   font-weight: bold;
