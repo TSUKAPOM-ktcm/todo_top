@@ -46,6 +46,7 @@ textarea {
 h3, h4 {
   font-weight: bold;
   margin-bottom: 0.5rem;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .login-screen {
@@ -59,6 +60,7 @@ h3, h4 {
   color: #804040;
   font-weight: bold;
   line-height: 1.3;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .bear-icon {
@@ -90,13 +92,14 @@ header {
   font-size: 1.7rem;
   font-weight: bold;
   color: #4d2c2c;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .top-buttons {
-display: flex;
-flex-wrap: wrap;
-align-items: center;
-gap: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .container {
@@ -117,6 +120,7 @@ gap: 0.5rem;
 .tasks-column h3, .right-column h3 {
   color: #ff77aa;
   font-size: 1.1rem;
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .task-box, .memo-box, .calendar-box {
@@ -136,13 +140,17 @@ gap: 0.5rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.memo-item, .okaimono-item{
+.memo-item, .okaimono-item {
   background: #fff0f7;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
   border-radius: 1rem;
   cursor: pointer;
   white-space: pre-wrap;
+  font-family: "M PLUS Rounded 1c", cursive;
+  font-size: 0.95rem;
+  color: #a05278;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .okaimono-section h3 {
@@ -220,52 +228,6 @@ gap: 0.5rem;
   cursor: pointer;
 }
 
-.modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.modal-content {
-  background: #fff0f7;
-  border-radius: 1.5rem;
-  padding: 2rem;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.modal-content h3 {
-  text-align: center;
-  font-size: 1.3rem;
-  color: #804040;
-  margin-bottom: 1rem;
-  font-family: "M PLUS Rounded 1c", cursive;
-}
-
-.modal-content label {
-  display: block;
-  margin: 0.7rem 0 0.2rem;
-  font-weight: bold;
-  color: #804040;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.calendar-area {
-  margin-bottom: 2rem;
-}
 
 .calendar-table {
   width: 100%;
@@ -358,6 +320,7 @@ gap: 0.5rem;
   padding: 0.5rem 1rem;
   margin-bottom: 1rem;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  font-family: "M PLUS Rounded 1c", cursive;
 }
 
 .bubble-time {
