@@ -171,7 +171,6 @@ function showOkaimonoEditModal(id, data) {
         <button type="button" onclick="hideModal()">キャンセル</button>
         <button type="submit">保存</button>
         <button type="button" id="deleteOkaimonoBtn">削除</button>
-        <button type="button" id="completeOkaimonoBtn">完了</button>
       </div>
     </form>
   `;
