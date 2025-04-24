@@ -417,11 +417,26 @@ function renderTasksFromSnapshot(snapshot) {
     "都度": 5
   };
 
+  function getDailySubOrder(taskName) {
+  if (taskName.startsWith("【毎日】朝_")) return 1;
+  if (taskName.startsWith("【毎日】昼_")) return 2;
+  if (taskName.startsWith("【毎日】夕夜_")) return 3;
+  return 4; // その他
+}
+
   tasks.sort((a, b) => {
     const orderA = frequencyOrder[a.frequency] ?? 99;
     const orderB = frequencyOrder[b.frequency] ?? 99;
-    return orderA - orderB;
-  });
+    if (freqA !== freqB) return freqA - freqB;
+// 毎日タスクの場合、サブ順で比較
+  if (a.frequency === "毎日" && b.frequency === "毎日") {
+    const subA = getDailySubOrder(a.name);
+    const subB = getDailySubOrder(b.name);
+    return subA - subB;
+  }
+
+  return 0; // 頻度が同じで毎日でもなければ順番そのまま
+});
 
   tasks.forEach(data => {
     const id = data.id;
