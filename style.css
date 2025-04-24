@@ -336,6 +336,10 @@ header .top-buttons {
     padding: 0.5rem;
   }
 
+    header {
+    margin-bottom: 1rem; /* ← タイトルと保育園エリアの間に余白追加 */
+  }
+
   .nursery-wrapper {
     margin: 0;
   }
@@ -348,5 +352,15 @@ header .top-buttons {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+  }
+
+    .calendar-table th,
+  .calendar-table td {
+    font-size: 0.7rem; /* ← 被り対策でフォント少し小さく */
+    padding: 0.4rem;   /* ← パディング調整で高さを抑える */
+  }
+
+  .calendar-table td {
+    height: 4rem; /* ← 縦の高さもややコンパクトに */
   }
 }
