@@ -140,6 +140,18 @@ header .top-buttons {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.task-daily {
+  background: #d4f8d4;
+}
+
+.task-weekly {
+  background: #d0eaff;
+}
+
+.task-monthly {
+  background: #f3ddff;
+}
+
 .memo-item {
   background: #fff0f7;
   padding: 0.5rem;
