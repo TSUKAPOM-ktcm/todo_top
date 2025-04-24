@@ -1,10 +1,10 @@
 /* 👗 ページ全体の基本スタイル設定 */
 body {
   margin: 0;
-  font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic Pro", "Yu Gothic UI", sans-serif;
   background: #fff8f2;
   color: #4d2c2c;
   overflow-x: hidden;
+  font-family: 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif;
 }
 
 .hidden {
@@ -46,7 +46,7 @@ textarea {
 h3, h4 {
   font-weight: bold;
   margin-bottom: 0.5rem;
-  font-family: "M PLUS Rounded 1c", cursive;
+  font-family: 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif;
 }
 
 .login-screen {
