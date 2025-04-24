@@ -343,5 +343,15 @@ header {
 @media (max-width: 768px) {
   .nursery-wrapper {
     flex-direction: column;
+    padding: 0; /* 追加：スマホ時は横余白を消す */
+    margin: 0;  /* 追加：上下の余白も整える */
+  }
+
+  .nursery-section,
+  .okaimono-section,
+  .completed-task-summary,
+  .weekly-graph-section {
+    margin: 0 8px 16px 8px; /* 左右をぎゅっと詰めて、下だけ余白 */
+    width: auto; /* 幅を100%に近く */
   }
 }
