@@ -14,8 +14,7 @@ function login() {
       if (!querySnapshot.empty) {
         document.getElementById("loginScreen").classList.add("hidden");
         document.getElementById("mainScreen").classList.remove("hidden");
-        renderTodayNursery(); // 🔸ログイン後に今日の保育園時間を表示
-        renderTodayCompletedTasksCount(); // 🔸ログイン後に今日のタスク完了数を表示
+        initializeAfterLogin();
       } else {
         alert("IDかパスワードが違います");
       }
@@ -40,11 +39,32 @@ function initializeAfterLogin() {
   renderTodayNursery();
   renderTodayCompletedTasksCount();
   renderOkaimonoList();
-
   // ログイン後のみリアルタイム同期を開始
   db.collection("tasks").onSnapshot(renderTasksFromSnapshot);
   db.collection("events").onSnapshot(renderEventsFromSnapshot);
   db.collection("memos").onSnapshot(renderMemosFromSnapshot);
+}
+
+  // 🔧 タスクが完了に更新されたとき completedAt をセット
+function updateTaskStatusToCompleted(taskId, updateData) {
+  if (updateData.status === "完了") {
+    updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
+  }
+  return db.collection("tasks").doc(taskId).update(updateData)
+    .then(() => {
+      renderTodayCompletedTasksCount(); // ← 🧸✨ここを追加！
+    });
+}
+
+// モーダル非表示関数
+function hideModal() {
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
+}
+
+function hideMemoModal() {
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
 }
   
 // 🔸今日の保育園時間を表示する
@@ -231,10 +251,6 @@ function showDoneTasksModal(assignee, list) {
 
 window.showDoneTasksModal = showDoneTasksModal;
 
-function formatTime(date) {
-  if (!date) return "--:--";
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-}
 
 // 💖 タスクアイテムにかわいい色をつける（毎日→グリーン、毎週→ブルー、毎月→パープル）
 function getTaskColorClass(frequency) {
@@ -330,16 +346,6 @@ function showModal(type) {
     });
   }
 
-  // 🔧 タスクが完了に更新されたとき completedAt をセット
-function updateTaskStatusToCompleted(taskId, updateData) {
-  if (updateData.status === "完了") {
-    updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
-  }
-  return db.collection("tasks").doc(taskId).update(updateData)
-    .then(() => {
-      renderTodayCompletedTasksCount(); // ← 🧸✨ここを追加！
-    });
-}
   
 // 伝言メモ追加
   else if (type === "memo") {
@@ -834,19 +840,20 @@ function addMemoFromForm(e) {
 }
 
 
-// モーダル非表示関数
-function hideModal() {
-  document.getElementById("modal").classList.add("hidden");
-  document.getElementById("modal").style.display = "none";
-}
-
-function hideMemoModal() {
-  document.getElementById("memoViewModal").classList.add("hidden");
-  document.getElementById("memoViewModal").style.display = "none";
-}
-
 
 // 判定用補助関数
+function formatTime(date) {
+  if (!date) return "--:--";
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function getTaskColorClass(frequency) {
+  if (frequency.includes("毎日")) return "task-daily";
+  if (frequency.includes("毎週")) return "task-weekly";
+  if (frequency.includes("毎月")) return "task-monthly";
+  return "";
+}
+
 function isSameWeek(date, reference) {
   const ref = new Date(reference);
   const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
