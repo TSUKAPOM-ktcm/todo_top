@@ -997,26 +997,21 @@ function openNurseryCalendarModal() {
     const endDate = `${y}-${monthStr}-${String(totalDays).padStart(2, '0')}`;
 
     fetchNurseryDataIfNeeded(selectedYear, selectedMonth).then(monthData => {
-  snapshot.forEach(doc => {
-    const date = doc.id;
-    if (date >= startDate && date <= endDate) {
-      const cell = document.getElementById("day-" + date);
-      if (cell) {
-        const d = monthData[date];
-        const label = (!d.start && !d.end) ? "休" : `${d.start}〜${d.end}`;
-        const timeSpan = cell.querySelector(".nursery-time");
-        if (timeSpan) {
-          timeSpan.textContent = label;
-        }
-        if (label !== "") {
-          cell.style.cursor = "pointer";
-          cell.onclick = () => window.openNurseryEditModalByDate(date);
-        }
+  Object.entries(monthData).forEach(([date, d]) => {
+    const cell = document.getElementById("day-" + date);
+    if (cell) {
+      const label = (!d.start && !d.end)
+        ? "休" // ← お休みの表示も修正済みバージョン
+        : (d.start && d.end) ? `${d.start}〜${d.end}` : "";
+      const timeSpan = cell.querySelector(".nursery-time");
+      if (timeSpan) timeSpan.textContent = label;
+      if (label !== "") {
+        cell.style.cursor = "pointer";
+        cell.onclick = () => window.openNurseryEditModalByDate(date);
       }
     }
   });
 });
-  }
 }
 
 // 🔧 今日の日付の保育園時間を編集するモーダルを開く
@@ -1030,7 +1025,6 @@ function openNurseryEditModal() {
 }
 window.openNurseryEditModal = openNurseryEditModal;
 
-// 🔧 任意の日付の保育園時間を編集するモーダルを開く
 function openNurseryEditModalByDate(dateStr) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -1049,21 +1043,42 @@ function openNurseryEditModalByDate(dateStr) {
     </form>
   `;
 
-  // Firestoreから既存データを読み込み
- db.collection("nursery").doc(dateStr).set({
-  start: start || null,
-  end: end || null,
-  updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-}).then(() => {
-  const y = parseInt(dateStr.split("-")[0]);
-  const m = parseInt(dateStr.split("-")[1]) - 1;
-  const key = `${y}-${m}`;
-  if (nurseryCache[key]) {
-    nurseryCache[key][dateStr] = { start: start || null, end: end || null };
-  }
-  renderTodayNursery(); // メイン画面の表示更新
-  hideModal();
-});
+  // 🔽 Firestoreから既存データを読み取って、モーダルに反映！
+  db.collection("nursery").doc(dateStr).get().then((doc) => {
+    if (doc.exists) {
+      const data = doc.data();
+      if (data.start) {
+        document.getElementById("editNurseryStart").value = data.start.padStart(5, '0');
+      }
+      if (data.end) {
+        document.getElementById("editNurseryEnd").value = data.end.padStart(5, '0');
+      }
+    }
+  });
+
+  // ✅ 🔧「保存」ボタンが押されたときに書き込む処理！
+  document.getElementById("editNurseryForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const start = document.getElementById("editNurseryStart").value;
+    const end = document.getElementById("editNurseryEnd").value;
+
+    db.collection("nursery").doc(dateStr).set({
+      start: start || null,
+      end: end || null,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      const y = parseInt(dateStr.split("-")[0]);
+      const m = parseInt(dateStr.split("-")[1]) - 1;
+      const key = `${y}-${m}`;
+      if (window.nurseryCache?.[key]) {
+        nurseryCache[key][dateStr] = { start: start || null, end: end || null };
+      }
+      renderTodayNursery();
+      hideModal();
+    });
+  });
+}
+
 
 function renderWeeklyCompletedTasksChart() {
   const today = new Date();
