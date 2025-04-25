@@ -212,11 +212,6 @@ function showOkaimonoEditModal(id, data) {
     hideModal();
   };
 
-  document.getElementById("completeOkaimonoBtn").onclick = () => {
-    db.collection("okaimono").doc(id).update({ complete: true });
-    hideModal();
-  };
-}
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 
 // 🔸 担当者別・今日の完了タスク数を表示
