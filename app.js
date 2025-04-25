@@ -167,15 +167,33 @@ function renderOkaimonoList() {
   if (!container) return;
   container.innerHTML = "";
 
-db.collection("okaimono").where("delete", "!=", true).get().then((snapshot) => {
-  container.innerHTML = "";
-  snapshot.forEach(doc => {
+  db.collection("okaimono").where("delete", "!=", true).onSnapshot((snapshot) => {
+    snapshot.docChanges().forEach(change => {
+      const doc = change.doc;
       const data = doc.data();
+      const id = doc.id;
+
+      const existing = container.querySelector(`[data-id="${id}"]`);
+
+      // 削除されたら要素を消す
+      if (change.type === "removed" || data.delete === true) {
+        existing?.remove();
+        return;
+      }
+
+      // 更新や追加の場合は要素を再描画
       const div = document.createElement("div");
       div.className = "okaimono-item" + (data.complete ? " complete" : "");
       div.textContent = data.text;
-      div.onclick = () => showOkaimonoEditModal(doc.id, data);
-      container.appendChild(div);
+      div.dataset.id = id;
+      div.onclick = () => showOkaimonoEditModal(id, data);
+
+      // 既存があれば置き換え、新規なら追加
+      if (existing) {
+        container.replaceChild(div, existing);
+      } else {
+        container.appendChild(div);
+      }
     });
   });
 }
@@ -476,25 +494,34 @@ function renderTasksFromSnapshot(snapshot) {
 
 
 
-  function renderEventsFromSnapshot(snapshot) {
-  document.getElementById("calendar-week").innerHTML = "";
-  document.getElementById("calendar-month").innerHTML = "";
-  document.getElementById("calendar-future").innerHTML = "";
+ function renderEventsFromSnapshot(snapshot) {
+  const weekEl = document.getElementById("calendar-week");
+  const monthEl = document.getElementById("calendar-month");
+  const futureEl = document.getElementById("calendar-future");
+
+  if (!weekEl || !monthEl || !futureEl) return;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  snapshot.forEach(doc => {
+  snapshot.docChanges().forEach(change => {
+    const doc = change.doc;
     const data = doc.data();
+    const id = doc.id;
+
+    // 削除または削除フラグ付きなら remove
+    if (change.type === "removed" || data.deleted) {
+      document.querySelector(`[data-id='${id}']`)?.remove();
+      return;
+    }
+
     const eventDate = new Date(data.date + "T00:00:00");
-    if (eventDate < today || data.deleted) return;
+    if (eventDate < today) return; // 昨日以前は無視
 
-    const existing = document.querySelector(`[data-id='${doc.id}']`);
-    if (existing) existing.remove();
-
+    // 表示エレメント作成
     const event = document.createElement("div");
     event.className = "event-item";
-    event.dataset.id = doc.id;
+    event.dataset.id = id;
     event.dataset.date = data.date;
     event.dataset.hour = data.hour;
     event.dataset.minute = data.minute;
@@ -505,43 +532,68 @@ function renderTasksFromSnapshot(snapshot) {
     event.innerHTML = `<strong>${data.date}</strong> ${time} - ${data.content}`;
     event.onclick = () => openEditEventModal(event);
 
-    if (isSameWeek(eventDate, today)) {
-      document.getElementById("calendar-week").appendChild(event);
-    } else if (isSameMonth(eventDate, today)) {
-      document.getElementById("calendar-month").appendChild(event);
-    } else if (isNextMonthOrLater(eventDate, today)) {
-      document.getElementById("calendar-future").appendChild(event);
+    // 既存があれば差し替え
+    const existing = document.querySelector(`[data-id='${id}']`);
+    if (existing) {
+      existing.replaceWith(event);
+    } else {
+      if (isSameWeek(eventDate, today)) {
+        weekEl.appendChild(event);
+      } else if (isSameMonth(eventDate, today)) {
+        monthEl.appendChild(event);
+      } else if (isNextMonthOrLater(eventDate, today)) {
+        futureEl.appendChild(event);
+      }
     }
   });
 }
 
-function renderMemosFromSnapshot(snapshot) {
-  document.getElementById("memos").innerHTML = "";
 
-  snapshot.forEach(doc => {
+function renderMemosFromSnapshot(snapshot) {
+  const container = document.getElementById("memos");
+  if (!container) return;
+
+  snapshot.docChanges().forEach(change => {
+    const doc = change.doc;
     const data = doc.data();
     const id = doc.id;
-    if (data.deleted) return;
 
-    const memo = document.createElement("div");
-    memo.className = "memo-item";
-    memo.dataset.full = data.text;
-    memo.textContent = data.text.length > 100 ? data.text.slice(0, 100) + "…" : data.text;
+    // 削除 or 削除フラグ付きなら削除
+    if (change.type === "removed" || data.deleted) {
+      const existing = container.querySelector(`[data-id="${id}"]`);
+      existing?.remove();
+      return;
+    }
 
-    memo.onclick = () => {
+    const displayText = data.text.length > 100 ? data.text.slice(0, 100) + "…" : data.text;
+
+    const memoDiv = document.createElement("div");
+    memoDiv.className = "memo-item";
+    memoDiv.dataset.id = id; // ← これが差分描画で必要！
+    memoDiv.dataset.full = data.text;
+    memoDiv.textContent = displayText;
+
+    memoDiv.onclick = () => {
       document.getElementById("fullMemoText").textContent = data.text;
       document.getElementById("memoViewModal").classList.remove("hidden");
       document.getElementById("memoViewModal").style.display = "flex";
       document.getElementById("deleteMemoBtn").onclick = () => {
         db.collection("memos").doc(id).update({ deleted: true });
-        memo.remove();
+        memoDiv.remove(); // ← 自前で即時削除
         hideMemoModal();
       };
     };
 
-    document.getElementById("memos").appendChild(memo);
+    // すでに存在すれば差し替え、なければ追加
+    const existing = container.querySelector(`[data-id="${id}"]`);
+    if (existing) {
+      container.replaceChild(memoDiv, existing);
+    } else {
+      container.appendChild(memoDiv);
+    }
   });
 }
+
 
 
 function addTaskFromForm(e) {
