@@ -234,32 +234,32 @@ function showOkaimonoEditModal(id, data) {
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 
 // 🔸 担当者別・今日の完了タスク数を表示
-function renderTodayCompletedTasksCount() {
+function setupTodayCompletedTasksListener() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
-
-  const counts = {
-    つみき: [],
-    ぬみき: []
-  };
 
   db.collection("tasks")
     .where("status", "==", "完了")
     .where("completedAt", ">=", today)
     .where("completedAt", "<=", endOfToday)
-    .get()
-    .then(snapshot => {
+    .onSnapshot((snapshot) => {
+      const counts = {
+        つみき: [],
+        ぬみき: []
+      };
+
       snapshot.forEach(doc => {
         const data = doc.data();
         if (data.assignee === "つみき" || data.assignee === "ぬみき") {
-          counts[data.assignee].push({ name: data.name, time: formatTime(data.completedAt?.toDate()) });
+          counts[data.assignee].push({
+            name: data.name,
+            time: formatTime(data.completedAt?.toDate())
+          });
         }
       });
 
-      // 表示を更新
       document.getElementById("done-tsumiki-count").textContent = counts.つみき.length;
       document.getElementById("done-numiki-count").textContent = counts.ぬみき.length;
 
@@ -267,6 +267,7 @@ function renderTodayCompletedTasksCount() {
       document.getElementById("done-numiki-count").onclick = () => showDoneTasksModal("ぬみき", counts.ぬみき);
     });
 }
+
 
 function showDoneTasksModal(assignee, list) {
   const modal = document.getElementById("modal");
