@@ -229,6 +229,7 @@ function showOkaimonoEditModal(id, data) {
     db.collection("okaimono").doc(id).update({ delete: true });
     hideModal();
   };
+}
 
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 
