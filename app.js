@@ -982,7 +982,7 @@ function openNurseryCalendarModal() {
   let selectedMonth = currentMonth;
 
   renderNurseryCalendar(selectedYear, selectedMonth);
-
+}
   function renderNurseryCalendar(y, m) {
     selectedYear = y;
     selectedMonth = m;
