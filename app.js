@@ -136,6 +136,99 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("loginBtn").addEventListener("click", login);
 });
 
+function addMemoFromForm(e) {
+  e.preventDefault();
+  const text = document.getElementById("memoText").value.trim();
+  if (!text) return;
+
+  const memo = document.createElement("div");
+  memo.className = "memo-item";
+  memo.textContent = text.length > 100 ? text.slice(0, 100) + "…" : text;
+  memo.dataset.full = text;
+
+  memo.onclick = () => {
+    document.getElementById("fullMemoText").textContent = text;
+    document.getElementById("memoViewModal").classList.remove("hidden");
+    document.getElementById("memoViewModal").style.display = "flex";
+    document.getElementById("deleteMemoBtn").onclick = () => {
+      memo.remove();
+      hideMemoModal();
+    };
+  };
+
+  document.getElementById("memos").appendChild(memo);
+
+    // Firestoreに保存
+  db.collection("memos").add({
+    text,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    console.log("Firestoreにメモを保存しました");
+  }).catch((error) => {
+    console.error("Firestoreメモ保存エラー:", error);
+  });
+  
+  hideModal();
+}
+
+function addEventFromForm(e) {
+  e.preventDefault();
+  const date = document.getElementById("eventDate").value;
+  const hour = document.getElementById("eventHour").value;
+  const minute = document.getElementById("eventMinute").value;
+  const content = document.getElementById("eventContent").value;
+  const note = document.getElementById("eventNote").value;
+
+  if (!date || !content.trim()) return;
+
+  const eventDate = new Date(date + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  if (eventDate <= yesterday) {
+    hideModal(); // 昨日以前は無視
+    return;
+  }
+
+  const event = document.createElement("div");
+  event.className = "event-item";
+  event.dataset.date = date;
+  event.dataset.hour = hour;
+  event.dataset.minute = minute;
+  event.dataset.content = content;
+  event.dataset.note = note;
+
+  const time = hour && minute ? `${hour}:${minute}` : "";
+  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
+  event.onclick = () => openEditEventModal(event);
+
+  if (isSameWeek(eventDate, today)) {
+    document.getElementById("calendar-week").appendChild(event);
+  } else if (isSameMonth(eventDate, today)) {
+    document.getElementById("calendar-month").appendChild(event);
+  } else if (isNextMonthOrLater(eventDate, today)) {
+    document.getElementById("calendar-future").appendChild(event);
+  }
+
+    // Firestoreに保存
+  db.collection("events").add({
+    date,
+    hour,
+    minute,
+    content,
+    note,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    console.log("Firestoreに予定を保存しました");
+  }).catch((error) => {
+    console.error("Firestore予定保存エラー:", error);
+  });
+
+  hideModal();
+}
+
 function getTaskColorClass(frequency) {
   if (frequency.includes("毎日")) return "task-daily";
   if (frequency.includes("毎週")) return "task-weekly";
@@ -486,6 +579,7 @@ function showModal(type) {
       }
     });
   }
+
 
   
 // 伝言メモ追加
@@ -838,64 +932,6 @@ updateTaskStatusToCompleted(id, {
 window.openEditTaskModal = openEditTaskModal;
 
 
-function addEventFromForm(e) {
-  e.preventDefault();
-  const date = document.getElementById("eventDate").value;
-  const hour = document.getElementById("eventHour").value;
-  const minute = document.getElementById("eventMinute").value;
-  const content = document.getElementById("eventContent").value;
-  const note = document.getElementById("eventNote").value;
-
-  if (!date || !content.trim()) return;
-
-  const eventDate = new Date(date + "T00:00:00");
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-
-  if (eventDate <= yesterday) {
-    hideModal(); // 昨日以前は無視
-    return;
-  }
-
-  const event = document.createElement("div");
-  event.className = "event-item";
-  event.dataset.date = date;
-  event.dataset.hour = hour;
-  event.dataset.minute = minute;
-  event.dataset.content = content;
-  event.dataset.note = note;
-
-  const time = hour && minute ? `${hour}:${minute}` : "";
-  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
-  event.onclick = () => openEditEventModal(event);
-
-  if (isSameWeek(eventDate, today)) {
-    document.getElementById("calendar-week").appendChild(event);
-  } else if (isSameMonth(eventDate, today)) {
-    document.getElementById("calendar-month").appendChild(event);
-  } else if (isNextMonthOrLater(eventDate, today)) {
-    document.getElementById("calendar-future").appendChild(event);
-  }
-
-    // Firestoreに保存
-  db.collection("events").add({
-    date,
-    hour,
-    minute,
-    content,
-    note,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    console.log("Firestoreに予定を保存しました");
-  }).catch((error) => {
-    console.error("Firestore予定保存エラー:", error);
-  });
-
-  hideModal();
-}
-
 function openEditEventModal(eventDiv) {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
@@ -994,40 +1030,6 @@ function openEditEventModal(eventDiv) {
 
 
 
-function addMemoFromForm(e) {
-  e.preventDefault();
-  const text = document.getElementById("memoText").value.trim();
-  if (!text) return;
-
-  const memo = document.createElement("div");
-  memo.className = "memo-item";
-  memo.textContent = text.length > 100 ? text.slice(0, 100) + "…" : text;
-  memo.dataset.full = text;
-
-  memo.onclick = () => {
-    document.getElementById("fullMemoText").textContent = text;
-    document.getElementById("memoViewModal").classList.remove("hidden");
-    document.getElementById("memoViewModal").style.display = "flex";
-    document.getElementById("deleteMemoBtn").onclick = () => {
-      memo.remove();
-      hideMemoModal();
-    };
-  };
-
-  document.getElementById("memos").appendChild(memo);
-
-    // Firestoreに保存
-  db.collection("memos").add({
-    text,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    console.log("Firestoreにメモを保存しました");
-  }).catch((error) => {
-    console.error("Firestoreメモ保存エラー:", error);
-  });
-  
-  hideModal();
-}
 
 
 
@@ -1271,5 +1273,9 @@ function fetchNurseryDataIfNeeded(y, m) {
 }
 
 
+window.openNurseryCalendarModal = openNurseryCalendarModal;
+window.openNurseryEditModal = openNurseryEditModal;
+window.addMemoFromForm = addMemoFromForm;
+window.addEventFromForm = addEventFromForm;
 window.openNurseryEditModalByDate = openNurseryEditModalByDate;
-}
+
