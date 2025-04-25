@@ -243,7 +243,9 @@ function initializeAfterLogin() {
   renderTodayNursery();
   setupTodayCompletedTasksListener();
   renderOkaimonoList();
+  /*軽量化のためにコメントアウト
   renderWeeklyGraph();
+  */
   // ✅ 差分描画：tasks の変更だけ反映！
   db.collection("tasks").onSnapshot((snapshot) => {
     snapshot.docChanges().forEach(change => {
