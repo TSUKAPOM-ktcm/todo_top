@@ -39,7 +39,7 @@ window.addEventListener("DOMContentLoaded", () => {
 // 🔧 ログイン後の初期化処理（描画やリアルタイム監視）
 function initializeAfterLogin() {
   renderTodayNursery();
-  renderTodayCompletedTasksCount();
+  setupTodayCompletedTasksListener();
   renderOkaimonoList();
   renderWeeklyGraph();
   // ✅ 差分描画：tasks の変更だけ反映！
@@ -74,10 +74,7 @@ function updateTaskStatusToCompleted(taskId, updateData) {
   if (updateData.status === "完了") {
     updateData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
   }
-  return db.collection("tasks").doc(taskId).update(updateData)
-    .then(() => {
-      renderTodayCompletedTasksCount(); // ← 🧸✨ここを追加！
-    });
+  return db.collection("tasks").doc(taskId).update(updateData);
 }
 
 // モーダル非表示関数
@@ -701,19 +698,16 @@ function openEditTaskModal(task) {
     const newNote = document.getElementById("editNote").value;
     const id = task.dataset.id;
 
- updateTaskStatusToCompleted(id, {
-    status: newStatus,
-    assignee: newAssignee,
-    dueDate: newDueDate || null,
-    note: newNote || ""
-  }).then(() => {
-    // ✅ ここにリアルタイム更新したい処理を書く！
-    renderTodayCompletedTasksCount(); // ← これで即反映される！
-    hideModal();
-  }).catch((error) => {
-    console.error("更新エラー:", error);
-  });
-};
+updateTaskStatusToCompleted(id, {
+  status: newStatus,
+  assignee: newAssignee,
+  dueDate: newDueDate || null,
+  note: newNote || ""
+}).then(() => {
+  hideModal(); // モーダル閉じるだけでOK！
+}).catch((error) => {
+  console.error("更新エラー:", error);
+});
     
   // 🗑削除ボタン処理
   document.getElementById("deleteTaskBtn").addEventListener("click", () => {
