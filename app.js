@@ -3,6 +3,38 @@ const db = window.db;
 // 保育園情報のデータ連携超過を防ぐため、キャッシュ用意
 let nurseryCache = {};
 
+function renderWeeklyGraph() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+
+  const counts = {};
+
+  db.collection("tasks")
+    .where("status", "==", "完了")
+    .where("completedAt", ">=", weekStart)
+    .where("completedAt", "<=", weekEnd)
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const dateStr = data.completedAt?.toDate().toISOString().split("T")[0];
+        const assignee = data.assignee || "未設定";
+        if (!counts[dateStr]) counts[dateStr] = { "つみき": 0, "ぬみき": 0 };
+        if (assignee === "つみき" || assignee === "ぬみき") {
+          counts[dateStr][assignee]++;
+        }
+      });
+
+      drawWeeklyBarGraph(counts);
+    });
+}
+
 // 🔐 ログイン処理
 function login() {
   const email = document.getElementById("email").value;
@@ -1167,38 +1199,6 @@ function renderWeeklyCompletedTasksChart() {
     });
 }
 
-
-function renderWeeklyGraph() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - today.getDay());
-
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 6);
-  weekEnd.setHours(23, 59, 59, 999);
-
-  const counts = {};
-
-  db.collection("tasks")
-    .where("status", "==", "完了")
-    .where("completedAt", ">=", weekStart)
-    .where("completedAt", "<=", weekEnd)
-    .get()
-    .then(snapshot => {
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const dateStr = data.completedAt?.toDate().toISOString().split("T")[0];
-        const assignee = data.assignee || "未設定";
-        if (!counts[dateStr]) counts[dateStr] = { "つみき": 0, "ぬみき": 0 };
-        if (assignee === "つみき" || assignee === "ぬみき") {
-          counts[dateStr][assignee]++;
-        }
-      });
-
-      drawWeeklyBarGraph(counts);
-    });
-}
 
 function drawWeeklyBarGraph(counts) {
   const labels = [];
