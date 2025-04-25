@@ -230,6 +230,12 @@ function showOkaimonoEditModal(id, data) {
 
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 
+// 判定用補助関数
+function formatTime(date) {
+  if (!date) return "--:--";
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
 // 🔸 担当者別・今日の完了タスク数を表示
 function setupTodayCompletedTasksListener() {
   const today = new Date();
@@ -918,11 +924,6 @@ function addMemoFromForm(e) {
 
 
 
-// 判定用補助関数
-function formatTime(date) {
-  if (!date) return "--:--";
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-}
 
 function getTaskColorClass(frequency) {
   if (frequency.includes("毎日")) return "task-daily";
