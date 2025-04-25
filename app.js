@@ -1,5 +1,7 @@
 　// Firestoreの db は HTML 側で初期化されている前提です　
 const db = window.db;
+// 保育園情報のデータ連携超過を防ぐため、キャッシュ用意
+let nurseryCache = {};
 
 // 🔐 ログイン処理
 function login() {
@@ -40,10 +42,31 @@ function initializeAfterLogin() {
   renderTodayCompletedTasksCount();
   renderOkaimonoList();
   renderWeeklyGraph();
-  // ログイン後のみリアルタイム同期を開始
-  db.collection("tasks").onSnapshot(renderTasksFromSnapshot);
-  db.collection("events").onSnapshot(renderEventsFromSnapshot);
-  db.collection("memos").onSnapshot(renderMemosFromSnapshot);
+  // ✅ 差分描画：tasks の変更だけ反映！
+  db.collection("tasks").onSnapshot((snapshot) => {
+    snapshot.docChanges().forEach(change => {
+      const data = change.doc.data();
+      const id = change.doc.id;
+      if (data.delete === true || data.status === "完了") {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+        return;
+      }
+      if (change.type === "added") {
+        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
+      }
+      if (change.type === "modified") {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
+      }
+      if (change.type === "removed") {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+      }
+    });
+  });
+   // events は1回だけ取得
+  db.collection("events").get().then(renderEventsFromSnapshot);
+  // memos も1回だけ取得
+  db.collection("memos").get().then(renderMemosFromSnapshot);
 }
 
   // 🔧 タスクが完了に更新されたとき completedAt をセット
@@ -144,9 +167,9 @@ function renderOkaimonoList() {
   if (!container) return;
   container.innerHTML = "";
 
-  db.collection("okaimono").where("delete", "!=", true).onSnapshot((snapshot) => {
-    container.innerHTML = "";
-    snapshot.forEach(doc => {
+db.collection("okaimono").where("delete", "!=", true).get().then((snapshot) => {
+  container.innerHTML = "";
+  snapshot.forEach(doc => {
       const data = doc.data();
       const div = document.createElement("div");
       div.className = "okaimono-item" + (data.complete ? " complete" : "");
@@ -978,28 +1001,26 @@ function openNurseryCalendarModal() {
     const startDate = `${y}-${monthStr}-01`;
     const endDate = `${y}-${monthStr}-${String(totalDays).padStart(2, '0')}`;
 
-    db.collection("nursery").get().then(snapshot => {
-      snapshot.forEach(doc => {
-        const date = doc.id;
-        if (date >= startDate && date <= endDate) {
-          const cell = document.getElementById("day-" + date);
-          if (cell) {
-            const d = doc.data();
-            const label = (!d.start && !d.end)
-              ? "休"
-              : (d.start && d.end) ? `${d.start}〜${d.end}` : "";
-            const timeSpan = cell.querySelector(".nursery-time");
-            if (timeSpan) {
-              timeSpan.textContent = label;
-            }
-            if (label !== "") {
-              cell.style.cursor = "pointer";
-              cell.onclick = () => window.openNurseryEditModalByDate(date);
-            }
-          }
+    fetchNurseryDataIfNeeded(selectedYear, selectedMonth).then(monthData => {
+  snapshot.forEach(doc => {
+    const date = doc.id;
+    if (date >= startDate && date <= endDate) {
+      const cell = document.getElementById("day-" + date);
+      if (cell) {
+        const d = monthData[date];
+        const label = (!d.start && !d.end) ? "休" : `${d.start}〜${d.end}`;
+        const timeSpan = cell.querySelector(".nursery-time");
+        if (timeSpan) {
+          timeSpan.textContent = label;
         }
-      });
-    });
+        if (label !== "") {
+          cell.style.cursor = "pointer";
+          cell.onclick = () => window.openNurseryEditModalByDate(date);
+        }
+      }
+    }
+  });
+});
   }
 }
 
@@ -1034,17 +1055,20 @@ function openNurseryEditModalByDate(dateStr) {
   `;
 
   // Firestoreから既存データを読み込み
-  db.collection("nursery").doc(dateStr).get().then((doc) => {
-    if (doc.exists) {
-      const data = doc.data();
-      if (data.start) {
-        document.getElementById("editNurseryStart").value = data.start.padStart(5, '0');
-      }
-      if (data.end) {
-        document.getElementById("editNurseryEnd").value = data.end.padStart(5, '0');
-      }
-    }
-  });
+ db.collection("nursery").doc(dateStr).set({
+  start: start || null,
+  end: end || null,
+  updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+}).then(() => {
+  const y = parseInt(dateStr.split("-")[0]);
+  const m = parseInt(dateStr.split("-")[1]) - 1;
+  const key = `${y}-${m}`;
+  if (nurseryCache[key]) {
+    nurseryCache[key][dateStr] = { start: start || null, end: end || null };
+  }
+  renderTodayNursery(); // メイン画面の表示更新
+  hideModal();
+});
 
 function renderWeeklyCompletedTasksChart() {
   const today = new Date();
@@ -1180,5 +1204,29 @@ function drawWeeklyBarGraph(counts) {
     }
   });
 }
+
+function fetchNurseryDataIfNeeded(y, m) {
+  const key = `${y}-${m}`;
+  if (nurseryCache[key]) {
+    return Promise.resolve(nurseryCache[key]); // キャッシュがあれば即返す
+  } else {
+    const monthStr = String(m + 1).padStart(2, '0');
+    const startDate = `${y}-${monthStr}-01`;
+    const endDate = `${y}-${monthStr}-31`; // 月末までざっくり範囲指定
+    return db.collection("nursery")
+      .where(firebase.firestore.FieldPath.documentId(), ">=", startDate)
+      .where(firebase.firestore.FieldPath.documentId(), "<=", endDate)
+      .get()
+      .then(snapshot => {
+        const monthData = {};
+        snapshot.forEach(doc => {
+          monthData[doc.id] = doc.data();
+        });
+        nurseryCache[key] = monthData;
+        return monthData;
+      });
+  }
+}
+
 
 window.openNurseryEditModalByDate = openNurseryEditModalByDate;
