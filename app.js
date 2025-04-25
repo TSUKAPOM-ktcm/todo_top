@@ -3,6 +3,7 @@ const db = window.db;
 // 保育園情報のデータ連携超過を防ぐため、キャッシュ用意
 let nurseryCache = {};
 
+/*軽量化のためにいったんコメントアウト
 function drawWeeklyBarGraph(counts) {
   const labels = [];
   const tsumikiData = [];
@@ -81,6 +82,7 @@ function renderWeeklyGraph() {
       drawWeeklyBarGraph(counts);
     });
 }
+*/
 
 function isSameWeek(date, reference) {
   const ref = new Date(reference);
