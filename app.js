@@ -1108,23 +1108,6 @@ function renderWeeklyCompletedTasksChart() {
     });
 }
 
-  
-  // 保存ボタンが押されたときの処理
-  document.getElementById("editNurseryForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const start = document.getElementById("editNurseryStart").value;
-    const end = document.getElementById("editNurseryEnd").value;
-
-    db.collection("nursery").doc(dateStr).set({
-      start: start || null,
-      end: end || null,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      renderTodayNursery(); // メイン表示を更新！
-      hideModal();
-    });
-  });
-}
 
 function renderWeeklyGraph() {
   const today = new Date();
