@@ -1282,4 +1282,3 @@ window.openNurseryEditModal = openNurseryEditModal;
 window.addMemoFromForm = addMemoFromForm;
 window.addEventFromForm = addEventFromForm;
 window.openNurseryEditModalByDate = openNurseryEditModalByDate;
-}
