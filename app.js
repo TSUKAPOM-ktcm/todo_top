@@ -3,6 +3,53 @@ const db = window.db;
 // 保育園情報のデータ連携超過を防ぐため、キャッシュ用意
 let nurseryCache = {};
 
+function drawWeeklyBarGraph(counts) {
+  const labels = [];
+  const tsumikiData = [];
+  const numikiData = [];
+
+  const start = new Date();
+  start.setDate(start.getDate() - start.getDay());
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const dateStr = d.toISOString().split("T")[0];
+    labels.push(`${d.getMonth()+1}/${d.getDate()}`);
+    tsumikiData.push(counts[dateStr]?.つみき || 0);
+    numikiData.push(counts[dateStr]?.ぬみき || 0);
+  }
+
+  const ctx = document.getElementById("weeklyGraph").getContext("2d");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "つみき",
+          data: tsumikiData,
+          backgroundColor: "#f8b4d9"
+        },
+        {
+          label: "ぬみき",
+          data: numikiData,
+          backgroundColor: "#a5d8ff"
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      },
+      plugins: {
+        legend: { position: "bottom" }
+      }
+    }
+  });
+}
+
 function renderWeeklyGraph() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -34,6 +81,27 @@ function renderWeeklyGraph() {
       drawWeeklyBarGraph(counts);
     });
 }
+
+function isSameWeek(date, reference) {
+  const ref = new Date(reference);
+  const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 6);
+  return date >= startOfWeek && date <= endOfWeek;
+}
+
+function isSameMonth(date, reference) {
+  return date.getFullYear() === reference.getFullYear() &&
+         date.getMonth() === reference.getMonth();
+}
+
+function isNextMonthOrLater(date, reference) {
+  const refYear = reference.getFullYear();
+  const refMonth = reference.getMonth();
+  return date >= new Date(refYear, refMonth + 1, 1);
+}
+
 
 // 🔐 ログイン処理
 function login() {
@@ -67,6 +135,13 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("memoViewModal").style.display = "none";
   document.getElementById("loginBtn").addEventListener("click", login);
 });
+
+function getTaskColorClass(frequency) {
+  if (frequency.includes("毎日")) return "task-daily";
+  if (frequency.includes("毎週")) return "task-weekly";
+  if (frequency.includes("毎月")) return "task-monthly";
+  return "";
+}
 
 // 🔧 ログイン後の初期化処理（描画やリアルタイム監視）
 function initializeAfterLogin() {
@@ -957,44 +1032,6 @@ function addMemoFromForm(e) {
 
 
 
-function getTaskColorClass(frequency) {
-  if (frequency.includes("毎日")) return "task-daily";
-  if (frequency.includes("毎週")) return "task-weekly";
-  if (frequency.includes("毎月")) return "task-monthly";
-  return "";
-}
-
-function isSameWeek(date, reference) {
-  const ref = new Date(reference);
-  const startOfWeek = new Date(ref.setDate(ref.getDate() - ref.getDay()));
-  startOfWeek.setHours(0, 0, 0, 0);
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(endOfWeek.getDate() + 6);
-  return date >= startOfWeek && date <= endOfWeek;
-}
-
-function isSameMonth(date, reference) {
-  return date.getFullYear() === reference.getFullYear() &&
-         date.getMonth() === reference.getMonth();
-}
-
-function isNextMonthOrLater(date, reference) {
-  const refYear = reference.getFullYear();
-  const refMonth = reference.getMonth();
-  return date >= new Date(refYear, refMonth + 1, 1);
-}
-
-function deleteTask(id) {
-  db.collection("tasks").doc(id).update({ deleted: true })
-    .then(() => {
-      console.log("✅ タスクを削除フラグつけました");
-      hideModal();
-    })
-    .catch((err) => {
-      console.error("❌ タスク削除に失敗", err);
-    });
-}
-
 //保育園編集！
 // 🔧 「一覧を見る」ボタンで保育園スケジュールカレンダーモーダルを表示
 function openNurseryCalendarModal() {
@@ -1199,52 +1236,15 @@ function renderWeeklyCompletedTasksChart() {
     });
 }
 
-
-function drawWeeklyBarGraph(counts) {
-  const labels = [];
-  const tsumikiData = [];
-  const numikiData = [];
-
-  const start = new Date();
-  start.setDate(start.getDate() - start.getDay());
-
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    const dateStr = d.toISOString().split("T")[0];
-    labels.push(`${d.getMonth()+1}/${d.getDate()}`);
-    tsumikiData.push(counts[dateStr]?.つみき || 0);
-    numikiData.push(counts[dateStr]?.ぬみき || 0);
-  }
-
-  const ctx = document.getElementById("weeklyGraph").getContext("2d");
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: "つみき",
-          data: tsumikiData,
-          backgroundColor: "#f8b4d9"
-        },
-        {
-          label: "ぬみき",
-          data: numikiData,
-          backgroundColor: "#a5d8ff"
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      },
-      plugins: {
-        legend: { position: "bottom" }
-      }
-    }
-  });
+function deleteTask(id) {
+  db.collection("tasks").doc(id).update({ deleted: true })
+    .then(() => {
+      console.log("✅ タスクを削除フラグつけました");
+      hideModal();
+    })
+    .catch((err) => {
+      console.error("❌ タスク削除に失敗", err);
+    });
 }
 
 function fetchNurseryDataIfNeeded(y, m) {
