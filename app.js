@@ -1274,3 +1274,4 @@ window.openNurseryEditModalByDate = openNurseryEditModalByDate;
 window.showOkaimonoModal = showOkaimonoModal;
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 window.showDoneTasksModal = showDoneTasksModal;
+}
