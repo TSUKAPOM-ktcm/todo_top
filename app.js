@@ -20,7 +20,7 @@ function isSameWeek(date, reference) {
 function isSameMonth(date, reference) {
   return date.getFullYear() === reference.getFullYear() &&
          date.getMonth() === reference.getMonth();
-}
+
 
 function isNextMonthOrLater(date, reference) {
   const refYear = reference.getFullYear();
@@ -105,8 +105,7 @@ function fetchNurseryDataIfNeeded(y, m) {
         return monthData;
       });
   }
-
-
+}
 // --- 2. ユーティリティ関数ここまで ---
 
 // --- 3. モーダル管理 ---
