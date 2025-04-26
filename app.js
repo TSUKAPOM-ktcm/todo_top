@@ -1032,6 +1032,7 @@ function initializeAfterLogin() {
 // --- 7. ログイン処理 ---
 function login() {
   console.log("ログインボタン押された！");
+  console.log("Firestore接続テスト:", db);
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
