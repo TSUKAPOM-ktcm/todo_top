@@ -1085,7 +1085,7 @@ window.showOkaimonoEditModal = showOkaimonoEditModal;
 window.showDoneTasksModal = showDoneTasksModal;
 // --- 10. グローバル関数登録 ここまで---
   
-//仕上げのちょん
+}//仕上げのちょん
 
 
 // 棒グラフを描画するやつ
