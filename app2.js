@@ -1,4 +1,4 @@
-// --- 1. 最初の設定 ---
+// --- 1. 最初の設定 --- 
 const db = window.db;
 let nurseryCache = {}; // 保育園データキャッシュ
 
