@@ -881,14 +881,7 @@ function renderOkaimonoList() {
 }
 // --- 4. データ管理と表示関数ここまで ---
 
-
-// --- 5. リアルタイム差分描画版（tasks, events, memos） ---
-function setupTaskListener() { /* 中略 */ }
-function setupEventListener() { /* 中略 */ }
-function setupMemoListener() { /* 中略 */ }
-// --- 5. リアルタイム差分描画版（tasks, events, memos） ここまで---
-
-// --- 6. 完了タスク管理 ---
+// --- 5. 完了タスク管理 ---
 // 今日完了したタスク数のリスナーをセットアップするやつ
  function setupTodayCompletedTasksListener() {
   const today = new Date();
@@ -923,9 +916,9 @@ function setupMemoListener() { /* 中略 */ }
       document.getElementById("done-numiki-count").onclick = () => showDoneTasksModal("ぬみき", counts.ぬみき);
     });
 }
-// --- 6. 完了タスク管理 ここまで---
+// --- 5. 完了タスク管理 ここまで---
 
-// --- 7. ログイン後の初期化 ---
+// --- 6. ログイン後の初期化 ---
 function initializeAfterLogin() {
   renderTodayNursery();
   setupTodayCompletedTasksListener();
@@ -1034,9 +1027,9 @@ function initializeAfterLogin() {
     });
   });
 }
-// --- 7. ログイン後の初期化 ここまで---
-
-// --- 8. ログイン処理 ---
+// --- 6. ログイン後の初期化 ここまで---
+  
+// --- 7. ログイン処理 ---
 function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -1059,9 +1052,9 @@ function login() {
       alert("ログインに失敗しました");
     });
 }
-// --- 8. ログイン処理 ここまで---  
+// --- 7. ログイン処理 ここまで---  
 
-// --- 9. ページロード時に初期設定 ---
+// --- 8. ページロード時に初期設定 ---
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("mainScreen").classList.add("hidden");
   document.getElementById("modal").classList.add("hidden");
@@ -1070,9 +1063,9 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("memoViewModal").style.display = "none";
   document.getElementById("loginBtn").addEventListener("click", login);
 });
-// --- 9. ページロード時に初期設定 ここまで---
+// --- 8. ページロード時に初期設定 ここまで---
   
-// --- 10. グローバル関数登録 ---
+// --- 9. グローバル関数登録 ---
 window.showModal = showModal;
 window.openEditTaskModal = openEditTaskModal;
 window.openNurseryCalendarModal = openNurseryCalendarModal;
@@ -1083,7 +1076,7 @@ window.openNurseryEditModalByDate = openNurseryEditModalByDate;
 window.showOkaimonoModal = showOkaimonoModal;
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 window.showDoneTasksModal = showDoneTasksModal;
-// --- 10. グローバル関数登録 ここまで---
+// --- 9. グローバル関数登録 ここまで---
   
 }//仕上げのちょん
 
