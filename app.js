@@ -1,4 +1,4 @@
-// Firestoreの db は HTML 側で初期化されている前提
+// Firestoreの db は HTML 側で初期化されている前提 
 const db = window.db;
 
 // 保育園データのキャッシュ用オブジェクト
