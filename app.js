@@ -1087,7 +1087,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
 /*
 // 棒グラフを描画するやつ
-/*
 function drawWeeklyBarGraph(counts) {
   const labels = [];
   const tsumikiData = [];
@@ -1205,3 +1204,4 @@ function renderWeeklyCompletedTasksChart() {
       drawBarChart(dailyCounts);
     });
 }
+*/
