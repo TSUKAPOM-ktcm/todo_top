@@ -105,7 +105,7 @@ function fetchNurseryDataIfNeeded(y, m) {
         return monthData;
       });
   }
-}
+
 
 // --- 2. ユーティリティ関数ここまで ---
 
@@ -320,6 +320,7 @@ updateTaskStatusToCompleted(id, {
       console.error("削除エラー:", error);
     });
   });
+}
 }
 
 // 🔧 「一覧を見る」ボタンで保育園スケジュールカレンダーモーダルを表示
@@ -1204,12 +1205,3 @@ function renderWeeklyCompletedTasksChart() {
       drawBarChart(dailyCounts);
     });
 }
-
-
-*/
-
-
-
-
-
-
