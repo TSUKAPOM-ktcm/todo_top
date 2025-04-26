@@ -1056,18 +1056,7 @@ function login() {
 }
 // --- 7. ログイン処理 ここまで---  
 
-// --- 8. ページロード時に初期設定 ---
-window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("mainScreen").classList.add("hidden");
-  document.getElementById("modal").classList.add("hidden");
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("memoViewModal").classList.add("hidden");
-  document.getElementById("memoViewModal").style.display = "none";
-  document.getElementById("loginBtn").addEventListener("click", login);
-});
-// --- 8. ページロード時に初期設定 ここまで---
-  
-// --- 9. グローバル関数登録 ---
+// --- 8. グローバル関数登録 ---
 window.showModal = showModal;
 window.openEditTaskModal = openEditTaskModal;
 window.openNurseryCalendarModal = openNurseryCalendarModal;
@@ -1079,7 +1068,19 @@ window.showOkaimonoModal = showOkaimonoModal;
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 window.showDoneTasksModal = showDoneTasksModal;
 window.login = login;
-// --- 9. グローバル関数登録 ここまで---
+// --- 8. グローバル関数登録 ここまで---
+  
+// --- 9. ページロード時に初期設定 ---
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("mainScreen").classList.add("hidden");
+  document.getElementById("modal").classList.add("hidden");
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("memoViewModal").classList.add("hidden");
+  document.getElementById("memoViewModal").style.display = "none";
+  document.getElementById("loginBtn").addEventListener("click", login);
+});
+// --- 9. ページロード時に初期設定 ここまで---
+  
   
 }//仕上げのちょん
 
