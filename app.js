@@ -664,167 +664,9 @@ function hideMemoModal() {
 
 
 // タスクをレンダリングするやつ
-function renderTasksFromSnapshot(snapshot) {
-  const taskContainers = document.querySelectorAll("[id^='tasks-']");
-  taskContainers.forEach(container => container.innerHTML = "");
-  document.getElementById("tasks-overdue").innerHTML = "";
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
 
-  const tasks = [];
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const id = doc.id;
-
-    if (data.delete === true || data.status === "完了") return;
-
-    tasks.push({ ...data, id });
-  });
-
-  const frequencyOrder = {
-    "毎日": 1,
-    "毎週": 2,
-    "隔週": 3,
-    "毎月": 4,
-    "都度": 5
-  };
-
-  tasks.sort((a, b) => {
-    const orderA = frequencyOrder[a.frequency] ?? 99;
-    const orderB = frequencyOrder[b.frequency] ?? 99;
-    if (orderA !== orderB) return orderA - orderB;
-// 毎日タスクの場合、サブ順で比較
-  if (a.frequency === "毎日" && b.frequency === "毎日") {
-    const subA = getDailySubOrder(a.name);
-    const subB = getDailySubOrder(b.name);
-    return subA - subB;
-  }
-
-  return 0; // 頻度が同じで毎日でもなければ順番そのまま
-});
-
-  tasks.forEach(data => {
-    const id = data.id;
-    const due = data.dueDate ? new Date(data.dueDate + "T00:00:00") : null;
-    const isOverdue = due && due <= yesterday && data.status !== "完了";
-
-    createTaskElement(
-      data.name,
-      data.status,
-      data.frequency,
-      data.assignee,
-      data.dueDate,
-      data.note,
-      id,
-      isOverdue
-    );
-  });
-}
-
-  // イベントをレンダリングするやつ
-function renderEventsFromSnapshot(snapshot) {
-  const weekEl = document.getElementById("calendar-week");
-  const monthEl = document.getElementById("calendar-month");
-  const futureEl = document.getElementById("calendar-future");
-
-  if (!weekEl || !monthEl || !futureEl) return;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  snapshot.docChanges().forEach(change => {
-    const doc = change.doc;
-    const data = doc.data();
-    const id = doc.id;
-
-    // 削除または削除フラグ付きなら remove
-    if (change.type === "removed" || data.deleted) {
-      document.querySelector(`[data-id='${id}']`)?.remove();
-      return;
-    }
-
-    const eventDate = new Date(data.date + "T00:00:00");
-    if (eventDate < today) return; // 昨日以前は無視
-
-    // 表示エレメント作成
-    const event = document.createElement("div");
-    event.className = "event-item";
-    event.dataset.id = id;
-    event.dataset.date = data.date;
-    event.dataset.hour = data.hour;
-    event.dataset.minute = data.minute;
-    event.dataset.content = data.content;
-    event.dataset.note = data.note;
-
-    const time = data.hour && data.minute ? `${data.hour}:${data.minute}` : "";
-    event.innerHTML = `<strong>${data.date}</strong> ${time} - ${data.content}`;
-    event.onclick = () => openEditEventModal(event);
-
-    // 既存があれば差し替え
-    const existing = document.querySelector(`[data-id='${id}']`);
-    if (existing) {
-      existing.replaceWith(event);
-    } else {
-      if (isSameWeek(eventDate, today)) {
-        weekEl.appendChild(event);
-      } else if (isSameMonth(eventDate, today)) {
-        monthEl.appendChild(event);
-      } else if (isNextMonthOrLater(eventDate, today)) {
-        futureEl.appendChild(event);
-      }
-    }
-  });
-}
-
-  // メモをレンダリングするやつ
-  function renderMemosFromSnapshot(snapshot) {
-  const container = document.getElementById("memos");
-  if (!container) return;
-
-  snapshot.docChanges().forEach(change => {
-    const doc = change.doc;
-    const data = doc.data();
-    const id = doc.id;
-
-    // 削除 or 削除フラグ付きなら削除
-    if (change.type === "removed" || data.deleted) {
-      const existing = container.querySelector(`[data-id="${id}"]`);
-      existing?.remove();
-      return;
-    }
-
-    const displayText = data.text.length > 100 ? data.text.slice(0, 100) + "…" : data.text;
-
-    const memoDiv = document.createElement("div");
-    memoDiv.className = "memo-item";
-    memoDiv.dataset.id = id; // ← これが差分描画で必要！
-    memoDiv.dataset.full = data.text;
-    memoDiv.textContent = displayText;
-
-    memoDiv.onclick = () => {
-      document.getElementById("fullMemoText").textContent = data.text;
-      document.getElementById("memoViewModal").classList.remove("hidden");
-      document.getElementById("memoViewModal").style.display = "flex";
-      document.getElementById("deleteMemoBtn").onclick = () => {
-        db.collection("memos").doc(id).update({ deleted: true });
-        memoDiv.remove(); // ← 自前で即時削除
-        hideMemoModal();
-      };
-    };
-
-    // すでに存在すれば差し替え、なければ追加
-    const existing = container.querySelector(`[data-id="${id}"]`);
-    if (existing) {
-      container.replaceChild(memoDiv, existing);
-    } else {
-      container.appendChild(memoDiv);
-    }
-  });
-}
-
+ 
 // お買い物メモ一覧をレンダリングするやつ
 function renderOkaimonoList() {
   const container = document.getElementById("okaimonoList");
@@ -1223,10 +1065,88 @@ function initializeAfterLogin() {
       }
     });
   });
-   // events は1回だけ取得
-  db.collection("events").get().then(renderEventsFromSnapshot);
-  // memos も1回だけ取得
-  db.collection("memos").get().then(renderMemosFromSnapshot);
+   // ✅ events 差分反映
+  db.collection("events").onSnapshot((snapshot) => {
+    snapshot.docChanges().forEach(change => {
+      const data = change.doc.data();
+      const id = change.doc.id;
+      const eventDate = new Date(data.date + "T00:00:00");
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (eventDate < today || data.deleted) {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+        return;
+      }
+
+      if (change.type === "added" || change.type === "modified") {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+
+        const event = document.createElement("div");
+        event.className = "event-item";
+        event.dataset.id = id;
+        event.dataset.date = data.date;
+        event.dataset.hour = data.hour;
+        event.dataset.minute = data.minute;
+        event.dataset.content = data.content;
+        event.dataset.note = data.note;
+
+        const time = data.hour && data.minute ? `${data.hour}:${data.minute}` : "";
+        event.innerHTML = `<strong>${data.date}</strong> ${time} - ${data.content}`;
+        event.onclick = () => openEditEventModal(event);
+
+        if (isSameWeek(eventDate, today)) {
+          document.getElementById("calendar-week")?.appendChild(event);
+        } else if (isSameMonth(eventDate, today)) {
+          document.getElementById("calendar-month")?.appendChild(event);
+        } else if (isNextMonthOrLater(eventDate, today)) {
+          document.getElementById("calendar-future")?.appendChild(event);
+        }
+      }
+
+      if (change.type === "removed") {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+      }
+    });
+  });
+
+  // ✅ memos 差分反映
+  db.collection("memos").onSnapshot((snapshot) => {
+    snapshot.docChanges().forEach(change => {
+      const data = change.doc.data();
+      const id = change.doc.id;
+      if (data.deleted) {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+        return;
+      }
+
+      if (change.type === "added" || change.type === "modified") {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+
+        const memo = document.createElement("div");
+        memo.className = "memo-item";
+        memo.dataset.id = id;
+        memo.dataset.full = data.text;
+        memo.textContent = data.text.length > 100 ? data.text.slice(0, 100) + "…" : data.text;
+
+        memo.onclick = () => {
+          document.getElementById("fullMemoText").textContent = data.text;
+          document.getElementById("memoViewModal").classList.remove("hidden");
+          document.getElementById("memoViewModal").style.display = "flex";
+          document.getElementById("deleteMemoBtn").onclick = () => {
+            db.collection("memos").doc(id).update({ deleted: true });
+            memo.remove();
+            hideMemoModal();
+          };
+        };
+
+        document.getElementById("memos")?.appendChild(memo);
+      }
+
+      if (change.type === "removed") {
+        document.querySelector(`[data-id="${id}"]`)?.remove();
+      }
+    });
+  });
 }
 
 // --- そしてログイン処理 ---
@@ -1281,4 +1201,4 @@ window.openNurseryEditModalByDate = openNurseryEditModalByDate;
 window.showOkaimonoModal = showOkaimonoModal;
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 window.showDoneTasksModal = showDoneTasksModal;
-
+}
