@@ -1261,6 +1261,13 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("memoViewModal").classList.add("hidden");
   document.getElementById("memoViewModal").style.display = "none";
   document.getElementById("loginBtn").addEventListener("click", login);
+
+    const loginBtn = document.getElementById("loginBtn");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", login);
+  } else {
+    console.error("ログインボタンが見つからないよー！💦");
+  }
 });
 
 // --- 必要なグローバル登録も最後に ---
