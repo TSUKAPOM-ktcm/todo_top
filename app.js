@@ -20,7 +20,7 @@ function isSameWeek(date, reference) {
 function isSameMonth(date, reference) {
   return date.getFullYear() === reference.getFullYear() &&
          date.getMonth() === reference.getMonth();
-
+}
 
 function isNextMonthOrLater(date, reference) {
   const refYear = reference.getFullYear();
