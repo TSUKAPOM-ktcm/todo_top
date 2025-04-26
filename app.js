@@ -1085,7 +1085,7 @@ window.addEventListener("DOMContentLoaded", () => {
   
 //仕上げのちょん
 
-
+/*
 // 棒グラフを描画するやつ
 /*
 function drawWeeklyBarGraph(counts) {
