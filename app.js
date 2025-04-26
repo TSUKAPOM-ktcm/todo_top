@@ -1078,6 +1078,7 @@ window.openNurseryEditModalByDate = openNurseryEditModalByDate;
 window.showOkaimonoModal = showOkaimonoModal;
 window.showOkaimonoEditModal = showOkaimonoEditModal;
 window.showDoneTasksModal = showDoneTasksModal;
+window.login = login;
 // --- 9. グローバル関数登録 ここまで---
   
 }//仕上げのちょん
