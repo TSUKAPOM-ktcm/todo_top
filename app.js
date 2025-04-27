@@ -66,6 +66,7 @@ function renderTodayNursery() {
   const startEl = document.getElementById("nurseryStart");
   const endEl = document.getElementById("nurseryEnd");
 
+  // ★ キャッシュ無視してFirestoreに取りに行く
   db.collection("nursery").doc(dateStr).get().then((doc) => {
     if (doc.exists) {
       const data = doc.data();
@@ -80,6 +81,10 @@ function renderTodayNursery() {
       startEl.textContent = "--:--";
       endEl.textContent = "--:--";
     }
+  }).catch((error) => {
+    console.error("保育園データ読み取りエラー:", error);
+    startEl.textContent = "--:--";
+    endEl.textContent = "--:--";
   });
 }
 
@@ -306,9 +311,12 @@ updateTaskStatusToCompleted(id, {
 }).catch((error) => {
   console.error("更新エラー:", error);
 });
-    
-  // 🗑削除ボタン処理
-  document.getElementById("deleteTaskBtn").addEventListener("click", () => {
+  };
+  
+ // 🗑削除ボタン処理（リスナーリセットしてから付ける版）
+  const deleteBtn = document.getElementById("deleteTaskBtn");
+  deleteBtn.onclick = null; // ← いったんリセット！
+  deleteBtn.onclick = () => {
     const id = task.dataset.id;
     db.collection("tasks").doc(id).update({
       delete: true
@@ -318,13 +326,12 @@ updateTaskStatusToCompleted(id, {
     }).catch((error) => {
       console.error("削除エラー:", error);
     });
-  });
+  };
 }
-}
-
+    
 // 🔧 「一覧を見る」ボタンで保育園スケジュールカレンダーモーダルを表示
 
-  function renderNurseryCalendar(y, m) {
+  function renderNurseryCalendar(y, m, content) {
     selectedYear = y;
     selectedMonth = m;
 
@@ -422,7 +429,7 @@ function openNurseryCalendarModal() {
   let selectedYear = currentYear;
   let selectedMonth = currentMonth;
 
-  renderNurseryCalendar(selectedYear, selectedMonth);
+  renderNurseryCalendar(selectedYear, selectedMonth, content);
 }
   
 // 今日の日付で保育園時間を編集するやつ
@@ -445,7 +452,7 @@ function openNurseryEditModalByDate(dateStr) {
   content.innerHTML = `
     <form id="editNurseryForm">
       <h3>保育園時間の編集（${dateStr}）</h3>
-      <label>開始時間<input type="time" id="editNurseryStart"></label>
+      <label>開始時間<input type="time" id="edit"></label>
       <label>終了時間<input type="time" id="editNurseryEnd"></label>
       <div class="modal-buttons">
         <button type="button" onclick="hideModal()">キャンセル</button>
@@ -459,7 +466,7 @@ function openNurseryEditModalByDate(dateStr) {
     if (doc.exists) {
       const data = doc.data();
       if (data.start) {
-        document.getElementById("editNurseryStart").value = data.start.padStart(5, '0');
+        document.getElementById("edit").value = data.start.padStart(5, '0');
       }
       if (data.end) {
         document.getElementById("editNurseryEnd").value = data.end.padStart(5, '0');
@@ -470,7 +477,7 @@ function openNurseryEditModalByDate(dateStr) {
   // ✅ 🔧「保存」ボタンが押されたときに書き込む処理！
   document.getElementById("editNurseryForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const start = document.getElementById("editNurseryStart").value;
+    const start = document.getElementById("edit").value;
     const end = document.getElementById("editNurseryEnd").value;
 
     db.collection("nursery").doc(dateStr).set({
