@@ -684,6 +684,94 @@ function showOkaimonoEditModal(id, data) {
 }
 // --- 3. モーダル管理 ここまで---
 
+// --- 🆕 今週やったタスクのグラフ処理を追加 ---
+function drawBarChart(dailyCounts) {
+  const ctx = document.getElementById("weeklyGraph").getContext("2d");
+
+  const labels = [];
+  const tsumikiData = [];
+  const numikiData = [];
+
+  Object.keys(dailyCounts).forEach(dateKey => {
+    const date = new Date(dateKey);
+    labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+    tsumikiData.push(dailyCounts[dateKey].つみき);
+    numikiData.push(dailyCounts[dateKey].ぬみき);
+  });
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "つみき",
+          data: tsumikiData,
+          backgroundColor: "#f8b4d9"
+        },
+        {
+          label: "ぬみき",
+          data: numikiData,
+          backgroundColor: "#a5d8ff"
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        legend: { position: "bottom" }
+      }
+    }
+  });
+}
+
+// --- 日本時間で昨日までのタスクを集計してグラフ化 ---
+function renderWeeklyCompletedTasksChart() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay()); // 日曜始まり
+
+  const endOfRange = new Date(today);
+  endOfRange.setDate(today.getDate() - 1); // 昨日
+  endOfRange.setHours(23, 59, 59, 999);
+
+  const dailyCounts = {};
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().split("T")[0];
+    dailyCounts[key] = { つみき: 0, ぬみき: 0 };
+  }
+
+  db.collection("tasks")
+    .where("status", "==", "完了")
+    .where("completedAt", ">=", startOfWeek)
+    .where("completedAt", "<=", endOfRange)
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const dateKey = data.completedAt?.toDate().toISOString().split("T")[0];
+        const assignee = data.assignee;
+        if (dateKey && dailyCounts[dateKey] && (assignee === "つみき" || assignee === "ぬみき")) {
+          dailyCounts[dateKey][assignee]++;
+        }
+      });
+
+      drawBarChart(dailyCounts);
+    });
+}
+
+// --- 🆕 今週やったタスクのグラフ処理を追加　ここまで ---
+
 // --- 4. データ管理と表示関数 ---
   // タスク要素を作るやつ
 function createTaskElement(name, status, frequency, assignee, dueDate, note, id, isOverdue = false) {
@@ -880,8 +968,6 @@ function initializeAfterLogin() {
   renderTodayNursery();
   setupTodayCompletedTasksListener();
   renderOkaimonoList();
-  // ここは軽量化のためコメントアウトのまま
-  // renderWeeklyGraph();
   // ✅ tasks 差分反映
   db.collection("tasks").onSnapshot((snapshot) => {
     snapshot.docChanges().forEach(change => {
@@ -983,6 +1069,7 @@ function initializeAfterLogin() {
       }
     });
   });
+  renderWeeklyCompletedTasksChart();
 }
 // --- 6. ログイン後の初期化 ここまで---
   
