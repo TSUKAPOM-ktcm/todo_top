@@ -178,7 +178,6 @@ function showModal(type) {
 
         snapshot.forEach(doc => {
           const data = doc.data();
-          createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, doc.id);
 
           db.collection("tasks").add({
             name: data.name,
@@ -760,23 +759,6 @@ function addMemoFromForm(e) {
   const text = document.getElementById("memoText").value.trim();
   if (!text) return;
 
-  const memo = document.createElement("div");
-  memo.className = "memo-item";
-  memo.textContent = text.length > 100 ? text.slice(0, 100) + "…" : text;
-  memo.dataset.full = text;
-
-  memo.onclick = () => {
-    document.getElementById("fullMemoText").textContent = text;
-    document.getElementById("memoViewModal").classList.remove("hidden");
-    document.getElementById("memoViewModal").style.display = "flex";
-    document.getElementById("deleteMemoBtn").onclick = () => {
-      memo.remove();
-      hideMemoModal();
-    };
-  };
-
-  document.getElementById("memos").appendChild(memo);
-
     // Firestoreに保存
   db.collection("memos").add({
     text,
@@ -800,37 +782,6 @@ function addEventFromForm(e) {
   const note = document.getElementById("eventNote").value;
 
   if (!date || !content.trim()) return;
-
-  const eventDate = new Date(date + "T00:00:00");
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-
-  if (eventDate <= yesterday) {
-    hideModal(); // 昨日以前は無視
-    return;
-  }
-
-  const event = document.createElement("div");
-  event.className = "event-item";
-  event.dataset.date = date;
-  event.dataset.hour = hour;
-  event.dataset.minute = minute;
-  event.dataset.content = content;
-  event.dataset.note = note;
-
-  const time = hour && minute ? `${hour}:${minute}` : "";
-  event.innerHTML = `<strong>${date}</strong> ${time} - ${content}`;
-  event.onclick = () => openEditEventModal(event);
-
-  if (isSameWeek(eventDate, today)) {
-    document.getElementById("calendar-week").appendChild(event);
-  } else if (isSameMonth(eventDate, today)) {
-    document.getElementById("calendar-month").appendChild(event);
-  } else if (isNextMonthOrLater(eventDate, today)) {
-    document.getElementById("calendar-future").appendChild(event);
-  }
 
     // Firestoreに保存
   db.collection("events").add({
