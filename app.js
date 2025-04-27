@@ -1,6 +1,8 @@
 // --- 1. 最初の設定 --- 
 const db = window.db;
 let nurseryCache = {}; // 保育園データキャッシュ
+let currentMonth = new Date().getMonth();  // ← 今月（0～11）
+let currentYear = new Date().getFullYear(); // ← 今年
 
 // --- 2. ユーティリティ関数 ---
 function formatTime(date) {
@@ -331,8 +333,8 @@ updateTaskStatusToCompleted(id, {
 // 🔧 「一覧を見る」ボタンで保育園スケジュールカレンダーモーダルを表示
 
   function renderNurseryCalendar(y, m, content) {
-    selectedYear = y;
-    selectedMonth = m;
+    currentYear = y;
+    currentMonth = m;
 
     const firstDay = new Date(y, m, 1);
     const lastDay = new Date(y, m + 1, 0);
@@ -419,9 +421,11 @@ updateTaskStatusToCompleted(id, {
 function openNurseryCalendarModal() {
   const modal = document.getElementById("modal");
   const content = document.getElementById("modalContent");
+  
   modal.classList.remove("hidden");
   modal.style.display = "flex";
-
+  content.innerHTML = ""; // ←ここでいったん空にする！
+  
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
