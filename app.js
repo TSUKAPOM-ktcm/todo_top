@@ -739,7 +739,6 @@ function addTaskFromForm(e) {
     note: note || "",
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   }).then((docRef) => {
-    createTaskElement(name, status, frequency, assignee, dueDate, note, docRef.id);
     hideModal();
   });
 }
