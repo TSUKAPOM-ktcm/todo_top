@@ -732,14 +732,18 @@ function drawBarChart(dailyCounts) {
 
 // --- 日本時間で昨日までのタスクを集計してグラフ化 ---
 function renderWeeklyCompletedTasksChart() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
 
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDay()); // 日曜始まり
+  // 🌸 まず日本時間の現在日時を作る
+  const jst = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9にずらす！
 
-  const endOfRange = new Date(today);
-  endOfRange.setDate(today.getDate() - 1); // 昨日
+  jst.setHours(0, 0, 0, 0); // JSTの0時にリセット！
+
+  const startOfWeek = new Date(jst);
+  startOfWeek.setDate(jst.getDate() - jst.getDay()); // JSTベースで日曜スタート！
+ 
+  const endOfRange = new Date(jst);
+  endOfRange.setDate(jst.getDate() - 1); // JSTベースで昨日
   endOfRange.setHours(23, 59, 59, 999);
 
   const dailyCounts = {};
