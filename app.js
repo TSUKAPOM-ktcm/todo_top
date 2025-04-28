@@ -973,34 +973,36 @@ function initializeAfterLogin() {
   setupTodayCompletedTasksListener();
   renderOkaimonoList();
   // ✅ tasks 差分反映
-  db.collection("tasks").onSnapshot((snapshot) => {
+db.collection("tasks").onSnapshot((snapshot) => {
     const tasks = [];
 
     snapshot.docChanges().forEach(change => {
       const data = change.doc.data();
       const id = change.doc.id;
 
-      if (change.type === "removed" || data.delete === true || data.status === "完了") {
+      // 🧸完了済み or 削除フラグありなら、画面から消す！
+      if (data.delete === true || data.status === "完了") {
         document.querySelector(`[data-id="${id}"]`)?.remove();
         return;
       }
 
+      // 🐾 未完了タスクだけ集める
       if (change.type === "added" || change.type === "modified") {
-        tasks.push({ ...data, id }); // いったんためる
+        tasks.push({ ...data, id });
       }
     });
 
-    // 🌸 一旦全部リセット！
+    // 🧹 一旦未完了タスクだけリセット！
     document.querySelectorAll(".task-item").forEach(el => el.remove());
 
-    // 🌟 タスク名でソート！
+    // 🌟タスク名で並び替え！
     tasks.sort((a, b) => {
       const orderA = getDailySubOrder(a.name);
       const orderB = getDailySubOrder(b.name);
       return orderA - orderB;
     });
 
-    // 🌟 再描画！
+    // 🌟再描画！！
     tasks.forEach(task => {
       createTaskElement(
         task.name,
