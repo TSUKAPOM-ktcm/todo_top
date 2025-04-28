@@ -731,20 +731,18 @@ function drawBarChart(dailyCounts) {
 }
 
 // --- 日本時間で昨日までのタスクを集計してグラフ化 ---
+
+
+// --- 🆕 今週やったタスクのグラフ処理を追加　ここまで ---
 function renderWeeklyCompletedTasksChart() {
   const now = new Date();
 
-  // 🌸 まず日本時間の現在日時を作る
-  const jst = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9にずらす！
-
-  jst.setHours(0, 0, 0, 0); // JSTの0時にリセット！
+  // 日本時間に直す
+  const jst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+  jst.setHours(0, 0, 0, 0);
 
   const startOfWeek = new Date(jst);
-  startOfWeek.setDate(jst.getDate() - jst.getDay()); // JSTベースで日曜スタート！
- 
-  const endOfRange = new Date(jst);
-  endOfRange.setDate(jst.getDate() - 1); // JSTベースで昨日
-  endOfRange.setHours(23, 59, 59, 999);
+  startOfWeek.setDate(jst.getDate() - jst.getDay());
 
   const dailyCounts = {};
 
@@ -758,12 +756,15 @@ function renderWeeklyCompletedTasksChart() {
   db.collection("tasks")
     .where("status", "==", "完了")
     .where("completedAt", ">=", startOfWeek)
-    .where("completedAt", "<=", endOfRange)
     .get()
     .then(snapshot => {
       snapshot.forEach(doc => {
         const data = doc.data();
-        const dateKey = data.completedAt?.toDate().toISOString().split("T")[0];
+        if (!data.completedAt) return;
+
+        const completedAtJST = new Date(data.completedAt.toDate().getTime() + (9 * 60 * 60 * 1000));
+        const dateKey = completedAtJST.toISOString().split("T")[0];
+
         const assignee = data.assignee;
         if (dateKey && dailyCounts[dateKey] && (assignee === "つみき" || assignee === "ぬみき")) {
           dailyCounts[dateKey][assignee]++;
@@ -773,8 +774,6 @@ function renderWeeklyCompletedTasksChart() {
       drawBarChart(dailyCounts);
     });
 }
-
-// --- 🆕 今週やったタスクのグラフ処理を追加　ここまで ---
 
 // --- 4. データ管理と表示関数 ---
   // タスク要素を作るやつ
