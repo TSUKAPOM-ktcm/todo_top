@@ -975,34 +975,37 @@ function initializeAfterLogin() {
   // ✅ tasks 差分反映
 db.collection("tasks").onSnapshot((snapshot) => {
     const tasks = [];
+    const changedIds = new Set();
 
     snapshot.docChanges().forEach(change => {
       const data = change.doc.data();
       const id = change.doc.id;
 
-      // 🧸完了済み or 削除フラグありなら、画面から消す！
+      changedIds.add(id); // 🔥 差分があったIDだけ記録！
+
       if (data.delete === true || data.status === "完了") {
-        document.querySelector(`[data-id="${id}"]`)?.remove();
+        document.querySelector(`[data-id="${id}"]`)?.remove(); // 🔥 完了や削除は消す！
         return;
       }
 
-      // 🐾 未完了タスクだけ集める
       if (change.type === "added" || change.type === "modified") {
         tasks.push({ ...data, id });
       }
     });
 
-    // 🧹 一旦未完了タスクだけリセット！
-    document.querySelectorAll(".task-item").forEach(el => el.remove());
+    // 🧹【ポイント！】変更があったタスクだけリセット！
+    changedIds.forEach(id => {
+      document.querySelector(`[data-id="${id}"]`)?.remove();
+    });
 
-    // 🌟タスク名で並び替え！
+    // 🌟 タスク並び替え！
     tasks.sort((a, b) => {
       const orderA = getDailySubOrder(a.name);
       const orderB = getDailySubOrder(b.name);
       return orderA - orderB;
     });
 
-    // 🌟再描画！！
+    // 🌟 再描画！
     tasks.forEach(task => {
       createTaskElement(
         task.name,
@@ -1015,6 +1018,7 @@ db.collection("tasks").onSnapshot((snapshot) => {
       );
     });
   });
+
 
   // ✅ events 差分反映
   db.collection("events").onSnapshot((snapshot) => {
