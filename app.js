@@ -974,20 +974,43 @@ function initializeAfterLogin() {
   renderOkaimonoList();
   // ✅ tasks 差分反映
   db.collection("tasks").onSnapshot((snapshot) => {
+    const tasks = [];
+
     snapshot.docChanges().forEach(change => {
       const data = change.doc.data();
       const id = change.doc.id;
-      if (data.delete === true || data.status === "完了") {
+
+      if (change.type === "removed" || data.delete === true || data.status === "完了") {
         document.querySelector(`[data-id="${id}"]`)?.remove();
         return;
       }
+
       if (change.type === "added" || change.type === "modified") {
-        document.querySelector(`[data-id="${id}"]`)?.remove();
-        createTaskElement(data.name, data.status, data.frequency, data.assignee, data.dueDate, data.note, id);
+        tasks.push({ ...data, id }); // いったんためる
       }
-      if (change.type === "removed") {
-        document.querySelector(`[data-id="${id}"]`)?.remove();
-      }
+    });
+
+    // 🌸 一旦全部リセット！
+    document.querySelectorAll(".task-item").forEach(el => el.remove());
+
+    // 🌟 タスク名でソート！
+    tasks.sort((a, b) => {
+      const orderA = getDailySubOrder(a.name);
+      const orderB = getDailySubOrder(b.name);
+      return orderA - orderB;
+    });
+
+    // 🌟 再描画！
+    tasks.forEach(task => {
+      createTaskElement(
+        task.name,
+        task.status,
+        task.frequency,
+        task.assignee,
+        task.dueDate,
+        task.note,
+        task.id
+      );
     });
   });
 
